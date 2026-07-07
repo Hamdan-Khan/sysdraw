@@ -15,5 +15,9 @@
       "onFail": "download"
     }
   },
-  "type": "module"
+  "type": "module",
+  "devDependencies": {
+    "tsup": "catalog:",
+    "typescript": "catalog:"
+  }
 }
