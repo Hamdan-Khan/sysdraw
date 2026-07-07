@@ -1,3 +1,3 @@
-import { test } from "@sysdraw/common";
+import { BaseNode } from "@sysdraw/models";
 
-test();
+const node = new BaseNode();
