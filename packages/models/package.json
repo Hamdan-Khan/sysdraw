@@ -21,5 +21,8 @@
   "devDependencies": {
     "tsup": "catalog:",
     "typescript": "catalog:"
+  },
+  "dependencies": {
+    "@xyflow/react": "catalog:"
   }
 }
