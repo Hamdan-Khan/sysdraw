@@ -15,15 +15,22 @@
   ],
   "scripts": {
     "build": "tsup src/index.ts --format esm --dts",
-    "dev": "tsup src/index.ts --format esm --dts --watch",
+    "dev": "vite",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@sysdraw/common": "workspace:*",
     "@sysdraw/models": "workspace:*",
-    "@sysdraw/common": "workspace:*"
+    "@xyflow/react": "^12.11.2",
+    "react": "catalog:",
+    "react-dom": "catalog:"
   },
   "devDependencies": {
+    "@types/react": "catalog:",
+    "@types/react-dom": "catalog:",
+    "@vitejs/plugin-react": "catalog:",
     "tsup": "catalog:",
-    "typescript": "catalog:"
+    "typescript": "catalog:",
+    "vite": "catalog:"
   }
 }

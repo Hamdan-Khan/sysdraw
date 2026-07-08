@@ -2,7 +2,13 @@
   "extends": "../../tsconfig.json",
   "compilerOptions": {
     "outDir": "dist",
-    "rootDir": "src"
+    "rootDir": ".",
+    "baseUrl": ".",
+    "jsx": "react-jsx",
+    "types": ["vite/client", "react", "react-dom"],
+    "paths": {
+      "@sysdraw/canvas": ["./src/index.ts"]
+    }
   },
-  "include": ["src"]
+  "include": ["src", "dev"]
 }
