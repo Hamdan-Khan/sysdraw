@@ -1,5 +1,5 @@
 {
-  "name": "web",
+  "name": "@sysdraw/web",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -10,6 +10,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@sysdraw/canvas": "workspace:*",
     "react": "catalog:",
     "react-dom": "catalog:"
   },
