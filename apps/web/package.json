@@ -12,7 +12,8 @@
   "dependencies": {
     "@sysdraw/canvas": "workspace:*",
     "react": "catalog:",
-    "react-dom": "catalog:"
+    "react-dom": "catalog:",
+    "zustand": "catalog:"
   },
   "devDependencies": {
     "@types/node": "^24.13.2",

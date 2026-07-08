@@ -10,10 +10,15 @@ import {
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
 import { useCallback } from "react";
+import { InitialCanvasStoreState } from "../store";
 
-const Canvas = () => {
-  const [nodes, , onNodesChange] = useNodesState([]);
-  const [edges, setEdges, onEdgesChange] = useEdgesState([]);
+interface CanvasProps {
+  canvasState: InitialCanvasStoreState;
+}
+
+const Canvas = ({ canvasState }: CanvasProps) => {
+  const [nodes, onNodesChange] = useNodesState(canvasState.nodes);
+  const [edges, setEdges, onEdgesChange] = useEdgesState(canvasState.edges);
   const onConnect: OnConnect = useCallback(
     (connection) => setEdges((edges) => addEdge(connection, edges)),
     [setEdges],

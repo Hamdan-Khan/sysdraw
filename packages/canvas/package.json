@@ -23,7 +23,8 @@
     "@sysdraw/models": "workspace:*",
     "@xyflow/react": "^12.11.2",
     "react": "catalog:",
-    "react-dom": "catalog:"
+    "react-dom": "catalog:",
+    "zustand": "catalog:"
   },
   "devDependencies": {
     "@types/react": "catalog:",
