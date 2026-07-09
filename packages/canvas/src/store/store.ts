@@ -15,16 +15,10 @@ interface CanvasStoreState extends InitialCanvasStoreState {
 const createCanvasStore = (storeState: InitialCanvasStoreState) => {
   return create<CanvasStoreState>((set) => ({
     nodes: storeState.nodes || [],
-    setNodes: (node: any) =>
-      set((state) => ({ nodes: [...state.nodes, node] })),
+    setNodes: (node: any) => set((state) => ({ nodes: [...state.nodes, node] })),
     edges: storeState.edges || [],
-    setEdges: (edge: any) =>
-      set((state) => ({ edges: [...state.edges, edge] })),
+    setEdges: (edge: any) => set((state) => ({ edges: [...state.edges, edge] })),
   }));
 };
 
-export {
-  createCanvasStore,
-  type CanvasStoreState,
-  type InitialCanvasStoreState,
-};
+export { createCanvasStore, type CanvasStoreState, type InitialCanvasStoreState };

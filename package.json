@@ -4,6 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "format": "prettier --write .",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
@@ -17,6 +18,11 @@
   },
   "type": "module",
   "devDependencies": {
+    "@tailwindcss/vite": "catalog:",
+    "autoprefixer": "catalog:",
+    "postcss": "catalog:",
+    "prettier": "3.9.4",
+    "tailwindcss": "catalog:",
     "tsup": "catalog:",
     "typescript": "catalog:"
   }

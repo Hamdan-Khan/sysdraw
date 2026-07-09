@@ -1,11 +1,6 @@
 import type { BaseNodeData } from "../types";
 
-export type DatabaseSubtype =
-  | "sql"
-  | "nosql"
-  | "document"
-  | "time-series"
-  | "object";
+export type DatabaseSubtype = "sql" | "nosql" | "document" | "time-series" | "object";
 
 export type DatabaseData = BaseNodeData & {
   subtype: DatabaseSubtype;
