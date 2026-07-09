@@ -8,10 +8,10 @@ export type DatabaseData = BaseNodeData & {
   replicationStrategy?: "leader-follower" | "multi-leader" | "leaderless";
 };
 
-export const databaseDefaults = (): DatabaseData => ({
+export const databaseDefault: DatabaseData = {
   label: "Database",
   icon: "database",
   subtype: "sql",
   consistencyModel: "strong",
   replicationStrategy: "leader-follower",
-});
+};

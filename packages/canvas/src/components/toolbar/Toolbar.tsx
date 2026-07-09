@@ -28,7 +28,7 @@ export const Toolbar = () => {
         <h5 className="text-xs text-secondary uppercase col-span-3">Nodes</h5>
         {NODE_TYPES.map((type) => {
           const Icon = IconsMap[type];
-          const data = defaultNodesMap[type]();
+          const data = defaultNodesMap[type];
           return (
             <div
               key={type}
@@ -48,7 +48,7 @@ export const Toolbar = () => {
       <div className="flex flex-col gap-3 px-4 mb-2">
         <h5 className="text-xs text-secondary uppercase">Groups</h5>
         {GROUP_TYPES.map((type) => {
-          const data = defaultGroupsMap[type]();
+          const data = defaultGroupsMap[type];
           return (
             <div
               key={type}

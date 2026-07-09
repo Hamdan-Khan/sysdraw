@@ -1,6 +1,6 @@
 import type { BaseNodeData } from "../types";
-import { databaseDefaults } from "./Database";
-import { loadBalancerDefaults } from "./LoadBalancer";
+import { databaseDefault } from "./Database";
+import { loadBalancerDefault } from "./LoadBalancer";
 
 /**
  * list of all registered nodes
@@ -13,9 +13,9 @@ enum RegisteredNodes {
 /**
  * Map of all registered nodes with default data values
  */
-const defaultNodesMap: Record<RegisteredNodes, () => BaseNodeData> = {
-  [RegisteredNodes.DATABASE]: databaseDefaults,
-  [RegisteredNodes.LOAD_BALANCER]: loadBalancerDefaults,
+const defaultNodesMap: Record<RegisteredNodes, BaseNodeData> = {
+  [RegisteredNodes.DATABASE]: databaseDefault,
+  [RegisteredNodes.LOAD_BALANCER]: loadBalancerDefault,
 };
 
 export { defaultNodesMap, RegisteredNodes };

@@ -7,7 +7,7 @@ export type AvailabilityZoneData = BaseGroupData & {
   zoneName?: string;
 };
 
-export const availabilityZoneDefaults = (): AvailabilityZoneData => ({
+export const availabilityZoneDefaults: AvailabilityZoneData = {
   label: "Availability Zone",
   color: "#3b82f6",
-});
+};

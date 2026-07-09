@@ -11,7 +11,7 @@ enum RegisteredGroups {
 /**
  * Map of all registered groups with default data values
  */
-const defaultGroupsMap: Record<RegisteredGroups, () => BaseGroupData> = {
+const defaultGroupsMap: Record<RegisteredGroups, BaseGroupData> = {
   [RegisteredGroups.AVAILABILITY_ZONE]: availabilityZoneDefaults,
 };
 

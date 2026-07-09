@@ -65,7 +65,7 @@ const CanvasElement = ({ canvasState }: CanvasProps) => {
         x: event.clientX,
         y: event.clientY,
       });
-      let defaultData: () => BaseNodeData | BaseGroupData;
+      let defaultData: BaseNodeData | BaseGroupData;
 
       if (kind === "node") {
         defaultData = defaultNodesMap[type as RegisteredNodes];
@@ -78,8 +78,10 @@ const CanvasElement = ({ canvasState }: CanvasProps) => {
         return;
       }
 
-      const data = defaultData();
-      setNodes((nodes) => [...nodes, { id: crypto.randomUUID(), type, position, data }]);
+      setNodes((nodes) => [
+        ...nodes,
+        { id: crypto.randomUUID(), type, position, data: defaultData },
+      ]);
     },
     [screenToFlowPosition, setNodes],
   );

@@ -11,7 +11,7 @@ enum RegisteredEdges {
 /**
  * Map of all registered edges with default data values
  */
-const defaultEdgesMap: Record<RegisteredEdges, () => BaseEdgeData> = {
+const defaultEdgesMap: Record<RegisteredEdges, BaseEdgeData> = {
   [RegisteredEdges.HTTP_CALL]: httpCallDefaults,
 };
 
