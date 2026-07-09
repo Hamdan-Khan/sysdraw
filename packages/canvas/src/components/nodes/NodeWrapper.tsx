@@ -1,4 +1,4 @@
-import { Handle, Position, useNodeConnections, useNodeId } from "@xyflow/react";
+import { Handle, NodeToolbar, Position, useNodeConnections, useNodeId, NodeResizer } from "@xyflow/react";
 import { useState } from "react";
 
 export interface NodeHandleConfig {
@@ -11,21 +11,26 @@ export interface NodeHandleConfig {
 export interface NodeWrapperProps {
   children: React.ReactNode;
   handles?: NodeHandleConfig[];
+  selected?: boolean;
 }
 
 const defaultHandles: NodeHandleConfig[] = [];
 
-export const NodeWrapper = ({ children, handles = defaultHandles }: NodeWrapperProps) => {
+export const NodeWrapper = ({ children, handles = defaultHandles, selected }: NodeWrapperProps) => {
   const [isHovered, setIsHovered] = useState(false);
   const connections = useNodeConnections();
   const nodeId = useNodeId();
 
   return (
     <div
-      className="flex flex-col items-center justify-center min-w-[80px] relative"
+      className="flex flex-col items-center justify-center min-w-[80px] min-h-[80px] w-full h-full relative p-2"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
+      <NodeResizer minWidth={80} minHeight={80} isVisible={selected} keepAspectRatio />
+      <NodeToolbar className="flex gap-2">
+        <span>Hello</span>
+      </NodeToolbar>
       {handles.map((handle) => {
         const hasConnection = connections.some((c) =>
           handle.type === "target"

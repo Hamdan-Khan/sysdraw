@@ -9,6 +9,7 @@ import {
 import {
   addEdge,
   Background,
+  BackgroundVariant,
   Controls,
   OnConnect,
   ReactFlow,
@@ -101,7 +102,7 @@ const CanvasElement = ({ canvasState }: CanvasProps) => {
           className="bg-transparent"
           proOptions={{ hideAttribution: true }}
         >
-          <Background color="var(--color-border)" gap={16} />
+          <Background color="var(--color-border)" variant={BackgroundVariant.Lines} gap={16} />
           <Controls position="top-right" orientation="horizontal" />
         </ReactFlow>
       </DndWrapper>
@@ -110,7 +111,7 @@ const CanvasElement = ({ canvasState }: CanvasProps) => {
 };
 
 /**
- * The complete canvas for rendering the
+ * The complete canvas for rendering everything
  */
 const Canvas = (props: CanvasProps) => {
   return (

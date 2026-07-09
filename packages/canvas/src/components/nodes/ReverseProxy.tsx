@@ -8,11 +8,11 @@ const HANDLES: NodeHandleConfig[] = [
   { id: "bottom", type: "source", position: Position.Bottom },
 ];
 
-export const ReverseProxyNodeComponent = ({ data }: NodeProps<Node<BaseNodeData>>) => {
+export const ReverseProxyNodeComponent = ({ data, selected }: NodeProps<Node<BaseNodeData>>) => {
   const Icon = IconsMap[RegisteredNodes.REVERSE_PROXY];
   return (
-    <NodeWrapper handles={HANDLES}>
-      <Icon size={48} strokeWidth={1.5} className="text-text drop-shadow-sm mb-1" />
+    <NodeWrapper selected={selected} handles={HANDLES}>
+      <Icon strokeWidth={1.5} className="w-full h-full text-text drop-shadow-sm" />
     </NodeWrapper>
   );
 };
