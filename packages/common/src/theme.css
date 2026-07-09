@@ -1,0 +1,46 @@
+@theme {
+  --color-bg: var(--theme-bg);
+  --color-surface: var(--theme-surface);
+  --color-text: var(--theme-text);
+  --color-border: var(--theme-border);
+  --color-primary: var(--theme-primary);
+  --color-secondary: var(--theme-secondary);
+}
+
+@layer base {
+  :root {
+    --sans: system-ui, "Segoe UI", Roboto, sans-serif;
+    --heading: system-ui, "Segoe UI", Roboto, sans-serif;
+    --mono: ui-monospace, Consolas, monospace;
+
+    /* Light Theme */
+    --theme-bg: #ffffff;
+    --theme-surface: #f3f4f6;
+    --theme-text: #000000;
+    --theme-border: #d1d5db;
+    --theme-primary: #111827;
+    --theme-secondary: #6b7280;
+  }
+
+  [data-theme="dark"] {
+    /* Dark Theme */
+    --theme-bg: #000000;
+    --theme-surface: #1f2937;
+    --theme-text: #ffffff;
+    --theme-border: #374151;
+    --theme-primary: #f9fafb;
+    --theme-secondary: #9ca3af;
+  }
+
+  body,
+  html,
+  #root {
+    height: 100%;
+  }
+
+  body {
+    @apply m-0 font-sans;
+    background-color: var(--theme-bg);
+    color: var(--theme-text);
+  }
+}
