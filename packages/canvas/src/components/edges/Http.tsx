@@ -8,7 +8,7 @@ export const HttpEdgeComponent = ({
   targetY,
   sourcePosition,
   targetPosition,
-  style = {},
+  style,
   markerEnd,
   data,
 }: EdgeProps<Edge<BaseEdgeData>>) => {

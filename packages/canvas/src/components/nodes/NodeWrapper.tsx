@@ -13,7 +13,9 @@ export interface NodeWrapperProps {
   handles?: NodeHandleConfig[];
 }
 
-export const NodeWrapper = ({ children, handles = [] }: NodeWrapperProps) => {
+const defaultHandles: NodeHandleConfig[] = [];
+
+export const NodeWrapper = ({ children, handles = defaultHandles }: NodeWrapperProps) => {
   const [isHovered, setIsHovered] = useState(false);
   const connections = useNodeConnections();
   const nodeId = useNodeId();

@@ -36,7 +36,7 @@ const CanvasElement = ({ canvasState }: CanvasProps) => {
   const [nodes, setNodes, onNodesChange] = useNodesState(canvasState.nodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(canvasState.edges);
   const onConnect: OnConnect = useCallback(
-    (connection) => setEdges((edges) => addEdge(connection, edges)),
+    (connection) => setEdges((prev) => addEdge(connection, prev)),
     [setEdges],
   );
   const { screenToFlowPosition } = useReactFlow();
@@ -78,10 +78,7 @@ const CanvasElement = ({ canvasState }: CanvasProps) => {
         return;
       }
 
-      setNodes((nodes) => [
-        ...nodes,
-        { id: crypto.randomUUID(), type, position, data: defaultData },
-      ]);
+      setNodes((prev) => [...prev, { id: crypto.randomUUID(), type, position, data: defaultData }]);
     },
     [screenToFlowPosition, setNodes],
   );
