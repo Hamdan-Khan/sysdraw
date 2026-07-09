@@ -1,13 +1,18 @@
-import type { BaseNodeData } from "@sysdraw/models";
-import { Handle, Node, NodeProps, Position } from "@xyflow/react";
+import { RegisteredNodes, type BaseNodeData } from "@sysdraw/models";
+import { Node, NodeProps, Position } from "@xyflow/react";
+import { IconsMap } from "../../assets";
+import { NodeHandleConfig, NodeWrapper } from "./NodeWrapper";
+
+const HANDLES: NodeHandleConfig[] = [
+  { id: "top", type: "target", position: Position.Top },
+  { id: "bottom", type: "source", position: Position.Bottom },
+];
 
 export const LoadBalancerNodeComponent = ({ data }: NodeProps<Node<BaseNodeData>>) => {
+  const Icon = IconsMap[RegisteredNodes.LOAD_BALANCER];
   return (
-    <div className="bg-surface text-text px-5 py-2.5 rounded-lg border-2 border-border min-w-[120px] text-center">
-      <Handle type="target" position={Position.Top} />
-      <div className="text-xs text-secondary">Load Balancer</div>
-      <div className="font-bold">{data.label}</div>
-      <Handle type="source" position={Position.Bottom} />
-    </div>
+    <NodeWrapper handles={HANDLES}>
+      <Icon size={48} strokeWidth={1.5} className="text-text drop-shadow-sm mb-1" />
+    </NodeWrapper>
   );
 };

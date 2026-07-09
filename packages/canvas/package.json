@@ -22,6 +22,7 @@
     "@sysdraw/common": "workspace:*",
     "@sysdraw/models": "workspace:*",
     "@xyflow/react": "^12.11.2",
+    "lucide-react": "catalog:",
     "react": "catalog:",
     "react-dom": "catalog:",
     "zustand": "catalog:"

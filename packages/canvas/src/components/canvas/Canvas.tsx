@@ -10,7 +10,6 @@ import {
   addEdge,
   Background,
   Controls,
-  MiniMap,
   OnConnect,
   ReactFlow,
   ReactFlowProvider,
@@ -95,23 +94,25 @@ const CanvasElement = ({ canvasState }: CanvasProps) => {
           nodes={nodes}
           nodeTypes={combinedNodeTypes}
           onNodesChange={onNodesChange}
+          onEdgesChange={onEdgesChange}
           edges={edges}
           edgeTypes={edgeTypes}
-          onEdgesChange={onEdgesChange}
           onConnect={onConnect}
           fitView
-          colorMode="system"
+          className="bg-transparent"
           proOptions={{ hideAttribution: true }}
         >
-          <Background color="#333" gap={16} />
-          <MiniMap />
-          <Controls />
+          <Background color="var(--color-border)" gap={16} />
+          <Controls position="top-right" orientation="horizontal" />
         </ReactFlow>
       </DndWrapper>
     </div>
   );
 };
 
+/**
+ * The complete canvas for rendering the
+ */
 const Canvas = (props: CanvasProps) => {
   return (
     <ReactFlowProvider>

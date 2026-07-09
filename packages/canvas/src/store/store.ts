@@ -1,23 +1,24 @@
+import type { Edge, Node } from "@xyflow/react";
 import { create } from "zustand";
 
 type InitialCanvasStoreState = {
-  nodes: any[];
-  edges: any[];
+  nodes: Node[];
+  edges: Edge[];
 };
 
 interface CanvasStoreState extends InitialCanvasStoreState {
-  nodes: any[];
-  setNodes: (nodes: any[]) => void;
-  edges: any[];
-  setEdges: (edges: any[]) => void;
+  nodes: Node[];
+  setNodes: (nodes: Node) => void;
+  edges: Edge[];
+  setEdges: (edges: Edge) => void;
 }
 
 const createCanvasStore = (storeState: InitialCanvasStoreState) => {
   return create<CanvasStoreState>((set) => ({
     nodes: storeState.nodes || [],
-    setNodes: (node: any) => set((state) => ({ nodes: [...state.nodes, node] })),
+    setNodes: (node: Node) => set((state) => ({ nodes: [...state.nodes, node] })),
     edges: storeState.edges || [],
-    setEdges: (edge: any) => set((state) => ({ edges: [...state.edges, edge] })),
+    setEdges: (edge: Edge) => set((state) => ({ edges: [...state.edges, edge] })),
   }));
 };
 
