@@ -1,12 +1,13 @@
-import { Handle, NodeToolbar, Position, useNodeConnections, useNodeId, NodeResizer } from "@xyflow/react";
+import type { NodeHandleConfig } from "@sysdraw/models";
+import {
+  Handle,
+  NodeResizer,
+  NodeToolbar,
+  Position,
+  useNodeConnections,
+  useNodeId,
+} from "@xyflow/react";
 import { useState } from "react";
-
-export interface NodeHandleConfig {
-  id: string;
-  type: "source" | "target";
-  position?: Position;
-  style?: React.CSSProperties;
-}
 
 export interface NodeWrapperProps {
   children: React.ReactNode;

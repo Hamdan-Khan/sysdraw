@@ -1,14 +1,20 @@
-import type { BaseNodeData } from "../types";
+import { Position } from "@xyflow/react";
+import type { BaseNodeData, NodeHandleConfig } from "../types";
+import { apiGatewayDefault } from "./ApiGateway";
+import { cacheDefault } from "./Cache";
+import { cdnDefault } from "./Cdn";
 import { databaseDefault } from "./Database";
 import { loadBalancerDefault } from "./LoadBalancer";
-import { webServerDefault } from "./WebServer";
-import { virtualMachineDefault } from "./VirtualMachine";
-import { cdnDefault } from "./Cdn";
-import { apiGatewayDefault } from "./ApiGateway";
+import { noSqlDbDefault } from "./NoSqlDb";
 import { reverseProxyDefault } from "./ReverseProxy";
 import { sqlDbDefault } from "./SqlDb";
-import { noSqlDbDefault } from "./NoSqlDb";
-import { cacheDefault } from "./Cache";
+import { virtualMachineDefault } from "./VirtualMachine";
+import { webServerDefault } from "./WebServer";
+
+const defaultHandles: NodeHandleConfig[] = [
+  { id: "top", type: "target", position: Position.Top },
+  { id: "bottom", type: "source", position: Position.Bottom },
+];
 
 /**
  * list of all registered nodes
@@ -30,16 +36,16 @@ enum RegisteredNodes {
  * Map of all registered nodes with default data values
  */
 const defaultNodesMap: Record<RegisteredNodes, BaseNodeData> = {
-  [RegisteredNodes.DATABASE]: databaseDefault,
-  [RegisteredNodes.LOAD_BALANCER]: loadBalancerDefault,
-  [RegisteredNodes.WEB_SERVER]: webServerDefault,
-  [RegisteredNodes.VIRTUAL_MACHINE]: virtualMachineDefault,
-  [RegisteredNodes.CDN]: cdnDefault,
-  [RegisteredNodes.API_GATEWAY]: apiGatewayDefault,
-  [RegisteredNodes.REVERSE_PROXY]: reverseProxyDefault,
-  [RegisteredNodes.SQL_DB]: sqlDbDefault,
-  [RegisteredNodes.NOSQL_DB]: noSqlDbDefault,
-  [RegisteredNodes.CACHE]: cacheDefault,
+  [RegisteredNodes.DATABASE]: { ...databaseDefault, handles: defaultHandles },
+  [RegisteredNodes.LOAD_BALANCER]: { ...loadBalancerDefault, handles: defaultHandles },
+  [RegisteredNodes.WEB_SERVER]: { ...webServerDefault, handles: defaultHandles },
+  [RegisteredNodes.VIRTUAL_MACHINE]: { ...virtualMachineDefault, handles: defaultHandles },
+  [RegisteredNodes.CDN]: { ...cdnDefault, handles: defaultHandles },
+  [RegisteredNodes.API_GATEWAY]: { ...apiGatewayDefault, handles: defaultHandles },
+  [RegisteredNodes.REVERSE_PROXY]: { ...reverseProxyDefault, handles: defaultHandles },
+  [RegisteredNodes.SQL_DB]: { ...sqlDbDefault, handles: defaultHandles },
+  [RegisteredNodes.NOSQL_DB]: { ...noSqlDbDefault, handles: defaultHandles },
+  [RegisteredNodes.CACHE]: { ...cacheDefault, handles: defaultHandles },
 };
 
 export { defaultNodesMap, RegisteredNodes };

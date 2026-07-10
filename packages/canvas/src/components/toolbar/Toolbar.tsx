@@ -23,7 +23,7 @@ function onDragStart(event: React.DragEvent<HTMLDivElement>, data: DnDTransferDa
 
 export const Toolbar = () => {
   return (
-    <div className="absolute left-4 top-1/2 -translate-y-1/2 z-10 bg-surface border border-border rounded-lg py-2 flex flex-col gap-3 shadow-md max-h-[80vh] overflow-y-auto">
+    <div className="absolute left-4 top-1/2 -translate-y-1/2 z-10 bg-surface border border-border rounded-lg py-2 flex flex-col gap-3 shadow-md">
       <div className="grid grid-cols-3 gap-3 px-4">
         <h5 className="text-xs text-secondary uppercase col-span-3">Nodes</h5>
         {NODE_TYPES.map((type) => {

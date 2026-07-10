@@ -1,5 +1,13 @@
+import { Position } from "@xyflow/react";
 import { RegisteredGroups } from "./groups";
 import { RegisteredNodes } from "./nodes";
+
+export interface NodeHandleConfig {
+  id: string;
+  type: "source" | "target";
+  position?: Position;
+  style?: React.CSSProperties;
+}
 
 /**
  * Base node data type to extend node instances from
@@ -8,6 +16,7 @@ export type BaseNodeData = {
   label: string;
   description?: string;
   icon?: string;
+  handles?: NodeHandleConfig[];
 };
 
 /**
