@@ -34,6 +34,7 @@ export type BaseGroupData = {
   label: string;
   description?: string;
   color?: string;
+  handles?: NodeHandleConfig[];
 };
 
 /**

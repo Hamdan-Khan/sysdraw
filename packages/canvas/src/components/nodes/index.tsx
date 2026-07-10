@@ -1,17 +1,14 @@
-import { RegisteredNodes, defaultNodesMap, type BaseNodeData } from "@sysdraw/models";
-import type { Node, NodeProps } from "@xyflow/react";
+import { BaseNodeData, RegisteredNodes, defaultNodesMap } from "@sysdraw/models";
+import { NodeComponentType, NodePropsType } from "../canvas";
 import { GenericNode } from "./GenericNode";
 import { NodeWrapper } from "./NodeWrapper";
-
-type NodePropsType = NodeProps<Node<BaseNodeData>>;
-type NodeComponentType = React.ComponentType<NodePropsType>;
 
 /**
  * Map of all registered nodes components
  */
 export const nodeTypes = Object.values(RegisteredNodes).reduce(
   (acc, nodeType) => {
-    acc[nodeType] = (props: NodePropsType) => {
+    acc[nodeType] = (props: NodePropsType<BaseNodeData>) => {
       const defaultData = defaultNodesMap[nodeType];
       const handles = props.data.handles || defaultData.handles;
 
@@ -23,5 +20,5 @@ export const nodeTypes = Object.values(RegisteredNodes).reduce(
     };
     return acc;
   },
-  {} as Record<RegisteredNodes, NodeComponentType>,
+  {} as Record<RegisteredNodes, NodeComponentType<BaseNodeData>>,
 );
