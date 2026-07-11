@@ -1,5 +1,6 @@
-import { Controls, ReactFlow, ReactFlowProvider } from "@xyflow/react";
+import { ControlButton, Controls, ReactFlow, ReactFlowProvider } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
+import { ArchiveRestore, Save } from "lucide-react";
 import { createRef, useMemo } from "react";
 import { StoreApi, useStore } from "zustand";
 import { useShallow } from "zustand/shallow";
@@ -9,7 +10,9 @@ import { edgeTypes } from "../edges";
 import { groupTypes } from "../groups";
 import { nodeTypes as coreNodeTypes } from "../nodes";
 import { Toolbar } from "../toolbar";
+import "./canvas.css";
 import { useCanvasHandlers } from "./useCanvasHandlers";
+import { useCanvasStorage } from "./useCanvasStorage";
 
 interface CanvasProps {
   canvasState: StoreApi<CanvasStoreState>;
@@ -33,6 +36,8 @@ const CanvasElement = ({ canvasState }: CanvasProps) => {
   const { onDragOver, onDrop, onConnect, onNodeDrag, onNodeDragStop } =
     useCanvasHandlers(canvasState);
 
+  const { setRfInstance, onSave, onRestore } = useCanvasStorage(canvasState);
+
   const combinedNodeTypes = useMemo(() => ({ ...coreNodeTypes, ...groupTypes }), []);
 
   return (
@@ -52,8 +57,16 @@ const CanvasElement = ({ canvasState }: CanvasProps) => {
           fitView
           className="bg-transparent"
           proOptions={{ hideAttribution: true }}
+          onInit={setRfInstance}
         >
-          <Controls position="top-right" orientation="horizontal" />
+          <Controls position="top-right" orientation="horizontal">
+            <ControlButton onClick={() => onSave()}>
+              <Save />
+            </ControlButton>
+            <ControlButton onClick={() => onRestore()}>
+              <ArchiveRestore />
+            </ControlButton>
+          </Controls>
         </ReactFlow>
       </DndWrapper>
     </div>
