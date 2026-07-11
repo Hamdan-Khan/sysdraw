@@ -1,4 +1,13 @@
-import type { Edge, Node } from "@xyflow/react";
+import {
+  addEdge,
+  applyEdgeChanges,
+  applyNodeChanges,
+  type Edge,
+  type Node,
+  type OnConnect,
+  type OnEdgesChange,
+  type OnNodesChange,
+} from "@xyflow/react";
 import { create } from "zustand";
 
 type InitialCanvasStoreState = {
@@ -8,17 +17,42 @@ type InitialCanvasStoreState = {
 
 interface CanvasStoreState extends InitialCanvasStoreState {
   nodes: Node[];
-  setNodes: (nodes: Node) => void;
   edges: Edge[];
-  setEdges: (edges: Edge) => void;
+  onNodesChange: OnNodesChange<Node>;
+  onEdgesChange: OnEdgesChange;
+  onConnect: OnConnect;
+  setNodes: (nodes: Node[] | ((prev: Node[]) => Node[])) => void;
+  setEdges: (edges: Edge[] | ((prev: Edge[]) => Edge[])) => void;
 }
 
+/**
+ * create a canvas state store composed of nodes and edges.
+ */
 const createCanvasStore = (storeState: InitialCanvasStoreState) => {
-  return create<CanvasStoreState>((set) => ({
-    nodes: storeState.nodes || [],
-    setNodes: (node: Node) => set((state) => ({ nodes: [...state.nodes, node] })),
-    edges: storeState.edges || [],
-    setEdges: (edge: Edge) => set((state) => ({ edges: [...state.edges, edge] })),
+  return create<CanvasStoreState>((set, get) => ({
+    nodes: storeState.nodes,
+    edges: storeState.edges,
+    onNodesChange: (changes) => {
+      set({
+        nodes: applyNodeChanges(changes, get().nodes),
+      });
+    },
+    onEdgesChange: (changes) => {
+      set({
+        edges: applyEdgeChanges(changes, get().edges),
+      });
+    },
+    onConnect: (connection) => {
+      set({
+        edges: addEdge(connection, get().edges),
+      });
+    },
+    setNodes: (nodes) => {
+      set({ nodes: typeof nodes === "function" ? nodes(get().nodes) : nodes });
+    },
+    setEdges: (edges) => {
+      set({ edges: typeof edges === "function" ? edges(get().edges) : edges });
+    },
   }));
 };
 
