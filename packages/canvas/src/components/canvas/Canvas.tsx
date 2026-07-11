@@ -2,6 +2,7 @@ import { ControlButton, Controls, ReactFlow, ReactFlowProvider } from "@xyflow/r
 import "@xyflow/react/dist/style.css";
 import { ArchiveRestore, Save } from "lucide-react";
 import { createRef, useMemo } from "react";
+import { Toaster } from "sonner";
 import { StoreApi, useStore } from "zustand";
 import { useShallow } from "zustand/shallow";
 import { CanvasStoreState } from "../../store";
@@ -79,6 +80,7 @@ const CanvasElement = ({ canvasState }: CanvasProps) => {
 const Canvas = (props: CanvasProps) => {
   return (
     <ReactFlowProvider>
+      <Toaster />
       <CanvasElement {...props} />
     </ReactFlowProvider>
   );

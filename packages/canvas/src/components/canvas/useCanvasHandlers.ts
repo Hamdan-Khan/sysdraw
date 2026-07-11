@@ -8,12 +8,13 @@ import {
 } from "@sysdraw/models";
 import { Node, OnNodeDrag, useReactFlow } from "@xyflow/react";
 import { useCallback } from "react";
+import { toast } from "sonner";
 import { StoreApi, useStore } from "zustand";
 import { useShallow } from "zustand/shallow";
 import { CanvasStoreState } from "../../store";
 import { SYSDRAW_DRAG_DATA_FORMAT } from "../toolbar";
 import { DnDTransferData } from "./types";
-import { clampPositionInsideGroup, getIntersectingArea, getNodeRect } from "./utils";
+import { clampPositionInsideGroup, getIntersectingArea, getNodeRect, NodeRect } from "./utils";
 
 const selector = (state: CanvasStoreState) => ({
   setNodes: state.setNodes,
@@ -27,7 +28,8 @@ const selector = (state: CanvasStoreState) => ({
 export const useCanvasHandlers = (canvasState: StoreApi<CanvasStoreState>) => {
   const { setNodes, onConnect } = useStore(canvasState, useShallow(selector));
 
-  const { screenToFlowPosition, getIntersectingNodes, getInternalNode } = useReactFlow();
+  const { screenToFlowPosition, getIntersectingNodes, getInternalNode, getNodesBounds } =
+    useReactFlow();
 
   /**
    * drag over (from toolbar)
@@ -82,34 +84,94 @@ export const useCanvasHandlers = (canvasState: StoreApi<CanvasStoreState>) => {
     (node: Node) =>
       getIntersectingNodes(node).filter((n) => {
         if (!n.type) return false;
-        const isGroup = Object.values(RegisteredGroups).includes(n.type as RegisteredGroups);
-        return isGroup && n.id !== node.id;
+        return isGroup(n) && n.id !== node.id;
       }),
     [getIntersectingNodes],
   );
 
   /**
-   * node drag for reparenting (highlight drop targets)
+   * returns true if the given node is a sysdraw group node
    */
-  const onNodeDrag: OnNodeDrag<Node> = useCallback(
-    (_e, node) => {
-      const group = getIntersectingNodeGroup(node)[0];
-      let area = 0;
+  const isGroup = (node: Node): boolean => {
+    if (!node.type) return false;
+    return Object.values(RegisteredGroups).includes(node.type as RegisteredGroups);
+  };
 
-      if (group) {
-        const nodeInternal = getInternalNode(node.id);
-        const groupInternal = getInternalNode(group.id);
-        if (!nodeInternal || !groupInternal) return;
-        area = getIntersectingArea(getNodeRect(nodeInternal), getNodeRect(groupInternal));
+  /**
+   * finds the best group drop target for a selection of nodes.
+   *
+   * the group with the highest overlap ratio against the selection is chosen.
+   */
+  const getBestDropGroup = useCallback(
+    (nodes: Node[]): { group: Node; groupRect: NodeRect } | null => {
+      // bounding rect for the whole selection (or just the single node).
+      const dragBounds = nodes.length > 1 ? getNodesBounds(nodes) : null;
+
+      // Union candidates from every dragged node so a group that only overlaps
+      // a non-lead node is still discovered.
+      const seen = new Set<string>();
+      const candidateGroups: Node[] = [];
+      for (const n of nodes) {
+        for (const g of getIntersectingNodeGroup(n)) {
+          if (!seen.has(g.id)) {
+            seen.add(g.id);
+            candidateGroups.push(g);
+          }
+        }
       }
 
-      const nodeArea = (node.measured?.width ?? 0) * (node.measured?.height ?? 0);
-      const isIntersectingEnough = nodeArea !== 0 ? area / nodeArea >= 0.25 : false;
+      let bestGroup: Node | undefined;
+      let bestGroupRect: NodeRect | undefined;
+      let bestRatio = 0;
+
+      for (const candidate of candidateGroups) {
+        const groupInternal = getInternalNode(candidate.id);
+        if (!groupInternal) continue;
+        const groupRect = getNodeRect(groupInternal);
+
+        let overlapArea: number;
+        let selectionArea: number;
+
+        if (dragBounds) {
+          overlapArea = getIntersectingArea(dragBounds, groupRect);
+          selectionArea = dragBounds.width * dragBounds.height;
+        } else {
+          // resolve precise rect from internals (in case of a single node)
+          const nodeInternal = getInternalNode(nodes[0].id);
+          if (!nodeInternal) continue;
+          const nodeRect = getNodeRect(nodeInternal);
+          overlapArea = getIntersectingArea(nodeRect, groupRect);
+          selectionArea = nodeRect.width * nodeRect.height;
+        }
+
+        const ratio = selectionArea !== 0 ? overlapArea / selectionArea : 0;
+        if (ratio > bestRatio) {
+          bestRatio = ratio;
+          bestGroup = candidate;
+          bestGroupRect = groupRect;
+        }
+      }
+
+      if (!bestGroup || !bestGroupRect || bestRatio < 0.25) return null;
+      return { group: bestGroup, groupRect: bestGroupRect };
+    },
+    [getIntersectingNodeGroup, getInternalNode, getNodesBounds],
+  );
+
+  /**
+   * node drag for reparenting (highlight drop targets).
+   *
+   * in case of multi nodes selection, the entire selection is treated as a
+   * single entity / node.
+   */
+  const onNodeDrag: OnNodeDrag<Node> = useCallback(
+    (_e, _node, nodes) => {
+      const best = getBestDropGroup(nodes);
 
       // apply / clear the drop-target highlight ring
       setNodes((ns) =>
         ns.map((n) => {
-          if (n.id === group?.id && isIntersectingEnough) {
+          if (n.id === best?.group.id) {
             return {
               ...n,
               className: "ring-2 ring-primary bg-primary/5 rounded-xl transition-all",
@@ -122,91 +184,77 @@ export const useCanvasHandlers = (canvasState: StoreApi<CanvasStoreState>) => {
         }),
       );
     },
-    [getIntersectingNodeGroup, setNodes, getInternalNode],
+    [getBestDropGroup, setNodes],
   );
 
   /**
-   * node drag stop for reparenting (reparent / unparent)
+   * node drag stop for reparenting (reparent / unparent).
    */
   const onNodeDragStop: OnNodeDrag<Node> = useCallback(
-    (_e, node) => {
-      const dropTarget = getIntersectingNodeGroup(node)[0];
+    (_e, node, nodes) => {
+      const best = getBestDropGroup(nodes);
 
-      if (dropTarget) {
-        const nodeInternal = getInternalNode(node.id);
-        const groupInternal = getInternalNode(dropTarget.id);
-        if (!nodeInternal || !groupInternal) return;
+      if (nodes.length == 1) {
+        const nodeArea = (node.measured?.height ?? 0) * (node.measured?.width ?? 0);
+        const targetArea = (best?.groupRect.height ?? 0) * (best?.groupRect.width ?? 0);
 
-        const nodeRect = getNodeRect(nodeInternal);
-        const groupRect = getNodeRect(groupInternal);
-        const area = getIntersectingArea(nodeRect, groupRect);
-        const nodeArea = nodeRect.width * nodeRect.height;
-        const isIntersectingEnough = nodeArea !== 0 ? area / nodeArea >= 0.25 : false;
-
-        if (isIntersectingEnough) {
-          // reparent the node into the group
-          setNodes((ns) =>
-            ns.map((n) => {
-              if (n.id === dropTarget.id) {
-                // clear the drop target highlight
-                return { ...n, className: "" };
-              }
-              if (n.id === node.id) {
-                const rawRelPos = { x: nodeRect.x - groupRect.x, y: nodeRect.y - groupRect.y };
-                const position = clampPositionInsideGroup(
-                  rawRelPos,
-                  nodeRect.width,
-                  nodeRect.height,
-                  groupRect.width,
-                  groupRect.height,
-                );
-                return { ...n, position, parentId: dropTarget.id };
-              }
-              return n;
-            }),
-          );
-        } else {
-          // clear styles and strip any existing parent
-          setNodes((ns) =>
-            ns.map((n) => {
-              if (n.className?.includes("ring-2")) return { ...n, className: "" };
-              if (n.id === node.id) {
-                return {
-                  ...n,
-                  position: nodeInternal.internals.positionAbsolute,
-                  parentId: undefined,
-                };
-              }
-              return n;
-            }),
-          );
-        }
-      } else {
-        // unparent if it is dropped into a empty canvas
-        if (node.parentId) {
-          setNodes((ns) =>
-            ns.map((n) => {
-              const nodeInternal = getInternalNode(node.id);
-              if (n.id === node.id && nodeInternal) {
-                return {
-                  ...n,
-                  position: nodeInternal.internals.positionAbsolute,
-                  parentId: undefined,
-                };
-              }
-              if (n.className?.includes("ring-2")) return { ...n, className: "" };
-              return n;
-            }),
-          );
-        } else {
-          // clean up any stale highlight rings
-          setNodes((ns) =>
-            ns.map((n) => (n.className?.includes("ring-2") ? { ...n, className: "" } : n)),
-          );
+        if (nodeArea > 0 && targetArea > 0 && nodeArea >= targetArea) {
+          toast.error("Group is too small to contain the node");
+          return;
         }
       }
+
+      if (best) {
+        const { group: dropTarget, groupRect } = best;
+
+        // Reparent every selected node into the group.
+        setNodes((ns) =>
+          ns.map((n) => {
+            // Clear the drop-target highlight ring.
+            if (n.id === dropTarget.id) return { ...n, className: "" };
+
+            // Only touch nodes that are part of the current drag selection.
+            const isDragged = nodes.some((dn) => dn.id === n.id);
+            if (!isDragged) return n;
+
+            const nodeInternal = getInternalNode(n.id);
+            if (!nodeInternal) return n;
+
+            const nodeRect = getNodeRect(nodeInternal);
+            const rawRelPos = { x: nodeRect.x - groupRect.x, y: nodeRect.y - groupRect.y };
+            const position = clampPositionInsideGroup(
+              rawRelPos,
+              nodeRect.width,
+              nodeRect.height,
+              groupRect.width,
+              groupRect.height,
+            );
+            return { ...n, position, parentId: dropTarget.id };
+          }),
+        );
+      } else {
+        // no valid drop target found so unparent every selected node that had a parent
+        // then restore its absolute position and clean up any highlight rings.
+        setNodes((ns) =>
+          ns.map((n) => {
+            if (n.className?.includes("ring-2")) return { ...n, className: "" };
+
+            const isDragged = nodes.some((dn) => dn.id === n.id);
+            if (!isDragged || !n.parentId) return n;
+
+            const nodeInternal = getInternalNode(n.id);
+            if (!nodeInternal) return n;
+
+            return {
+              ...n,
+              position: nodeInternal.internals.positionAbsolute,
+              parentId: undefined,
+            };
+          }),
+        );
+      }
     },
-    [getIntersectingNodeGroup, getInternalNode, setNodes],
+    [getBestDropGroup, getInternalNode, setNodes],
   );
 
   return { onDragOver, onDrop, onConnect, onNodeDrag, onNodeDragStop };

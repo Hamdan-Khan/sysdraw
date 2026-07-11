@@ -25,6 +25,7 @@
     "lucide-react": "catalog:",
     "react": "catalog:",
     "react-dom": "catalog:",
+    "sonner": "catalog:",
     "zustand": "catalog:"
   },
   "devDependencies": {
