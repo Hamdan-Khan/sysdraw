@@ -6,6 +6,7 @@ import {
   Position,
   useNodeConnections,
   useNodeId,
+  useReactFlow,
 } from "@xyflow/react";
 import { useState } from "react";
 
@@ -22,15 +23,29 @@ export const NodeWrapper = ({ children, handles = defaultHandles, selected }: No
   const connections = useNodeConnections();
   const nodeId = useNodeId();
 
+  const { deleteElements } = useReactFlow();
+
+  const handleDelete = (e: React.KeyboardEvent) => {
+    switch (e.key) {
+      case "Delete":
+        if (nodeId) deleteElements({ nodes: [{ id: nodeId }] });
+        break;
+      default:
+        break;
+    }
+  };
+
   return (
     <div
       className="flex flex-col items-center justify-center min-w-[80px] min-h-[80px] w-full h-full relative p-2"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
+      onKeyDown={handleDelete}
+      tabIndex={0} // enables keyboard events on div
     >
       <NodeResizer minWidth={80} minHeight={80} isVisible={selected} keepAspectRatio />
       <NodeToolbar className="flex gap-2">
-        <span>Hello</span>
+        <span>{nodeId?.slice(0, 6)}</span>
       </NodeToolbar>
       {handles.map((handle) => {
         const hasConnection = connections.some((c) =>
