@@ -7,6 +7,7 @@ import {
   useNodeConnections,
   useNodeId,
   useReactFlow,
+  useViewport,
 } from "@xyflow/react";
 import { useState } from "react";
 
@@ -24,6 +25,7 @@ export const NodeWrapper = ({ children, handles = defaultHandles, selected }: No
   const nodeId = useNodeId();
 
   const { deleteElements } = useReactFlow();
+  const { zoom } = useViewport();
 
   const handleDelete = (e: React.KeyboardEvent) => {
     switch (e.key) {
@@ -37,13 +39,19 @@ export const NodeWrapper = ({ children, handles = defaultHandles, selected }: No
 
   return (
     <div
-      className="flex flex-col items-center justify-center min-w-[80px] min-h-[80px] w-full h-full relative p-2"
+      className="flex flex-col items-center justify-center min-w-20 min-h-20 w-full h-full relative p-2"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       onKeyDown={handleDelete}
       tabIndex={0} // enables keyboard events on div
     >
-      <NodeResizer minWidth={80} minHeight={80} isVisible={selected} keepAspectRatio />
+      <NodeResizer
+        minWidth={80}
+        minHeight={80}
+        isVisible={selected}
+        keepAspectRatio
+        lineStyle={{ borderWidth: 0.7 / zoom }}
+      />
       <NodeToolbar className="flex gap-2">
         <span>{nodeId?.slice(0, 6)}</span>
       </NodeToolbar>

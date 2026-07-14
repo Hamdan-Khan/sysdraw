@@ -4,8 +4,10 @@ import {
   NodeResizer,
   NodeToolbar,
   Position,
+  ResizeDragEvent,
   useNodeConnections,
   useNodeId,
+  useViewport,
 } from "@xyflow/react";
 import { useState } from "react";
 
@@ -29,6 +31,15 @@ export const GroupWrapper = ({
   const [isHovered, setIsHovered] = useState(false);
   const connections = useNodeConnections();
   const nodeId = useNodeId();
+  const { zoom } = useViewport();
+
+  const shouldResize = (_e: ResizeDragEvent) => {
+    // console.log(e);
+    // if (e.dx < 0) {
+    //   return false;
+    // }
+    return true;
+  };
 
   return (
     <div
@@ -40,9 +51,15 @@ export const GroupWrapper = ({
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      <NodeResizer minWidth={200} minHeight={150} isVisible={selected} />
+      <NodeResizer
+        minWidth={200}
+        minHeight={150}
+        isVisible={selected}
+        shouldResize={shouldResize}
+        lineStyle={{ borderWidth: 0.5 / zoom }}
+      />
       <NodeToolbar className="flex gap-2">
-        <span>Group</span>
+        <span>{nodeId}</span>
       </NodeToolbar>
       {handles.map((handle) => {
         const hasConnection = connections.some((c) =>

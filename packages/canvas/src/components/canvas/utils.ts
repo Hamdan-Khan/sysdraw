@@ -1,3 +1,4 @@
+import { RegisteredGroups } from "@sysdraw/models";
 import { InternalNode, Node } from "@xyflow/react";
 
 /**
@@ -64,4 +65,55 @@ export const clampPositionInsideGroup = (
   const x = Math.min(Math.max(relativePosistion.x, 0), groupW - nodeW);
   const y = Math.min(Math.max(relativePosistion.y, 0), groupH - nodeH);
   return { x, y };
+};
+
+export const RegisteredGroupsSet = new Set(Object.values(RegisteredGroups));
+
+/**
+ * returns true if the given node is a sysdraw group node
+ */
+export const isGroup = (node: Node): boolean => {
+  if (!node.type) return false;
+  return RegisteredGroupsSet.has(node.type as RegisteredGroups);
+};
+
+/**
+ * sorts nodes and groups so that parent groups appear before their child groups in the
+ * array because xyflow renders nodes in the order they appear in the array and it
+ * requires parent nodes to be drawn before child nodes
+ */
+export const sortNodesAndGroups = (nodes: Node[]): Node[] => {
+  const sysdrawNodes = nodes.filter((n) => !RegisteredGroupsSet.has(n.type as RegisteredGroups));
+  const sysdrawGroups = nodes.filter((n) => RegisteredGroupsSet.has(n.type as RegisteredGroups));
+
+  const sortedGroups: Node[] = [];
+  sysdrawGroups.forEach((group) => {
+    // not a child group, so it can be placed anywhere in the array
+    if (!group.parentId) {
+      sortedGroups.push(group);
+    } else {
+      // to see if a child group already exists earlier in the array
+      // we'll replace it with the parent group, and add the child group to the end instead
+      let childIndex = -1;
+      let i = 0;
+      for (const v of sortedGroups) {
+        if (v.parentId === group.id) {
+          childIndex = i;
+          break;
+        }
+        i++;
+      }
+
+      // a child group earlier in the array is found
+      if (childIndex >= 0) {
+        let tempChild = sortedGroups[childIndex];
+        sortedGroups[childIndex] = group;
+        sortedGroups.push(tempChild);
+      } else {
+        sortedGroups.push(group);
+      }
+    }
+  });
+
+  return [...sortedGroups, ...sysdrawNodes];
 };

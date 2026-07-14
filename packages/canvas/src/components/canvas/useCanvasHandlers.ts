@@ -14,7 +14,14 @@ import { useShallow } from "zustand/shallow";
 import { CanvasStoreState } from "../../store";
 import { SYSDRAW_DRAG_DATA_FORMAT } from "../toolbar";
 import { DnDTransferData } from "./types";
-import { clampPositionInsideGroup, getIntersectingArea, getNodeRect, NodeRect } from "./utils";
+import {
+  clampPositionInsideGroup,
+  getIntersectingArea,
+  getNodeRect,
+  isGroup,
+  NodeRect,
+  sortNodesAndGroups,
+} from "./utils";
 
 const selector = (state: CanvasStoreState) => ({
   setNodes: state.setNodes,
@@ -72,7 +79,16 @@ export const useCanvasHandlers = (canvasState: StoreApi<CanvasStoreState>) => {
         return;
       }
 
-      setNodes((prev) => [...prev, { id: crypto.randomUUID(), type, position, data: defaultData }]);
+      const newNode: Node = { id: crypto.randomUUID(), type, position, data: defaultData };
+
+      setNodes((prev) => {
+        // xyflow requires parent nodes to be drawn before child nodes
+        // hence, we add groups at the start when they're added from the toolbar
+        if (isGroup(newNode)) {
+          return [newNode, ...prev];
+        }
+        return [...prev, newNode];
+      });
     },
     [screenToFlowPosition, setNodes],
   );
@@ -88,14 +104,6 @@ export const useCanvasHandlers = (canvasState: StoreApi<CanvasStoreState>) => {
       }),
     [getIntersectingNodes],
   );
-
-  /**
-   * returns true if the given node is a sysdraw group node
-   */
-  const isGroup = (node: Node): boolean => {
-    if (!node.type) return false;
-    return Object.values(RegisteredGroups).includes(node.type as RegisteredGroups);
-  };
 
   /**
    * finds the best group drop target for a selection of nodes.
@@ -208,8 +216,8 @@ export const useCanvasHandlers = (canvasState: StoreApi<CanvasStoreState>) => {
         const { group: dropTarget, groupRect } = best;
 
         // Reparent every selected node into the group.
-        setNodes((ns) =>
-          ns.map((n) => {
+        setNodes((ns) => {
+          const updatedNodes = ns.map((n) => {
             // Clear the drop-target highlight ring.
             if (n.id === dropTarget.id) return { ...n, className: "" };
 
@@ -230,8 +238,9 @@ export const useCanvasHandlers = (canvasState: StoreApi<CanvasStoreState>) => {
               groupRect.height,
             );
             return { ...n, position, parentId: dropTarget.id };
-          }),
-        );
+          });
+          return sortNodesAndGroups(updatedNodes);
+        });
       } else {
         // no valid drop target found so unparent every selected node that had a parent
         // then restore its absolute position and clean up any highlight rings.
