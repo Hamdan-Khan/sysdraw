@@ -86,36 +86,29 @@ export const sortNodesAndGroups = (nodes: Node[]): Node[] => {
   const sysdrawNodes = nodes.filter((n) => !RegisteredGroupsSet.has(n.type as RegisteredGroups));
   const sysdrawGroups = nodes.filter((n) => RegisteredGroupsSet.has(n.type as RegisteredGroups));
 
-  const sortedGroups: Node[] = [];
-  sysdrawGroups.forEach((group) => {
-    // not a child group, so it can be placed anywhere in the array
-    if (!group.parentId) {
-      sortedGroups.push(group);
-    } else {
-      // to see if a child group already exists earlier in the array
-      // we'll replace it with the parent group, and add the child group to the end instead
-      let childIndex = -1;
-      let i = 0;
-      for (const v of sortedGroups) {
-        if (v.parentId === group.id) {
-          childIndex = i;
-          break;
-        }
-        i++;
-      }
+  const nodeMap = new Map(nodes.map((n) => [n.id, n]));
+  const depthCache = new Map<string, number>();
 
-      // a child group earlier in the array is found
-      if (childIndex >= 0) {
-        let tempChild = sortedGroups[childIndex];
-        sortedGroups[childIndex] = group;
-        sortedGroups.push(tempChild);
-      } else {
-        sortedGroups.push(group);
-      }
+  const getDepth = (nodeId: string): number => {
+    if (depthCache.has(nodeId)) return depthCache.get(nodeId)!;
+
+    const node = nodeMap.get(nodeId);
+    if (!node || !node.parentId) {
+      depthCache.set(nodeId, 0);
+      return 0;
     }
-  });
 
-  return [...sortedGroups, ...sysdrawNodes];
+    // prevent infinite loop from cyclic dependencies
+    depthCache.set(nodeId, 0);
+
+    const depth = 1 + getDepth(node.parentId);
+    depthCache.set(nodeId, depth);
+    return depth;
+  };
+
+  sysdrawGroups.sort((a, b) => getDepth(a.id) - getDepth(b.id));
+
+  return [...sysdrawGroups, ...sysdrawNodes];
 };
 
 /**
