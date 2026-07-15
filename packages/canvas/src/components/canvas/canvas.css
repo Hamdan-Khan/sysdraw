@@ -10,3 +10,10 @@
   max-width: 16px;
   max-height: 16px;
 }
+
+/*
+ * prevents child nodes from lagging behind their parent while dragging (xyflow uses tranform)
+ */
+.react-flow__node {
+  transition: none !important;
+}

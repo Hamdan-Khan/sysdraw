@@ -18,6 +18,7 @@ import {
   clampPositionInsideGroup,
   getIntersectingArea,
   getNodeRect,
+  isChildNode,
   isGroup,
   NodeRect,
   sortNodesAndGroups,
@@ -29,13 +30,16 @@ const selector = (state: CanvasStoreState) => ({
   onConnect: state.onConnect,
 });
 
+/** minimum overlapping area percentage to trigger reparenting */
+const MIN_OVERLAPPING_AREA = 0.25;
+
 /**
  * event handlers for the canvas (drag, drop, re-parenting, etc.)
  */
 export const useCanvasHandlers = (canvasState: StoreApi<CanvasStoreState>) => {
   const { setNodes, onConnect } = useStore(canvasState, useShallow(selector));
 
-  const { screenToFlowPosition, getIntersectingNodes, getInternalNode, getNodesBounds } =
+  const { screenToFlowPosition, getIntersectingNodes, getInternalNode, getNodesBounds, getNodes } =
     useReactFlow();
 
   /**
@@ -94,7 +98,7 @@ export const useCanvasHandlers = (canvasState: StoreApi<CanvasStoreState>) => {
   );
 
   /**
-   * returns the group nodes that the node is intersecting with
+   * returns the group nodes that the node/group is intersecting with
    */
   const getIntersectingNodeGroup = useCallback(
     (node: Node) =>
@@ -112,16 +116,21 @@ export const useCanvasHandlers = (canvasState: StoreApi<CanvasStoreState>) => {
    */
   const getBestDropGroup = useCallback(
     (nodes: Node[]): { group: Node; groupRect: NodeRect } | null => {
-      // bounding rect for the whole selection (or just the single node).
-      const dragBounds = nodes.length > 1 ? getNodesBounds(nodes) : null;
+      /** bounding rect for the whole selection */
+      const multiSelectDragBounds = nodes.length > 1 ? getNodesBounds(nodes) : null;
 
-      // Union candidates from every dragged node so a group that only overlaps
-      // a non-lead node is still discovered.
       const seen = new Set<string>();
       const candidateGroups: Node[] = [];
+      // for every selected node: retrieves the group nodes it intersects with,
+      // and adds them to candidate group
       for (const n of nodes) {
         for (const g of getIntersectingNodeGroup(n)) {
-          if (!seen.has(g.id)) {
+          // omit child groups from becoming candidates, because when child
+          // group's area is large enough, it starts to trigger the min intersection
+          // condition and be considered for the drag/drag stop events
+          const isChild = isChildNode(n, g, getNodes());
+
+          if (!seen.has(g.id) && !isChild) {
             seen.add(g.id);
             candidateGroups.push(g);
           }
@@ -132,17 +141,20 @@ export const useCanvasHandlers = (canvasState: StoreApi<CanvasStoreState>) => {
       let bestGroupRect: NodeRect | undefined;
       let bestRatio = 0;
 
+      // finds the group with the highest overlapping (with selected nodes) out of the candidates
       for (const candidate of candidateGroups) {
         const groupInternal = getInternalNode(candidate.id);
-        if (!groupInternal) continue;
+        if (!groupInternal) {
+          continue;
+        }
         const groupRect = getNodeRect(groupInternal);
 
         let overlapArea: number;
         let selectionArea: number;
 
-        if (dragBounds) {
-          overlapArea = getIntersectingArea(dragBounds, groupRect);
-          selectionArea = dragBounds.width * dragBounds.height;
+        if (multiSelectDragBounds) {
+          overlapArea = getIntersectingArea(multiSelectDragBounds, groupRect);
+          selectionArea = multiSelectDragBounds.width * multiSelectDragBounds.height;
         } else {
           // resolve precise rect from internals (in case of a single node)
           const nodeInternal = getInternalNode(nodes[0].id);
@@ -160,10 +172,10 @@ export const useCanvasHandlers = (canvasState: StoreApi<CanvasStoreState>) => {
         }
       }
 
-      if (!bestGroup || !bestGroupRect || bestRatio < 0.25) return null;
+      if (!bestGroup || !bestGroupRect || bestRatio < MIN_OVERLAPPING_AREA) return null;
       return { group: bestGroup, groupRect: bestGroupRect };
     },
-    [getIntersectingNodeGroup, getInternalNode, getNodesBounds],
+    [getIntersectingNodeGroup, getInternalNode, getNodesBounds, getNodes],
   );
 
   /**
@@ -173,8 +185,17 @@ export const useCanvasHandlers = (canvasState: StoreApi<CanvasStoreState>) => {
    * single entity / node.
    */
   const onNodeDrag: OnNodeDrag<Node> = useCallback(
-    (_e, _node, nodes) => {
+    (_e, node, nodes) => {
       const best = getBestDropGroup(nodes);
+
+      if (nodes.length == 1) {
+        const nodeArea = (node.measured?.height ?? 0) * (node.measured?.width ?? 0);
+        const targetArea = (best?.groupRect.height ?? 0) * (best?.groupRect.width ?? 0);
+
+        if (nodeArea > 0 && targetArea > 0 && nodeArea >= targetArea) {
+          return;
+        }
+      }
 
       // apply / clear the drop-target highlight ring
       setNodes((ns) =>

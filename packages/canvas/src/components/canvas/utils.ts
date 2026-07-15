@@ -117,3 +117,25 @@ export const sortNodesAndGroups = (nodes: Node[]): Node[] => {
 
   return [...sortedGroups, ...sysdrawNodes];
 };
+
+/**
+ * checks if node1 is a child of node2 (or any of its ancestors)
+ *
+ * @param node1 - node to check
+ * @param node2 - potential parent node
+ * @param allNodes - array of all nodes in the canvas
+ */
+export const isChildNode = (node1: Node, node2: Node, allNodes: Node[]): boolean => {
+  if (!node1.parentId) {
+    return false;
+  }
+
+  let parentId: string | null = node1.parentId ?? null;
+
+  while (parentId != node2.id && parentId != null) {
+    const parentNode = allNodes.find((v) => v.id == parentId);
+    parentId = parentNode?.parentId ?? null;
+  }
+
+  return parentId === node2.id;
+};
