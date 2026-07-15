@@ -6,7 +6,7 @@ import {
   RegisteredGroups,
   RegisteredNodes,
 } from "@sysdraw/models";
-import { Node, OnNodeDrag, useReactFlow } from "@xyflow/react";
+import { Node, OnNodeDrag, Rect, useReactFlow } from "@xyflow/react";
 import { useCallback } from "react";
 import { toast } from "sonner";
 import { StoreApi, useStore } from "zustand";
@@ -128,7 +128,7 @@ export const useCanvasHandlers = (canvasState: StoreApi<CanvasStoreState>) => {
           // omit child groups from becoming candidates, because when child
           // group's area is large enough, it starts to trigger the min intersection
           // condition and be considered for the drag/drag stop events
-          const isChild = isChildNode(n, g, getNodes());
+          const isChild = isChildNode(g, n, getNodes());
 
           if (!seen.has(g.id) && !isChild) {
             seen.add(g.id);
@@ -151,6 +151,7 @@ export const useCanvasHandlers = (canvasState: StoreApi<CanvasStoreState>) => {
 
         let overlapArea: number;
         let selectionArea: number;
+        let selectionRect: Rect | null = multiSelectDragBounds;
 
         if (multiSelectDragBounds) {
           overlapArea = getIntersectingArea(multiSelectDragBounds, groupRect);
@@ -162,17 +163,25 @@ export const useCanvasHandlers = (canvasState: StoreApi<CanvasStoreState>) => {
           const nodeRect = getNodeRect(nodeInternal);
           overlapArea = getIntersectingArea(nodeRect, groupRect);
           selectionArea = nodeRect.width * nodeRect.height;
+          selectionRect = nodeRect;
         }
 
         const ratio = selectionArea !== 0 ? overlapArea / selectionArea : 0;
-        if (ratio > bestRatio) {
+        // besides minimum intersection area, also make sure if the dimensions of the
+        // drop target are large enough to contain the selection
+        const canContainSelection =
+          groupRect.width > (selectionRect?.width ?? 0) &&
+          groupRect.height > (selectionRect?.height ?? 0);
+        if (ratio > bestRatio && canContainSelection) {
           bestRatio = ratio;
           bestGroup = candidate;
           bestGroupRect = groupRect;
         }
       }
 
-      if (!bestGroup || !bestGroupRect || bestRatio < MIN_OVERLAPPING_AREA) return null;
+      if (!bestGroup || !bestGroupRect || bestRatio < MIN_OVERLAPPING_AREA) {
+        return null;
+      }
       return { group: bestGroup, groupRect: bestGroupRect };
     },
     [getIntersectingNodeGroup, getInternalNode, getNodesBounds, getNodes],
