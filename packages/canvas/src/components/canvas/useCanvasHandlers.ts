@@ -33,6 +33,8 @@ const selector = (state: CanvasStoreState) => ({
 /** minimum overlapping area percentage to trigger reparenting */
 const MIN_OVERLAPPING_AREA = 0.25;
 
+type CandidateGroupNode = { group: Node; groupRect: NodeRect; ratio: number };
+
 /**
  * event handlers for the canvas (drag, drop, re-parenting, etc.)
  */
@@ -118,6 +120,8 @@ export const useCanvasHandlers = (canvasState: StoreApi<CanvasStoreState>) => {
     (nodes: Node[]): { group: Node; groupRect: NodeRect } | null => {
       /** bounding rect for the whole selection */
       const multiSelectDragBounds = nodes.length > 1 ? getNodesBounds(nodes) : null;
+      const allNodes = getNodes();
+      console.log(allNodes);
 
       const seen = new Set<string>();
       const candidateGroups: Node[] = [];
@@ -128,7 +132,7 @@ export const useCanvasHandlers = (canvasState: StoreApi<CanvasStoreState>) => {
           // omit child groups from becoming candidates, because when child
           // group's area is large enough, it starts to trigger the min intersection
           // condition and be considered for the drag/drag stop events
-          const isChild = isChildNode(g, n, getNodes());
+          const isChild = isChildNode(g, n, allNodes);
 
           if (!seen.has(g.id) && !isChild) {
             seen.add(g.id);
@@ -137,11 +141,9 @@ export const useCanvasHandlers = (canvasState: StoreApi<CanvasStoreState>) => {
         }
       }
 
-      let bestGroup: Node | undefined;
-      let bestGroupRect: NodeRect | undefined;
-      let bestRatio = 0;
+      const validCandidates: CandidateGroupNode[] = [];
 
-      // finds the group with the highest overlapping (with selected nodes) out of the candidates
+      // evaluate all candidates and filter out the ones that are too small or have not enough overlap
       for (const candidate of candidateGroups) {
         const groupInternal = getInternalNode(candidate.id);
         if (!groupInternal) {
@@ -172,17 +174,34 @@ export const useCanvasHandlers = (canvasState: StoreApi<CanvasStoreState>) => {
         const canContainSelection =
           groupRect.width > (selectionRect?.width ?? 0) &&
           groupRect.height > (selectionRect?.height ?? 0);
-        if (ratio > bestRatio && canContainSelection) {
-          bestRatio = ratio;
-          bestGroup = candidate;
-          bestGroupRect = groupRect;
+
+        if (ratio >= MIN_OVERLAPPING_AREA && canContainSelection) {
+          validCandidates.push({ group: candidate, groupRect, ratio });
         }
       }
 
-      if (!bestGroup || !bestGroupRect || bestRatio < MIN_OVERLAPPING_AREA) {
+      // out of all valid candidates, keep only the deepest ones in their respective group hierarchies
+      // by discarding any candidate that is an ancestor of another valid candidate
+      const deepestCandidates = validCandidates.filter((c1) => {
+        const hasValidDescendant = validCandidates.some(
+          (c2) => c1.group.id !== c2.group.id && isChildNode(c2.group, c1.group, allNodes),
+        );
+        return !hasValidDescendant;
+      });
+
+      let best: CandidateGroupNode | null = null;
+
+      // finally, find the candidate with the highest overlapping ratio among the deepest candidates
+      for (const candidate of deepestCandidates) {
+        if (best === null || candidate.ratio > best.ratio) {
+          best = candidate;
+        }
+      }
+
+      if (!best) {
         return null;
       }
-      return { group: bestGroup, groupRect: bestGroupRect };
+      return { group: best.group, groupRect: best.groupRect };
     },
     [getIntersectingNodeGroup, getInternalNode, getNodesBounds, getNodes],
   );
