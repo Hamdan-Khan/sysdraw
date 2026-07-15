@@ -10,6 +10,7 @@ import {
   useViewport,
 } from "@xyflow/react";
 import { useState } from "react";
+import { OptionBar } from "../common";
 
 export interface GroupWrapperProps {
   children: React.ReactNode;
@@ -56,10 +57,10 @@ export const GroupWrapper = ({
         minHeight={150}
         isVisible={selected}
         shouldResize={shouldResize}
-        lineStyle={{ borderWidth: 0.5 / zoom }}
+        lineStyle={{ borderWidth: 0.8 / zoom }}
       />
       <NodeToolbar className="flex gap-2">
-        <span>{nodeId}</span>
+        <OptionBar type="group" />
       </NodeToolbar>
       {handles.map((handle) => {
         const hasConnection = connections.some((c) =>

@@ -121,7 +121,6 @@ export const useCanvasHandlers = (canvasState: StoreApi<CanvasStoreState>) => {
       /** bounding rect for the whole selection */
       const multiSelectDragBounds = nodes.length > 1 ? getNodesBounds(nodes) : null;
       const allNodes = getNodes();
-      console.log(allNodes);
 
       const seen = new Set<string>();
       const candidateGroups: Node[] = [];

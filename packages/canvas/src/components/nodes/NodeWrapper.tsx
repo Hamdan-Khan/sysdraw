@@ -10,6 +10,7 @@ import {
   useViewport,
 } from "@xyflow/react";
 import { useState } from "react";
+import { OptionBar } from "../common";
 
 export interface NodeWrapperProps {
   children: React.ReactNode;
@@ -39,21 +40,21 @@ export const NodeWrapper = ({ children, handles = defaultHandles, selected }: No
 
   return (
     <div
-      className="flex flex-col items-center justify-center min-w-20 min-h-20 w-full h-full relative p-2"
+      className="flex flex-col items-center justify-center min-w-10 min-h-10 relative"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       onKeyDown={handleDelete}
       tabIndex={0} // enables keyboard events on div
     >
       <NodeResizer
-        minWidth={80}
-        minHeight={80}
+        minWidth={40}
+        minHeight={40}
         isVisible={selected}
         keepAspectRatio
-        lineStyle={{ borderWidth: 0.7 / zoom }}
+        lineStyle={{ borderWidth: 0.1 / zoom }}
       />
       <NodeToolbar className="flex gap-2">
-        <span>{nodeId?.slice(0, 6)}</span>
+        <OptionBar type="node" />
       </NodeToolbar>
       {handles.map((handle) => {
         const hasConnection = connections.some((c) =>
