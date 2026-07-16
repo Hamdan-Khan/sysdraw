@@ -7,22 +7,23 @@ import {
   RegisteredNodes,
 } from "@sysdraw/models";
 import { Node, OnNodeDrag, Rect, useReactFlow } from "@xyflow/react";
+import { nanoid } from "nanoid";
 import { useCallback } from "react";
 import { toast } from "sonner";
 import { StoreApi, useStore } from "zustand";
 import { useShallow } from "zustand/shallow";
-import { CanvasStoreState } from "../../store";
-import { SYSDRAW_DRAG_DATA_FORMAT } from "../toolbar";
-import { DnDTransferData } from "./types";
 import {
   clampPositionInsideGroup,
+  DnDTransferData,
   getIntersectingArea,
   getNodeRect,
   isChildNode,
   isGroup,
   NodeRect,
   sortNodesAndGroups,
-} from "./utils";
+} from "../components/canvas";
+import { SYSDRAW_DRAG_DATA_FORMAT } from "../components/toolbar";
+import { CanvasStoreState } from "../store";
 
 const selector = (state: CanvasStoreState) => ({
   setNodes: state.setNodes,
@@ -85,7 +86,7 @@ export const useCanvasHandlers = (canvasState: StoreApi<CanvasStoreState>) => {
         return;
       }
 
-      const newNode: Node = { id: crypto.randomUUID(), type, position, data: defaultData };
+      const newNode: Node = { id: nanoid(), type, position, data: defaultData };
 
       setNodes((prev) => {
         // xyflow requires parent nodes to be drawn before child nodes

@@ -23,6 +23,7 @@
     "@sysdraw/models": "workspace:*",
     "@xyflow/react": "^12.11.2",
     "lucide-react": "catalog:",
+    "nanoid": "^6.0.0",
     "react": "catalog:",
     "react-dom": "catalog:",
     "sonner": "catalog:",

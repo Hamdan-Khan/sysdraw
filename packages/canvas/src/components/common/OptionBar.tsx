@@ -1,6 +1,8 @@
 import { useNodeId, useReactFlow } from "@xyflow/react";
 import { Copy, Lock, MessageSquare, Trash2 } from "lucide-react";
+import { useCallback } from "react";
 import { toast } from "sonner";
+import { useCopyPaste } from "../../hooks/useCopyPaste";
 import { Tooltip } from "./Tooltip";
 
 interface OptionBarProps {
@@ -9,8 +11,10 @@ interface OptionBarProps {
 
 export const OptionBar = ({ type }: OptionBarProps) => {
   const nodeId = useNodeId();
-  const formattedType = type.charAt(0).toUpperCase() + type.slice(1);
   const { deleteElements } = useReactFlow();
+  const { copy } = useCopyPaste();
+
+  const formattedType = type.charAt(0).toUpperCase() + type.slice(1);
 
   const handleDelete = () => {
     if (nodeId) {
@@ -19,7 +23,13 @@ export const OptionBar = ({ type }: OptionBarProps) => {
     }
   };
 
-  const handleCopy = () => {};
+  const handleCopy = useCallback(() => {
+    if (nodeId) {
+      copy(nodeId);
+
+      toast.success(`${formattedType} copied.`);
+    }
+  }, [nodeId, copy, formattedType]);
 
   const options = [
     { icon: Copy, label: "Copy", action: handleCopy },

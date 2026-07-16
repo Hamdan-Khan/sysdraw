@@ -1,0 +1,154 @@
+import { useReactFlow, type Edge, type Node } from "@xyflow/react";
+import { nanoid } from "nanoid";
+import { useCallback, useEffect, useRef } from "react";
+
+interface ClipboardData {
+  nodes: Node[];
+  edges: Edge[];
+}
+
+/** module level clipboard reference */
+const clipboardRef: { current: ClipboardData | null } = { current: null };
+
+/**
+ * Custom hook for copy-paste functionality in the canvas.
+ */
+export function useCopyPaste() {
+  const { getNodes, getEdges, setNodes, setEdges, screenToFlowPosition } = useReactFlow();
+  const lastMousePosition = useRef<{ x: number; y: number } | null>(null);
+  /** to add offset to pasted elements */
+  const pasteCount = useRef(0);
+
+  useEffect(() => {
+    const handleClick = (e: MouseEvent) => {
+      lastMousePosition.current = { x: e.clientX, y: e.clientY };
+      // clears offset
+      pasteCount.current = 0;
+    };
+    window.addEventListener("click", handleClick);
+    return () => window.removeEventListener("click", handleClick);
+  }, []);
+
+  const copy = useCallback(
+    (explicitNodeId?: string) => {
+      const allNodes = getNodes();
+      const allEdges = getEdges();
+
+      const nodesToCopy = explicitNodeId
+        ? allNodes.filter((n) => n.id === explicitNodeId)
+        : allNodes.filter((n) => n.selected);
+
+      if (nodesToCopy.length === 0) {
+        return;
+      }
+
+      const idSet = new Set(nodesToCopy.map((n) => n.id));
+      const edgesToCopy = allEdges.filter((e) => idSet.has(e.source) && idSet.has(e.target));
+
+      // deep clone to avoid references to copied element's data
+      clipboardRef.current = {
+        nodes: structuredClone(nodesToCopy),
+        edges: structuredClone(edgesToCopy),
+      };
+
+      // clear previous copy's references
+      pasteCount.current = 0;
+      lastMousePosition.current = null;
+    },
+    [getNodes, getEdges],
+  );
+
+  const paste = useCallback(
+    (screenPosition?: { x: number; y: number }) => {
+      const clipboard = clipboardRef.current;
+      if (!clipboard || clipboard.nodes.length === 0) return;
+
+      pasteCount.current += 1;
+
+      // calculate of multi node selection's dimensions
+      const minX = Math.min(...clipboard.nodes.map((n) => n.position.x));
+      const minY = Math.min(...clipboard.nodes.map((n) => n.position.y));
+      const maxX = Math.max(...clipboard.nodes.map((n) => n.position.x + (n.measured?.width ?? 0)));
+      const maxY = Math.max(
+        ...clipboard.nodes.map((n) => n.position.y + (n.measured?.height ?? 0)),
+      );
+      const width = maxX - minX;
+      const height = maxY - minY;
+
+      const anchor = screenPosition ?? lastMousePosition.current;
+
+      let targetX: number;
+      let targetY: number;
+
+      if (anchor) {
+        const flowPos = screenToFlowPosition(anchor);
+        targetX = flowPos.x + width * pasteCount.current * 0.6;
+        targetY = flowPos.y + height * pasteCount.current * 0.1;
+      } else {
+        // if no known cursor position, offset by the selection's own size
+        targetX = minX + width * pasteCount.current * 0.6;
+        targetY = minY + height * pasteCount.current * 0.1;
+      }
+
+      const dx = targetX - minX;
+      const dy = targetY - minY;
+
+      const idMap = new Map<string, string>();
+      const newNodes = structuredClone(clipboard.nodes).map((n) => {
+        const newId = nanoid();
+        idMap.set(n.id, newId);
+        n.id = newId;
+        n.position.x += dx;
+        n.position.y += dy;
+        n.selected = true;
+        return n;
+      });
+      const newEdges = structuredClone(clipboard.edges).map((e) => {
+        e.id = nanoid();
+        e.source = idMap.get(e.source)!;
+        e.target = idMap.get(e.target)!;
+        e.selected = true;
+        return e;
+      });
+
+      setNodes((nds) =>
+        nds.map((n) => (n.selected ? { ...n, selected: false } : n)).concat(newNodes),
+      );
+      setEdges((eds) =>
+        eds.map((e) => (e.selected ? { ...e, selected: false } : e)).concat(newEdges),
+      );
+    },
+    [screenToFlowPosition, setNodes, setEdges],
+  );
+
+  return { copy, paste };
+}
+
+/**
+ * hook to enable global keyboard shortcuts for copy paste.
+ *
+ * should be called once at the root canvas level.
+ */
+export function useGlobalCopyPasteShortcuts() {
+  const { copy, paste } = useCopyPaste();
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (!(e.ctrlKey || e.metaKey)) {
+        return;
+      }
+
+      const target = e.target as HTMLElement;
+      // shoudn't trigger on editable elements
+      if (target.tagName === "INPUT" || target.tagName === "TEXTAREA" || target.isContentEditable) {
+        return;
+      }
+
+      if (e.key === "c") copy();
+      if (e.key === "v") paste();
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [copy, paste]);
+}

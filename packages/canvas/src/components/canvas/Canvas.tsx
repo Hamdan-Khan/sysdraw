@@ -1,10 +1,13 @@
 import { ControlButton, Controls, ReactFlow, ReactFlowProvider } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
 import { ArchiveRestore, Save } from "lucide-react";
-import { createRef, useMemo } from "react";
+import { createRef } from "react";
 import { Toaster } from "sonner";
 import { StoreApi, useStore } from "zustand";
 import { useShallow } from "zustand/shallow";
+import { useCanvasHandlers } from "../../hooks/useCanvasHandlers";
+import { useCanvasStorage } from "../../hooks/useCanvasStorage";
+import { useGlobalCopyPasteShortcuts } from "../../hooks/useCopyPaste";
 import { CanvasStoreState } from "../../store";
 import { DndWrapper } from "../dnd";
 import { edgeTypes } from "../edges";
@@ -12,8 +15,6 @@ import { groupTypes } from "../groups";
 import { nodeTypes as coreNodeTypes } from "../nodes";
 import { Toolbar } from "../toolbar";
 import "./canvas.css";
-import { useCanvasHandlers } from "./useCanvasHandlers";
-import { useCanvasStorage } from "./useCanvasStorage";
 
 interface CanvasProps {
   canvasState: StoreApi<CanvasStoreState>;
@@ -25,6 +26,8 @@ const selector = (state: CanvasStoreState) => ({
   onNodesChange: state.onNodesChange,
   onEdgesChange: state.onEdgesChange,
 });
+
+const combinedNodeTypes = { ...coreNodeTypes, ...groupTypes };
 
 const CanvasElement = ({ canvasState }: CanvasProps) => {
   const dndWrapperRef = createRef<HTMLDivElement>();
@@ -39,7 +42,7 @@ const CanvasElement = ({ canvasState }: CanvasProps) => {
 
   const { setRfInstance, onSave, onRestore } = useCanvasStorage(canvasState);
 
-  const combinedNodeTypes = useMemo(() => ({ ...coreNodeTypes, ...groupTypes }), []);
+  useGlobalCopyPasteShortcuts();
 
   return (
     <div className="w-screen h-screen bg-bg relative" style={{ width: "100%", height: "100%" }}>
