@@ -16,7 +16,9 @@
   "scripts": {
     "build": "tsup src/index.ts --format esm --dts",
     "dev": "vite",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "dependencies": {
     "@sysdraw/common": "workspace:*",
@@ -31,14 +33,18 @@
   },
   "devDependencies": {
     "@tailwindcss/vite": "catalog:",
+    "@testing-library/react": "^16.3.2",
+    "@testing-library/user-event": "^14.6.1",
     "@types/react": "catalog:",
     "@types/react-dom": "catalog:",
     "@vitejs/plugin-react": "catalog:",
     "autoprefixer": "catalog:",
+    "jsdom": "^29.1.1",
     "postcss": "catalog:",
     "tailwindcss": "catalog:",
     "tsup": "catalog:",
     "typescript": "catalog:",
-    "vite": "catalog:"
+    "vite": "catalog:",
+    "vitest": "^4.1.10"
   }
 }

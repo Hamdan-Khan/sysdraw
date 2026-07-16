@@ -1,4 +1,4 @@
-import { ReactFlowInstance, useReactFlow } from "@xyflow/react";
+import { Edge, Node, ReactFlowInstance, ReactFlowJsonObject, useReactFlow } from "@xyflow/react";
 import { useCallback, useState } from "react";
 import { toast } from "sonner";
 import { CanvasStoreState } from "src/store";
@@ -28,14 +28,23 @@ export const useCanvasStorage = (canvasState: StoreApi<CanvasStoreState>) => {
 
   const onRestore = useCallback(() => {
     const restoreFlow = async () => {
-      const flow = JSON.parse(localStorage.getItem(CANVAS_LOCALSTORAGE_KEY) ?? "{}");
+      const stored = localStorage.getItem(CANVAS_LOCALSTORAGE_KEY);
 
-      if (flow) {
+      if (!stored) {
+        toast("No stored snapshot found.");
+        return;
+      }
+
+      try {
+        const flow: ReactFlowJsonObject<Node, Edge> = JSON.parse(stored);
         const { x = 0, y = 0, zoom = 1 } = flow.viewport;
         setNodes(flow.nodes || []);
         setEdges(flow.edges || []);
         setViewport({ x, y, zoom });
         toast("Snapshot restored!");
+      } catch (e) {
+        console.error(e);
+        toast("Failed to restore snapshot.");
       }
     };
 
