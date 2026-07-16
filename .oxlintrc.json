@@ -9,7 +9,9 @@
   "rules": {
     "typescript/no-explicit-any": "warn",
     "typescript/await-thenable": "error",
-    "react/react-in-jsx-scope": "allow"
+    "react/react-in-jsx-scope": "allow",
+    "react/rules-of-hooks": "error",
+    "react/only-export-components": ["warn", { "allowConstantExport": true }]
   },
   "ignorePatterns": ["dist", "node_modules", "*.config.*"]
 }
