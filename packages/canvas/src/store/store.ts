@@ -40,6 +40,8 @@ interface CanvasStoreState extends InitialCanvasStoreState {
   commit: () => void;
   undo: () => void;
   redo: () => void;
+  isInteractive: boolean;
+  setIsInteractive: (value: boolean) => void;
 }
 
 /**
@@ -53,6 +55,7 @@ const createCanvasStore = (storeState: InitialCanvasStoreState) => {
       past: [],
       future: [],
     },
+    isInteractive: true,
     onNodesChange: (changes) => {
       set({
         nodes: applyNodeChanges(changes, get().nodes),
@@ -106,6 +109,7 @@ const createCanvasStore = (storeState: InitialCanvasStoreState) => {
         history: { past: [...past, next], future: future.slice(1) },
       });
     },
+    setIsInteractive: (value) => set({ isInteractive: value }),
   }));
 };
 

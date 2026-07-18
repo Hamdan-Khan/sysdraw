@@ -23,6 +23,7 @@ const selector = (state: CanvasStoreState) => ({
   edges: state.edges,
   onNodesChange: state.onNodesChange,
   onEdgesChange: state.onEdgesChange,
+  isInteractive: state.isInteractive,
 });
 
 const combinedNodeTypes = { ...coreNodeTypes, ...groupTypes };
@@ -30,7 +31,7 @@ const combinedNodeTypes = { ...coreNodeTypes, ...groupTypes };
 const CanvasElement = ({ canvasState }: CanvasProps) => {
   const dndWrapperRef = createRef<HTMLDivElement>();
 
-  const { edges, nodes, onEdgesChange, onNodesChange } = useStore(
+  const { edges, nodes, onEdgesChange, onNodesChange, isInteractive } = useStore(
     canvasState,
     useShallow(selector),
   );
@@ -46,6 +47,7 @@ const CanvasElement = ({ canvasState }: CanvasProps) => {
     <div className="w-screen h-screen bg-bg relative" style={{ width: "100%", height: "100%" }}>
       <DndWrapper wrapperRef={dndWrapperRef} onDrop={onDrop} onDragOver={onDragOver}>
         <Toolbar />
+        <ControlsBar canvasState={canvasState} />
         <ReactFlow
           nodes={nodes}
           nodeTypes={combinedNodeTypes}
@@ -57,13 +59,15 @@ const CanvasElement = ({ canvasState }: CanvasProps) => {
           onNodeDragStart={onNodeDragStart}
           onNodeDrag={onNodeDrag}
           onNodeDragStop={onNodeDragStop}
+          nodesDraggable={isInteractive}
+          nodesConnectable={isInteractive}
+          // todo: fix nodes being able to be deleted after selected and switched to un-interative mode
+          elementsSelectable={isInteractive}
           fitView
           className="bg-transparent"
           proOptions={{ hideAttribution: true }}
           onInit={setRfInstance}
-        >
-          <ControlsBar canvasState={canvasState} />
-        </ReactFlow>
+        />
       </DndWrapper>
     </div>
   );

@@ -233,3 +233,40 @@ describe("commit / undo / redo", () => {
     expect(history.past[0].nodes[0].id).toBe("n5");
   });
 });
+
+describe("isInteractive / setIsInteractive", () => {
+  it("defaults to true", () => {
+    const store = makeStore();
+
+    expect(store.getState().isInteractive).toBe(true);
+  });
+
+  it("setIsInteractive(false) locks the canvas", () => {
+    const store = makeStore();
+    const { setIsInteractive } = store.getState();
+
+    setIsInteractive(false);
+
+    expect(store.getState().isInteractive).toBe(false);
+  });
+
+  it("setIsInteractive(true) unlocks the canvas after locking", () => {
+    const store = makeStore();
+    const { setIsInteractive } = store.getState();
+
+    setIsInteractive(false);
+    setIsInteractive(true);
+
+    expect(store.getState().isInteractive).toBe(true);
+  });
+
+  it("toggling interactivity does not affect nodes or edges", () => {
+    const store = makeStore([makeNode("a")], [makeEdge("e1", "a", "b")]);
+    const { setIsInteractive } = store.getState();
+
+    setIsInteractive(false);
+
+    expect(store.getState().nodes.map((n) => n.id)).toEqual(["a"]);
+    expect(store.getState().edges.map((e) => e.id)).toEqual(["e1"]);
+  });
+});

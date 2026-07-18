@@ -19,6 +19,7 @@ export const useCanvasStorage = (canvasState: StoreApi<CanvasStoreState>) => {
   const { setViewport } = useReactFlow();
 
   const onSave = useCallback(() => {
+    console.log(rfInstance); // todo: fix rfinstance setter call
     if (rfInstance) {
       const flow = rfInstance.toObject();
       localStorage.setItem(CANVAS_LOCALSTORAGE_KEY, JSON.stringify(flow));

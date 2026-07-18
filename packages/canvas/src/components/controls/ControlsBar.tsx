@@ -1,27 +1,95 @@
-import { ControlButton, Controls } from "@xyflow/react";
-import { ArchiveRestore, Redo, Save, Undo } from "lucide-react";
-import { StoreApi } from "zustand";
+import { useReactFlow } from "@xyflow/react";
+import { ArchiveRestoreIcon, Lock, Maximize, Redo, Save, Undo, Unlock } from "lucide-react";
+import { StoreApi, useStore } from "zustand";
 import { useCanvasStorage, useHistory } from "../../hooks";
 import { CanvasStoreState } from "../../store";
+import { Tooltip } from "../common";
 
 export const ControlsBar = ({ canvasState }: { canvasState: StoreApi<CanvasStoreState> }) => {
   const { onSave, onRestore } = useCanvasStorage(canvasState);
   const { undo, redo, canUndo, canRedo } = useHistory(canvasState);
+  const { fitView } = useReactFlow();
+  const isInteractive = useStore(canvasState, (s) => s.isInteractive);
+  const setIsInteractive = useStore(canvasState, (s) => s.setIsInteractive);
+
+  const handleToggleInteractivity = () => setIsInteractive(!isInteractive);
+
+  const buttons = [
+    {
+      id: "controls-save",
+      icon: Save,
+      label: "Save",
+      action: () => onSave(),
+      disabled: false,
+    },
+    {
+      id: "controls-restore",
+      icon: ArchiveRestoreIcon,
+      label: "Restore",
+      action: () => onRestore(),
+      disabled: false,
+    },
+    {
+      id: "controls-undo",
+      icon: Undo,
+      label: "Undo",
+      action: () => undo(),
+      disabled: !canUndo,
+    },
+    {
+      id: "controls-redo",
+      icon: Redo,
+      label: "Redo",
+      action: () => redo(),
+      disabled: !canRedo,
+    },
+    {
+      id: "controls-fit-view",
+      icon: Maximize,
+      label: "Fit View",
+      action: () => fitView({ padding: 0.1, duration: 300 }),
+      disabled: false,
+    },
+    {
+      id: "controls-toggle-interactivity",
+      icon: isInteractive ? Unlock : Lock,
+      label: isInteractive ? "Lock Canvas" : "Unlock Canvas",
+      action: handleToggleInteractivity,
+      disabled: false,
+      active: !isInteractive,
+    },
+  ] as const;
 
   return (
-    <Controls position="top-right" orientation="horizontal">
-      <ControlButton onClick={() => onSave()}>
-        <Save />
-      </ControlButton>
-      <ControlButton onClick={() => onRestore()}>
-        <ArchiveRestore />
-      </ControlButton>
-      <ControlButton disabled={!canUndo} onClick={() => undo()}>
-        <Undo />
-      </ControlButton>
-      <ControlButton disabled={!canRedo} onClick={() => redo()}>
-        <Redo />
-      </ControlButton>
-    </Controls>
+    <div className="absolute top-4 left-1/2 -translate-x-1/2 z-10 flex items-center gap-0.5 bg-surface border border-border rounded-lg p-1.5 shadow-md">
+      {buttons.map((btn) => {
+        const Icon = btn.icon;
+        const isDividerBefore = btn.id === "controls-fit-view"; // divider before fit-view group
+        return (
+          <div key={btn.id} className="flex items-center">
+            {isDividerBefore && <div className="w-px h-6 bg-border mx-1" />}
+            <div className="relative flex items-center justify-center group">
+              <button
+                id={btn.id}
+                onClick={btn.action}
+                disabled={btn.disabled}
+                aria-label={btn.label}
+                className={[
+                  "p-2.5 rounded-md transition-all flex items-center justify-center cursor-pointer outline-none",
+                  btn.disabled
+                    ? "text-secondary/40 cursor-not-allowed"
+                    : "active" in btn && btn.active
+                      ? "text-primary bg-dim"
+                      : "text-secondary hover:text-primary hover:bg-dim",
+                ].join(" ")}
+              >
+                <Icon size={18} />
+              </button>
+              <Tooltip direction="down" text={btn.label} />
+            </div>
+          </div>
+        );
+      })}
+    </div>
   );
 };
