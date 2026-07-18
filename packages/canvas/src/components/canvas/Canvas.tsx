@@ -1,17 +1,12 @@
-import { ControlButton, Controls, ReactFlow, ReactFlowProvider } from "@xyflow/react";
+import { ReactFlow, ReactFlowProvider } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
-import { ArchiveRestore, Redo, Save, Undo } from "lucide-react";
 import { createRef } from "react";
 import { Toaster } from "sonner";
 import { StoreApi, useStore } from "zustand";
 import { useShallow } from "zustand/shallow";
-import {
-  useCanvasHandlers,
-  useCanvasStorage,
-  useGlobalCopyPasteShortcuts,
-  useHistory,
-} from "../../hooks";
+import { useCanvasHandlers, useCanvasStorage, useGlobalCopyPasteShortcuts } from "../../hooks";
 import { CanvasStoreState } from "../../store";
+import { ControlsBar } from "../controls/ControlsBar";
 import { DndWrapper } from "../dnd";
 import { edgeTypes } from "../edges";
 import { groupTypes } from "../groups";
@@ -40,11 +35,10 @@ const CanvasElement = ({ canvasState }: CanvasProps) => {
     useShallow(selector),
   );
 
-  const { onDragOver, onDrop, onConnect, onNodeDrag, onNodeDragStop } =
+  const { onDragOver, onDrop, onConnect, onNodeDragStart, onNodeDrag, onNodeDragStop } =
     useCanvasHandlers(canvasState);
 
-  const { setRfInstance, onSave, onRestore } = useCanvasStorage(canvasState);
-  const { undo, redo, canUndo, canRedo } = useHistory(canvasState);
+  const { setRfInstance } = useCanvasStorage(canvasState);
 
   useGlobalCopyPasteShortcuts();
 
@@ -60,6 +54,7 @@ const CanvasElement = ({ canvasState }: CanvasProps) => {
           onNodesChange={onNodesChange}
           onEdgesChange={onEdgesChange}
           onConnect={onConnect}
+          onNodeDragStart={onNodeDragStart}
           onNodeDrag={onNodeDrag}
           onNodeDragStop={onNodeDragStop}
           fitView
@@ -67,20 +62,7 @@ const CanvasElement = ({ canvasState }: CanvasProps) => {
           proOptions={{ hideAttribution: true }}
           onInit={setRfInstance}
         >
-          <Controls position="top-right" orientation="horizontal">
-            <ControlButton onClick={() => onSave()}>
-              <Save />
-            </ControlButton>
-            <ControlButton onClick={() => onRestore()}>
-              <ArchiveRestore />
-            </ControlButton>
-            <ControlButton disabled={!canUndo} onClick={() => undo()}>
-              <Undo />
-            </ControlButton>
-            <ControlButton disabled={!canRedo} onClick={() => redo()}>
-              <Redo />
-            </ControlButton>
-          </Controls>
+          <ControlsBar canvasState={canvasState} />
         </ReactFlow>
       </DndWrapper>
     </div>

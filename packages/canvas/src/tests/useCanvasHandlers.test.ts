@@ -1,4 +1,5 @@
 import { act, renderHook } from "@testing-library/react";
+import { Node } from "@xyflow/react";
 import { toast } from "sonner";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { useCanvasHandlers } from "../hooks/useCanvasHandlers";
@@ -6,9 +7,11 @@ import { mockGetInternalNode, mockGetIntersectingNodes, mockGetNodes, mockSetNod
 
 vi.mock("nanoid", () => ({ nanoid: () => "new-id" }));
 
+const mockCommit = vi.fn();
+
 vi.mock("../hooks/useHistory", () => ({
   useHistory: () => ({
-    commit: vi.fn(),
+    commit: mockCommit,
     undo: vi.fn(),
     redo: vi.fn(),
     canUndo: false,
@@ -71,6 +74,14 @@ describe("useCanvasHandlers", () => {
       act(() => result.current.onDrop(makeEvent("group", "container") as any));
       updated = mockSetNodes.mock.calls[0][0](existing);
       expect(updated[0].type).toBe("container");
+    });
+  });
+
+  describe("onNodeDragStart", () => {
+    it("commites the history", () => {
+      const { result } = renderHook(() => useCanvasHandlers({} as any));
+      act(() => result.current.onNodeDragStart({} as any, {} as Node, [] as Node[]));
+      expect(mockCommit).toHaveBeenCalledTimes(1);
     });
   });
 

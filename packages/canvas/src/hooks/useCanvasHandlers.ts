@@ -211,6 +211,13 @@ export const useCanvasHandlers = (canvasState: StoreApi<CanvasStoreState>) => {
   );
 
   /**
+   * node drag start (commits the state before dragging for history)
+   */
+  const onNodeDragStart: OnNodeDrag<Node> = useCallback(() => {
+    commit();
+  }, [commit]);
+
+  /**
    * node drag for reparenting (highlight drop targets).
    *
    * in case of multi nodes selection, the entire selection is treated as a
@@ -268,7 +275,6 @@ export const useCanvasHandlers = (canvasState: StoreApi<CanvasStoreState>) => {
       if (best) {
         const { group: dropTarget, groupRect } = best;
 
-        commit();
         // Reparent every selected node into the group.
         setNodes((ns) => {
           const updatedNodes = ns.map((n) => {
@@ -296,7 +302,6 @@ export const useCanvasHandlers = (canvasState: StoreApi<CanvasStoreState>) => {
           return sortNodesAndGroups(updatedNodes);
         });
       } else {
-        commit();
         // no valid drop target found so unparent every selected node that had a parent
         // then restore its absolute position and clean up any highlight rings.
         setNodes((ns) =>
@@ -318,8 +323,8 @@ export const useCanvasHandlers = (canvasState: StoreApi<CanvasStoreState>) => {
         );
       }
     },
-    [getBestDropGroup, getInternalNode, setNodes, commit],
+    [getBestDropGroup, getInternalNode, setNodes],
   );
 
-  return { onDragOver, onDrop, onConnect, onNodeDrag, onNodeDragStop };
+  return { onDragOver, onDrop, onConnect, onNodeDragStart, onNodeDrag, onNodeDragStop };
 };
