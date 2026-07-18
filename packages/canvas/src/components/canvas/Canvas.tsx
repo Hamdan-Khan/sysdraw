@@ -4,9 +4,10 @@ import { createRef } from "react";
 import { Toaster } from "sonner";
 import { StoreApi, useStore } from "zustand";
 import { useShallow } from "zustand/shallow";
-import { useCanvasHandlers, useGlobalCopyPasteShortcuts } from "../../hooks";
+import { useCanvasHandlers, useShortcuts } from "../../hooks";
 import { CanvasStoreState } from "../../store";
-import { ControlsBar } from "../controls/ControlsBar";
+import { CanvasContextMenu } from "../common";
+import { ControlsBar } from "../controls";
 import { DndWrapper } from "../dnd";
 import { edgeTypes } from "../edges";
 import { groupTypes } from "../groups";
@@ -39,7 +40,7 @@ const CanvasElement = ({ canvasState }: CanvasProps) => {
   const { onDragOver, onDrop, onConnect, onNodeDragStart, onNodeDrag, onNodeDragStop } =
     useCanvasHandlers(canvasState);
 
-  useGlobalCopyPasteShortcuts();
+  useShortcuts(canvasState);
 
   return (
     <div className="w-screen h-screen bg-bg relative" style={{ width: "100%", height: "100%" }}>
@@ -66,6 +67,7 @@ const CanvasElement = ({ canvasState }: CanvasProps) => {
           proOptions={{ hideAttribution: true }}
         />
       </DndWrapper>
+      <CanvasContextMenu canvasState={canvasState} />
     </div>
   );
 };

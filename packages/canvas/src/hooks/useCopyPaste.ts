@@ -29,6 +29,7 @@ export function useCopyPaste() {
     return () => window.removeEventListener("click", handleClick);
   }, []);
 
+  /** copies selected nodes into an internal clipboard */
   const copy = useCallback(
     (explicitNodeId?: string) => {
       const allNodes = getNodes();
@@ -58,6 +59,10 @@ export function useCopyPaste() {
     [getNodes, getEdges],
   );
 
+  /**
+   * pastes copied nodes into the canvas at the current mouse position
+   * (or original position if none) with an offset
+   */
   const paste = useCallback(
     (screenPosition?: { x: number; y: number }) => {
       const clipboard = clipboardRef.current;
@@ -122,33 +127,4 @@ export function useCopyPaste() {
   );
 
   return { copy, paste };
-}
-
-/**
- * hook to enable global keyboard shortcuts for copy paste.
- *
- * should be called once at the root canvas level.
- */
-export function useGlobalCopyPasteShortcuts() {
-  const { copy, paste } = useCopyPaste();
-
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (!(e.ctrlKey || e.metaKey)) {
-        return;
-      }
-
-      const target = e.target as HTMLElement;
-      // shoudn't trigger on editable elements
-      if (target.tagName === "INPUT" || target.tagName === "TEXTAREA" || target.isContentEditable) {
-        return;
-      }
-
-      if (e.key === "c") copy();
-      if (e.key === "v") paste();
-    };
-
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [copy, paste]);
 }

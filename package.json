@@ -8,6 +8,7 @@
     "lint": "oxlint",
     "lint:fix": "oxlint . --fix",
     "test": "cd packages/canvas && pnpm test",
+    "test:ui": "cd packages/canvas && pnpm test:ui",
     "postinstall": "pnpm -r build"
   },
   "keywords": [],
@@ -22,6 +23,7 @@
   "type": "module",
   "devDependencies": {
     "@tailwindcss/vite": "catalog:",
+    "@vitest/ui": "^4.1.10",
     "autoprefixer": "catalog:",
     "oxlint": "catalog:",
     "postcss": "catalog:",
