@@ -1,4 +1,4 @@
-name: Tests
+name: Sysdraw Tests
 
 on:
   pull_request:

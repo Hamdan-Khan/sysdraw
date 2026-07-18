@@ -4,7 +4,7 @@ import { createRef } from "react";
 import { Toaster } from "sonner";
 import { StoreApi, useStore } from "zustand";
 import { useShallow } from "zustand/shallow";
-import { useCanvasHandlers, useCanvasStorage, useGlobalCopyPasteShortcuts } from "../../hooks";
+import { useCanvasHandlers, useGlobalCopyPasteShortcuts } from "../../hooks";
 import { CanvasStoreState } from "../../store";
 import { ControlsBar } from "../controls/ControlsBar";
 import { DndWrapper } from "../dnd";
@@ -39,8 +39,6 @@ const CanvasElement = ({ canvasState }: CanvasProps) => {
   const { onDragOver, onDrop, onConnect, onNodeDragStart, onNodeDrag, onNodeDragStop } =
     useCanvasHandlers(canvasState);
 
-  const { setRfInstance } = useCanvasStorage(canvasState);
-
   useGlobalCopyPasteShortcuts();
 
   return (
@@ -66,7 +64,6 @@ const CanvasElement = ({ canvasState }: CanvasProps) => {
           fitView
           className="bg-transparent"
           proOptions={{ hideAttribution: true }}
-          onInit={setRfInstance}
         />
       </DndWrapper>
     </div>

@@ -1,11 +1,13 @@
-import { Edge, Node, ReactFlowInstance, ReactFlowJsonObject, useReactFlow } from "@xyflow/react";
-import { useCallback, useState } from "react";
+import { Edge, Node, ReactFlowJsonObject, useReactFlow } from "@xyflow/react";
+import { useCallback } from "react";
 import { toast } from "sonner";
 import { CanvasStoreState } from "src/store";
 import { StoreApi, useStore } from "zustand";
 import { useShallow } from "zustand/shallow";
 
 const selector = (state: CanvasStoreState) => ({
+  nodes: state.nodes,
+  edges: state.edges,
   setNodes: state.setNodes,
   setEdges: state.setEdges,
 });
@@ -13,19 +15,19 @@ const selector = (state: CanvasStoreState) => ({
 export const CANVAS_LOCALSTORAGE_KEY = "sysdraw-canvas-snapshot";
 
 export const useCanvasStorage = (canvasState: StoreApi<CanvasStoreState>) => {
-  const { setEdges, setNodes } = useStore(canvasState, useShallow(selector));
+  const { nodes, edges, setEdges, setNodes } = useStore(canvasState, useShallow(selector));
 
-  const [rfInstance, setRfInstance] = useState<ReactFlowInstance | null>(null);
   const { setViewport } = useReactFlow();
 
   const onSave = useCallback(() => {
-    console.log(rfInstance); // todo: fix rfinstance setter call
-    if (rfInstance) {
-      const flow = rfInstance.toObject();
-      localStorage.setItem(CANVAS_LOCALSTORAGE_KEY, JSON.stringify(flow));
-      toast("Snapshot saved!");
-    }
-  }, [rfInstance]);
+    const flow: ReactFlowJsonObject<Node, Edge> = {
+      nodes,
+      edges,
+      viewport: { x: 0, y: 0, zoom: 1 },
+    };
+    localStorage.setItem(CANVAS_LOCALSTORAGE_KEY, JSON.stringify(flow));
+    toast("Snapshot saved!");
+  }, [nodes, edges]);
 
   const onRestore = useCallback(() => {
     const restoreFlow = async () => {
@@ -52,5 +54,5 @@ export const useCanvasStorage = (canvasState: StoreApi<CanvasStoreState>) => {
     restoreFlow();
   }, [setNodes, setEdges, setViewport]);
 
-  return { rfInstance, setRfInstance, onSave, onRestore };
+  return { onSave, onRestore };
 };
