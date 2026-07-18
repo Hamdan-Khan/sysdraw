@@ -14,3 +14,9 @@ function App() {
 
 export default App;
 ```
+
+## Todos
+
+- [] add locking nodes functionality
+- [] add custom context menu on right click
+- [] add keyboard shortcuts in root component

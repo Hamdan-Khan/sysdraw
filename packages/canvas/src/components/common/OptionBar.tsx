@@ -2,7 +2,7 @@ import { useNodeId, useReactFlow } from "@xyflow/react";
 import { Copy, Lock, MessageSquare, Trash2 } from "lucide-react";
 import { useCallback } from "react";
 import { toast } from "sonner";
-import { useCopyPaste } from "../../hooks/useCopyPaste";
+import { useCopyPaste } from "../../hooks";
 import { Tooltip } from "./Tooltip";
 
 interface OptionBarProps {

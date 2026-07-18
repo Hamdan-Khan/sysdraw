@@ -1,7 +1,7 @@
 import { act, renderHook } from "@testing-library/react";
 import { toast } from "sonner";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { CANVAS_LOCALSTORAGE_KEY, useCanvasStorage } from "../hooks/useCanvasStorage";
+import { CANVAS_LOCALSTORAGE_KEY, useCanvasStorage } from "../hooks";
 import { mockSetEdges, mockSetNodes, mockSetViewport } from "./mocks";
 
 describe("useCanvasStorage", () => {
@@ -48,6 +48,11 @@ describe("useCanvasStorage", () => {
   });
 
   describe("onRestore", () => {
+    // to not pollute the test logs with logged errors
+    beforeEach(() => {
+      vi.spyOn(console, "error").mockImplementation(() => {});
+    });
+
     it("shows a toast and does nothing if no snapshot is stored", async () => {
       const { result } = renderHook(() => useCanvasStorage({} as any));
       await act(async () => result.current.onRestore());

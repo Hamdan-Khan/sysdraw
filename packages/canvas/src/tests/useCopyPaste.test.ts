@@ -1,7 +1,7 @@
 import { act, renderHook } from "@testing-library/react";
 import type { Edge, Node } from "@xyflow/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { useCopyPaste } from "../hooks/useCopyPaste";
+import { useCopyPaste } from "../hooks";
 import {
   mockGetEdges,
   mockGetNodes,
