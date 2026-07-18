@@ -1,13 +1,16 @@
 import { ControlButton, Controls, ReactFlow, ReactFlowProvider } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
-import { ArchiveRestore, Save } from "lucide-react";
+import { ArchiveRestore, Redo, Save, Undo } from "lucide-react";
 import { createRef } from "react";
 import { Toaster } from "sonner";
 import { StoreApi, useStore } from "zustand";
 import { useShallow } from "zustand/shallow";
-import { useCanvasHandlers } from "../../hooks/useCanvasHandlers";
-import { useCanvasStorage } from "../../hooks/useCanvasStorage";
-import { useGlobalCopyPasteShortcuts } from "../../hooks/useCopyPaste";
+import {
+  useCanvasHandlers,
+  useCanvasStorage,
+  useGlobalCopyPasteShortcuts,
+  useHistory,
+} from "../../hooks";
 import { CanvasStoreState } from "../../store";
 import { DndWrapper } from "../dnd";
 import { edgeTypes } from "../edges";
@@ -41,6 +44,7 @@ const CanvasElement = ({ canvasState }: CanvasProps) => {
     useCanvasHandlers(canvasState);
 
   const { setRfInstance, onSave, onRestore } = useCanvasStorage(canvasState);
+  const { undo, redo, canUndo, canRedo } = useHistory(canvasState);
 
   useGlobalCopyPasteShortcuts();
 
@@ -69,6 +73,12 @@ const CanvasElement = ({ canvasState }: CanvasProps) => {
             </ControlButton>
             <ControlButton onClick={() => onRestore()}>
               <ArchiveRestore />
+            </ControlButton>
+            <ControlButton disabled={!canUndo} onClick={() => undo()}>
+              <Undo />
+            </ControlButton>
+            <ControlButton disabled={!canRedo} onClick={() => redo()}>
+              <Redo />
             </ControlButton>
           </Controls>
         </ReactFlow>

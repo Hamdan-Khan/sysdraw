@@ -6,6 +6,16 @@ import { mockGetInternalNode, mockGetIntersectingNodes, mockGetNodes, mockSetNod
 
 vi.mock("nanoid", () => ({ nanoid: () => "new-id" }));
 
+vi.mock("../hooks/useHistory", () => ({
+  useHistory: () => ({
+    commit: vi.fn(),
+    undo: vi.fn(),
+    redo: vi.fn(),
+    canUndo: false,
+    canRedo: false,
+  }),
+}));
+
 vi.mock("@sysdraw/models", async (importOriginal) => ({
   ...(await importOriginal<typeof import("@sysdraw/models")>()),
   defaultNodesMap: { rectangle: { label: "default rect" } },

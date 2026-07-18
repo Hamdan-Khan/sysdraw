@@ -1,0 +1,235 @@
+import { beforeEach, describe, expect, it, vi } from "vitest";
+import { makeEdge, makeNode, makeStore } from "./utils";
+
+vi.unmock("zustand");
+
+describe("setNodes", () => {
+  it("replaces nodes with a direct array", () => {
+    const store = makeStore([makeNode("a")]);
+    const { setNodes } = store.getState();
+
+    setNodes([makeNode("b"), makeNode("c")]);
+
+    const { nodes } = store.getState();
+    expect(nodes).toHaveLength(2);
+    expect(nodes.map((n) => n.id)).toEqual(["b", "c"]);
+  });
+
+  it("applies a functional updater", () => {
+    const store = makeStore([makeNode("a")]);
+    const { setNodes } = store.getState();
+
+    setNodes((prev) => [...prev, makeNode("b")]);
+
+    expect(store.getState().nodes.map((n) => n.id)).toEqual(["a", "b"]);
+  });
+});
+
+describe("setEdges", () => {
+  it("replaces edges with a direct array", () => {
+    const store = makeStore([], [makeEdge("e1", "a", "b")]);
+    const { setEdges } = store.getState();
+
+    setEdges([makeEdge("e2", "c", "d")]);
+
+    expect(store.getState().edges.map((e) => e.id)).toEqual(["e2"]);
+  });
+
+  it("applies a functional updater", () => {
+    const store = makeStore([], [makeEdge("e1", "a", "b")]);
+    const { setEdges } = store.getState();
+
+    setEdges((prev) => [...prev, makeEdge("e2", "c", "d")]);
+
+    expect(store.getState().edges.map((e) => e.id)).toEqual(["e1", "e2"]);
+  });
+});
+
+describe("onNodesChange", () => {
+  it("adds a node via an 'add' change", () => {
+    const store = makeStore();
+    const { onNodesChange } = store.getState();
+
+    onNodesChange([{ type: "add", item: makeNode("n1") }]);
+
+    expect(store.getState().nodes).toHaveLength(1);
+    expect(store.getState().nodes[0].id).toBe("n1");
+  });
+
+  it("removes a node via a 'remove' change", () => {
+    const store = makeStore([makeNode("n1"), makeNode("n2")]);
+    const { onNodesChange } = store.getState();
+
+    onNodesChange([{ type: "remove", id: "n1" }]);
+
+    const ids = store.getState().nodes.map((n) => n.id);
+    expect(ids).toEqual(["n2"]);
+  });
+});
+
+describe("onEdgesChange", () => {
+  it("adds an edge via an 'add' change", () => {
+    const store = makeStore();
+    const { onEdgesChange } = store.getState();
+
+    onEdgesChange([{ type: "add", item: makeEdge("e1", "a", "b") }]);
+
+    expect(store.getState().edges).toHaveLength(1);
+    expect(store.getState().edges[0].id).toBe("e1");
+  });
+
+  it("removes an edge via a 'remove' change", () => {
+    const store = makeStore([], [makeEdge("e1", "a", "b"), makeEdge("e2", "b", "c")]);
+    const { onEdgesChange } = store.getState();
+
+    onEdgesChange([{ type: "remove", id: "e1" }]);
+
+    expect(store.getState().edges.map((e) => e.id)).toEqual(["e2"]);
+  });
+});
+
+describe("onConnect", () => {
+  it("creates a new edge from a connection", () => {
+    const store = makeStore();
+    const { onConnect } = store.getState();
+
+    onConnect({ source: "s1", target: "t1", sourceHandle: null, targetHandle: null });
+
+    const { edges } = store.getState();
+    expect(edges).toHaveLength(1);
+    expect(edges[0].source).toBe("s1");
+    expect(edges[0].target).toBe("t1");
+  });
+
+  it("appends without removing existing edges", () => {
+    const store = makeStore([], [makeEdge("e-existing", "a", "b")]);
+    const { onConnect } = store.getState();
+
+    onConnect({ source: "s1", target: "t1", sourceHandle: null, targetHandle: null });
+
+    expect(store.getState().edges).toHaveLength(2);
+  });
+});
+
+describe("commit / undo / redo", () => {
+  beforeEach(() => vi.clearAllMocks());
+
+  it("commit pushes current store state into past and clears future", () => {
+    const store = makeStore([makeNode("a")]);
+    const { commit } = store.getState();
+
+    commit();
+
+    const { history } = store.getState();
+    expect(history.past).toHaveLength(1);
+    expect(history.past[0].nodes[0].id).toBe("a");
+    expect(history.future).toHaveLength(0);
+  });
+
+  it("undo is a no-op when past is empty", () => {
+    const store = makeStore([makeNode("a")]);
+    const { undo } = store.getState();
+
+    undo();
+
+    expect(store.getState().nodes.map((n) => n.id)).toEqual(["a"]);
+    expect(store.getState().history.past).toHaveLength(0);
+  });
+
+  it("undo restores previous snapshot and saves current state in future", () => {
+    const store = makeStore([makeNode("prev")]);
+    const { commit, undo, setNodes } = store.getState();
+
+    commit();
+    setNodes([makeNode("current")]);
+
+    undo();
+
+    const { nodes, history } = store.getState();
+    expect(nodes.map((n) => n.id)).toEqual(["prev"]);
+    expect(history.past).toHaveLength(0);
+    // future holds the state that was live before undo (i.e. "current")
+    expect(history.future).toHaveLength(1);
+    expect(history.future[0].nodes[0].id).toBe("current");
+  });
+
+  it("redo is a no-op when future is empty", () => {
+    const store = makeStore([makeNode("a")]);
+    const { redo } = store.getState();
+
+    redo();
+
+    expect(store.getState().nodes.map((n) => n.id)).toEqual(["a"]);
+  });
+
+  it("redo restores next snapshot and moves it to past", () => {
+    const store = makeStore([makeNode("step-1")]);
+    const { commit, undo, redo } = store.getState();
+
+    // captures "step-1", undo saves "step-1" in future
+    commit();
+    undo();
+    redo();
+
+    const { nodes, history } = store.getState();
+    expect(nodes.map((n) => n.id)).toEqual(["step-1"]);
+    expect(history.past).toHaveLength(1);
+    expect(history.future).toHaveLength(0);
+  });
+
+  it("commit after undo clears the future", () => {
+    const store = makeStore([makeNode("a")]);
+    const { commit, undo, setNodes } = store.getState();
+
+    commit();
+    undo();
+
+    // committing a new change should wipe the future
+    setNodes([makeNode("b")]);
+    commit();
+
+    expect(store.getState().history.future).toHaveLength(0);
+    expect(store.getState().history.past[0].nodes[0].id).toBe("b");
+  });
+
+  it("full undo/redo round-trip preserves state correctly", () => {
+    const store = makeStore([makeNode("initial")]);
+    const { commit, undo, redo, setNodes } = store.getState();
+
+    // captures "initial", then mutate to "a"
+    commit();
+    setNodes([makeNode("a")]);
+
+    // captures "a", then mutate to "b"
+    commit();
+    setNodes([makeNode("b")]);
+
+    // undo restores "a"
+    undo();
+    expect(store.getState().nodes.map((n) => n.id)).toEqual(["a"]);
+
+    // undo restores "initial"
+    undo();
+    expect(store.getState().nodes.map((n) => n.id)).toEqual(["initial"]);
+
+    // redo restores "a"
+    redo();
+    expect(store.getState().nodes.map((n) => n.id)).toEqual(["a"]);
+    expect(store.getState().history.past).toHaveLength(1);
+  });
+
+  it("caps history at HISTORY_LIMIT (30) entries", () => {
+    const store = makeStore();
+    const { commit, setNodes } = store.getState();
+
+    for (let i = 0; i < 35; i++) {
+      setNodes([makeNode(`n${i}`)]);
+      commit();
+    }
+
+    const { history } = store.getState();
+    expect(history.past).toHaveLength(30);
+    // oldest entries were dropped (0–4)
+    expect(history.past[0].nodes[0].id).toBe("n5");
+  });
+});

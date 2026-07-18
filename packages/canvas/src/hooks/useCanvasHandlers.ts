@@ -24,6 +24,7 @@ import {
 } from "../components/canvas";
 import { SYSDRAW_DRAG_DATA_FORMAT } from "../components/toolbar";
 import { CanvasStoreState } from "../store";
+import { useHistory } from "./useHistory";
 
 const selector = (state: CanvasStoreState) => ({
   setNodes: state.setNodes,
@@ -44,6 +45,8 @@ export const useCanvasHandlers = (canvasState: StoreApi<CanvasStoreState>) => {
 
   const { screenToFlowPosition, getIntersectingNodes, getInternalNode, getNodesBounds, getNodes } =
     useReactFlow();
+
+  const { commit } = useHistory(canvasState);
 
   /**
    * drag over (from toolbar)
@@ -88,6 +91,7 @@ export const useCanvasHandlers = (canvasState: StoreApi<CanvasStoreState>) => {
 
       const newNode: Node = { id: nanoid(), type, position, data: defaultData };
 
+      commit();
       setNodes((prev) => {
         // xyflow requires parent nodes to be drawn before child nodes
         // hence, we add groups at the start when they're added from the toolbar
@@ -97,7 +101,7 @@ export const useCanvasHandlers = (canvasState: StoreApi<CanvasStoreState>) => {
         return [...prev, newNode];
       });
     },
-    [screenToFlowPosition, setNodes],
+    [screenToFlowPosition, setNodes, commit],
   );
 
   /**
@@ -264,6 +268,7 @@ export const useCanvasHandlers = (canvasState: StoreApi<CanvasStoreState>) => {
       if (best) {
         const { group: dropTarget, groupRect } = best;
 
+        commit();
         // Reparent every selected node into the group.
         setNodes((ns) => {
           const updatedNodes = ns.map((n) => {
@@ -291,6 +296,7 @@ export const useCanvasHandlers = (canvasState: StoreApi<CanvasStoreState>) => {
           return sortNodesAndGroups(updatedNodes);
         });
       } else {
+        commit();
         // no valid drop target found so unparent every selected node that had a parent
         // then restore its absolute position and clean up any highlight rings.
         setNodes((ns) =>
@@ -312,7 +318,7 @@ export const useCanvasHandlers = (canvasState: StoreApi<CanvasStoreState>) => {
         );
       }
     },
-    [getBestDropGroup, getInternalNode, setNodes],
+    [getBestDropGroup, getInternalNode, setNodes, commit],
   );
 
   return { onDragOver, onDrop, onConnect, onNodeDrag, onNodeDragStop };
