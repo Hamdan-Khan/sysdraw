@@ -1,10 +1,9 @@
+import { RegisteredEdges } from "@sysdraw/models";
 import {
-  addEdge,
   applyEdgeChanges,
   applyNodeChanges,
   type Edge,
   type Node,
-  type OnConnect,
   type OnEdgesChange,
   type OnNodesChange,
 } from "@xyflow/react";
@@ -34,7 +33,8 @@ interface CanvasStoreState extends InitialCanvasStoreState {
   history: HistoryState;
   onNodesChange: OnNodesChange<Node>;
   onEdgesChange: OnEdgesChange;
-  onConnect: OnConnect;
+  globalEdgeType: RegisteredEdges;
+  setGlobalEdgeType: (type: RegisteredEdges) => void;
   setNodes: (nodes: Node[] | ((prev: Node[]) => Node[])) => void;
   setEdges: (edges: Edge[] | ((prev: Edge[]) => Edge[])) => void;
   commit: () => void;
@@ -66,11 +66,8 @@ const createCanvasStore = (storeState: InitialCanvasStoreState) => {
         edges: applyEdgeChanges(changes, get().edges),
       });
     },
-    onConnect: (connection) => {
-      set({
-        edges: addEdge(connection, get().edges),
-      });
-    },
+    globalEdgeType: RegisteredEdges.STRAIGHT,
+    setGlobalEdgeType: (type) => set({ globalEdgeType: type }),
     setNodes: (nodes) => {
       set({ nodes: typeof nodes === "function" ? nodes(get().nodes) : nodes });
     },

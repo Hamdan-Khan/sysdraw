@@ -1,18 +1,23 @@
 import type { BaseEdgeData } from "../types";
-import { httpCallDefaults } from "./Http";
 
 /**
- * list of all registered edges
+ * list of all registered edge shape types
  */
 enum RegisteredEdges {
-  HTTP_CALL = "http-call",
+  STRAIGHT = "straight",
+  STEP = "step",
+  SMOOTHSTEP = "smoothstep",
+  BEZIER = "bezier",
 }
 
 /**
- * Map of all registered edges with default data values
+ * map of all registered edge types with default data values
  */
 const defaultEdgesMap: Record<RegisteredEdges, BaseEdgeData> = {
-  [RegisteredEdges.HTTP_CALL]: httpCallDefaults,
+  [RegisteredEdges.STRAIGHT]: { label: "Straight" },
+  [RegisteredEdges.STEP]: { label: "Step" },
+  [RegisteredEdges.SMOOTHSTEP]: { label: "Smooth Step" },
+  [RegisteredEdges.BEZIER]: { label: "Bezier" },
 };
 
 export { defaultEdgesMap, RegisteredEdges };

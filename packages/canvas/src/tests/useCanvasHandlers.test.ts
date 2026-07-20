@@ -1,9 +1,16 @@
+import { RegisteredEdges } from "@sysdraw/models";
 import { act, renderHook } from "@testing-library/react";
 import { Node } from "@xyflow/react";
 import { toast } from "sonner";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { useCanvasHandlers } from "../hooks/useCanvasHandlers";
-import { mockGetInternalNode, mockGetIntersectingNodes, mockGetNodes, mockSetNodes } from "./mocks";
+import {
+  mockGetInternalNode,
+  mockGetIntersectingNodes,
+  mockGetNodes,
+  mockSetEdges,
+  mockSetNodes,
+} from "./mocks";
 
 vi.mock("nanoid", () => ({ nanoid: () => "new-id" }));
 
@@ -18,6 +25,18 @@ vi.mock("../hooks/useHistory", () => ({
     canRedo: false,
   }),
 }));
+
+vi.mock("zustand", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("zustand")>();
+  const { mockSetNodes, mockSetEdges } = await import("./mocks");
+  return {
+    ...actual,
+    useStore: (store: any, selector: any) =>
+      store?.getState
+        ? selector(store.getState())
+        : selector({ setNodes: mockSetNodes, setEdges: mockSetEdges, globalEdgeType: "straight" }),
+  };
+});
 
 vi.mock("@sysdraw/models", async (importOriginal) => ({
   ...(await importOriginal<typeof import("@sysdraw/models")>()),
@@ -139,6 +158,42 @@ describe("useCanvasHandlers", () => {
       const updated = mockSetNodes.mock.calls[0][0]([parented]);
       expect(updated[0].parentId).toBeUndefined();
       expect(updated[0].position).toEqual({ x: 10, y: 10 });
+    });
+  });
+
+  describe("onConnect", () => {
+    it("commits history and creates an edge with the globalEdgeType", () => {
+      const mockStore = {
+        getState: () => ({
+          setNodes: mockSetNodes,
+          setEdges: mockSetEdges,
+          globalEdgeType: RegisteredEdges.SMOOTHSTEP,
+        }),
+      };
+
+      const { result } = renderHook(() => useCanvasHandlers(mockStore as any));
+
+      act(() => {
+        result.current.onConnect({
+          source: "s1",
+          target: "t1",
+          sourceHandle: null,
+          targetHandle: null,
+        });
+      });
+
+      expect(mockCommit).toHaveBeenCalledTimes(1);
+      expect(mockSetEdges).toHaveBeenCalledTimes(1);
+
+      // the setEdges callback should be called
+      const setEdgesUpdater = mockSetEdges.mock.calls[0][0];
+      const existingEdges: any[] = [];
+      const updatedEdges = setEdgesUpdater(existingEdges);
+
+      expect(updatedEdges).toHaveLength(1);
+      expect(updatedEdges[0].source).toBe("s1");
+      expect(updatedEdges[0].target).toBe("t1");
+      expect(updatedEdges[0].type).toBe(RegisteredEdges.SMOOTHSTEP);
     });
   });
 });

@@ -1,3 +1,4 @@
+import { RegisteredEdges } from "@sysdraw/models";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { makeEdge, makeNode, makeStore } from "./utils";
 
@@ -88,26 +89,19 @@ describe("onEdgesChange", () => {
   });
 });
 
-describe("onConnect", () => {
-  it("creates a new edge from a connection", () => {
+describe("globalEdgeType / setGlobalEdgeType", () => {
+  it("defaults to straight", () => {
     const store = makeStore();
-    const { onConnect } = store.getState();
-
-    onConnect({ source: "s1", target: "t1", sourceHandle: null, targetHandle: null });
-
-    const { edges } = store.getState();
-    expect(edges).toHaveLength(1);
-    expect(edges[0].source).toBe("s1");
-    expect(edges[0].target).toBe("t1");
+    expect(store.getState().globalEdgeType).toBe(RegisteredEdges.STRAIGHT);
   });
 
-  it("appends without removing existing edges", () => {
-    const store = makeStore([], [makeEdge("e-existing", "a", "b")]);
-    const { onConnect } = store.getState();
+  it("updates globalEdgeType", () => {
+    const store = makeStore();
+    const { setGlobalEdgeType } = store.getState();
 
-    onConnect({ source: "s1", target: "t1", sourceHandle: null, targetHandle: null });
+    setGlobalEdgeType(RegisteredEdges.BEZIER);
 
-    expect(store.getState().edges).toHaveLength(2);
+    expect(store.getState().globalEdgeType).toBe(RegisteredEdges.BEZIER);
   });
 });
 
