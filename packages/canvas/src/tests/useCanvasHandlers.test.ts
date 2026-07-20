@@ -34,7 +34,12 @@ vi.mock("zustand", async (importOriginal) => {
     useStore: (store: any, selector: any) =>
       store?.getState
         ? selector(store.getState())
-        : selector({ setNodes: mockSetNodes, setEdges: mockSetEdges, globalEdgeType: "straight" }),
+        : selector({
+            nodes: [],
+            setNodes: mockSetNodes,
+            setEdges: mockSetEdges,
+            globalEdgeType: "straight",
+          }),
   };
 });
 
@@ -165,6 +170,7 @@ describe("useCanvasHandlers", () => {
     it("commits history and creates an edge with the globalEdgeType", () => {
       const mockStore = {
         getState: () => ({
+          nodes: [],
           setNodes: mockSetNodes,
           setEdges: mockSetEdges,
           globalEdgeType: RegisteredEdges.SMOOTHSTEP,

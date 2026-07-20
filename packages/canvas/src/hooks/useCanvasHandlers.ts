@@ -8,7 +8,7 @@ import {
 } from "@sysdraw/models";
 import { addEdge, Node, OnNodeDrag, Rect, useReactFlow, type OnConnect } from "@xyflow/react";
 import { nanoid } from "nanoid";
-import { useCallback } from "react";
+import { useCallback, useMemo } from "react";
 import { toast } from "sonner";
 import { StoreApi, useStore } from "zustand";
 import { useShallow } from "zustand/shallow";
@@ -27,6 +27,7 @@ import { CanvasStoreState } from "../store";
 import { useHistory } from "./useHistory";
 
 const selector = (state: CanvasStoreState) => ({
+  nodes: state.nodes,
   setNodes: state.setNodes,
   setEdges: state.setEdges,
   globalEdgeType: state.globalEdgeType,
@@ -41,12 +42,19 @@ type CandidateGroupNode = { group: Node; groupRect: NodeRect; ratio: number };
  * event handlers for the canvas (drag, drop, re-parenting, etc.)
  */
 export const useCanvasHandlers = (canvasState: StoreApi<CanvasStoreState>) => {
-  const { setNodes, setEdges, globalEdgeType } = useStore(canvasState, useShallow(selector));
+  const {
+    nodes: nodesList,
+    setNodes,
+    setEdges,
+    globalEdgeType,
+  } = useStore(canvasState, useShallow(selector));
 
-  const { screenToFlowPosition, getIntersectingNodes, getInternalNode, getNodesBounds, getNodes } =
+  const { screenToFlowPosition, getIntersectingNodes, getInternalNode, getNodesBounds } =
     useReactFlow();
 
   const { commit } = useHistory(canvasState);
+
+  const nodesMap = useMemo(() => new Map(nodesList.map((n) => [n.id, n])), [nodesList]);
 
   const onConnect: OnConnect = useCallback(
     (connection) => {
@@ -133,7 +141,6 @@ export const useCanvasHandlers = (canvasState: StoreApi<CanvasStoreState>) => {
     (nodes: Node[]): { group: Node; groupRect: NodeRect } | null => {
       /** bounding rect for the whole selection */
       const multiSelectDragBounds = nodes.length > 1 ? getNodesBounds(nodes) : null;
-      const allNodes = getNodes();
 
       const seen = new Set<string>();
       const candidateGroups: Node[] = [];
@@ -144,7 +151,7 @@ export const useCanvasHandlers = (canvasState: StoreApi<CanvasStoreState>) => {
           // omit child groups from becoming candidates, because when child
           // group's area is large enough, it starts to trigger the min intersection
           // condition and be considered for the drag/drag stop events
-          const isChild = isChildNode(g, n, allNodes);
+          const isChild = isChildNode(g, n, nodesMap);
 
           if (!seen.has(g.id) && !isChild) {
             seen.add(g.id);
@@ -196,7 +203,7 @@ export const useCanvasHandlers = (canvasState: StoreApi<CanvasStoreState>) => {
       // by discarding any candidate that is an ancestor of another valid candidate
       const deepestCandidates = validCandidates.filter((c1) => {
         const hasValidDescendant = validCandidates.some(
-          (c2) => c1.group.id !== c2.group.id && isChildNode(c2.group, c1.group, allNodes),
+          (c2) => c1.group.id !== c2.group.id && isChildNode(c2.group, c1.group, nodesMap),
         );
         return !hasValidDescendant;
       });
@@ -215,7 +222,7 @@ export const useCanvasHandlers = (canvasState: StoreApi<CanvasStoreState>) => {
       }
       return { group: best.group, groupRect: best.groupRect };
     },
-    [getIntersectingNodeGroup, getInternalNode, getNodesBounds, getNodes],
+    [getIntersectingNodeGroup, getInternalNode, getNodesBounds, nodesMap],
   );
 
   /**

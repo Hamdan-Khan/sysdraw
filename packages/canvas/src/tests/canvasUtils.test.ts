@@ -141,26 +141,28 @@ describe("isChildNode", () => {
   it("returns false when node1 has no parentId", () => {
     const n1 = makeRegularNode("n1");
     const n2 = makeGroupNode("n2");
-    expect(isChildNode(n1, n2, [n1, n2])).toBe(false);
+    expect(isChildNode(n1, n2, new Map([n1, n2].map((n) => [n.id, n])))).toBe(false);
   });
 
   it("returns true when node1 is a direct child of node2", () => {
     const parent = makeGroupNode("parent");
     const child = makeRegularNode("child", "parent");
-    expect(isChildNode(child, parent, [parent, child])).toBe(true);
+    expect(isChildNode(child, parent, new Map([parent, child].map((n) => [n.id, n])))).toBe(true);
   });
 
   it("returns true when node1 is a grandchild of node2", () => {
     const grandparent = makeGroupNode("grandparent");
     const parent = makeGroupNode("parent", "grandparent");
     const child = makeRegularNode("child", "parent");
-    expect(isChildNode(child, grandparent, [grandparent, parent, child])).toBe(true);
+    expect(
+      isChildNode(child, grandparent, new Map([grandparent, parent, child].map((n) => [n.id, n]))),
+    ).toBe(true);
   });
 
   it("returns false for completely unrelated nodes", () => {
     const a = makeGroupNode("a");
     const b = makeGroupNode("b");
     const c = makeRegularNode("c", "b");
-    expect(isChildNode(c, a, [a, b, c])).toBe(false);
+    expect(isChildNode(c, a, new Map([a, b, c].map((n) => [n.id, n])))).toBe(false);
   });
 });

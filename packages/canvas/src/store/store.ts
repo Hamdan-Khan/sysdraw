@@ -12,6 +12,7 @@ import { create } from "zustand";
 type InitialCanvasStoreState = {
   nodes: Node[];
   edges: Edge[];
+  selectedEdgeType?: RegisteredEdges;
 };
 
 export interface HistorySnapshot {
@@ -27,13 +28,13 @@ export interface HistoryState {
 /** max number of history depth */
 const HISTORY_LIMIT = 30;
 
-interface CanvasStoreState extends InitialCanvasStoreState {
+interface CanvasStoreState {
   nodes: Node[];
   edges: Edge[];
   history: HistoryState;
+  globalEdgeType: RegisteredEdges;
   onNodesChange: OnNodesChange<Node>;
   onEdgesChange: OnEdgesChange;
-  globalEdgeType: RegisteredEdges;
   setGlobalEdgeType: (type: RegisteredEdges) => void;
   setNodes: (nodes: Node[] | ((prev: Node[]) => Node[])) => void;
   setEdges: (edges: Edge[] | ((prev: Edge[]) => Edge[])) => void;
@@ -56,6 +57,7 @@ const createCanvasStore = (storeState: InitialCanvasStoreState) => {
       future: [],
     },
     isInteractive: true,
+    globalEdgeType: storeState.selectedEdgeType ?? RegisteredEdges.STRAIGHT,
     onNodesChange: (changes) => {
       set({
         nodes: applyNodeChanges(changes, get().nodes),
@@ -66,7 +68,6 @@ const createCanvasStore = (storeState: InitialCanvasStoreState) => {
         edges: applyEdgeChanges(changes, get().edges),
       });
     },
-    globalEdgeType: RegisteredEdges.STRAIGHT,
     setGlobalEdgeType: (type) => set({ globalEdgeType: type }),
     setNodes: (nodes) => {
       set({ nodes: typeof nodes === "function" ? nodes(get().nodes) : nodes });

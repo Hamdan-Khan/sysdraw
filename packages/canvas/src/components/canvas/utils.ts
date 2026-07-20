@@ -116,9 +116,9 @@ export const sortNodesAndGroups = (nodes: Node[]): Node[] => {
  *
  * @param node1 - node to check
  * @param node2 - potential parent node
- * @param allNodes - array of all nodes in the canvas
+ * @param nodesMap - map of all nodes in the canvas
  */
-export const isChildNode = (node1: Node, node2: Node, allNodes: Node[]): boolean => {
+export const isChildNode = (node1: Node, node2: Node, nodesMap: Map<string, Node>): boolean => {
   if (!node1.parentId) {
     return false;
   }
@@ -126,7 +126,7 @@ export const isChildNode = (node1: Node, node2: Node, allNodes: Node[]): boolean
   let parentId: string | null = node1.parentId ?? null;
 
   while (parentId != node2.id && parentId != null) {
-    const parentNode = allNodes.find((v) => v.id == parentId);
+    const parentNode = nodesMap.get(parentId);
     parentId = parentNode?.parentId ?? null;
   }
 
