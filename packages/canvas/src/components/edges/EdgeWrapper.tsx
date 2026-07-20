@@ -6,6 +6,8 @@ import {
   getBezierPath,
   getSmoothStepPath,
   getStraightPath,
+  ReactFlowState,
+  useStore,
   useViewport,
 } from "@xyflow/react";
 import { EdgeOptionBar } from "./EdgeOptionBar";
@@ -49,7 +51,6 @@ export const EdgeWrapper = ({
       [edgePath, labelX, labelY] = getStraightPath(pathParams);
       break;
     case RegisteredEdges.STEP:
-      // step is smoothstep with borderRadius 0 (xyflow does not export getStepPath)
       [edgePath, labelX, labelY] = getSmoothStepPath({ ...pathParams, borderRadius: 0 });
       break;
     case RegisteredEdges.SMOOTHSTEP:
@@ -71,21 +72,63 @@ export const EdgeWrapper = ({
         style={edgeStyle}
       />
       {selected && (
-        <EdgeLabelRenderer>
-          <div
-            style={{
-              position: "absolute",
-              // counter-scale by 1/zoom so the bar stays the same visual size at any zoom level
-              transform: `translate(-50%, -50%) translate(${labelX}px,${labelY}px) scale(${1 / zoom})`,
-              pointerEvents: "all",
-              zIndex: 1000,
-            }}
-            className="nodrag nopan"
-          >
-            <EdgeOptionBar edgeId={id} />
-          </div>
-        </EdgeLabelRenderer>
+        <EdgeOptionBarContainer edgeId={id} labelX={labelX} labelY={labelY} zoom={zoom} />
       )}
     </>
+  );
+};
+
+/**
+ * selector that returns true if only one element is selected (node or edge)
+ *
+ * to avoid rendering multiple edge option bars when multiple elements are selected.
+ */
+const isOnlySelectedSelector = (s: ReactFlowState) => {
+  let count = 0;
+  for (const n of s.nodes) {
+    if (n.selected) {
+      count++;
+    }
+  }
+  for (const e of s.edges) {
+    if (e.selected) {
+      count++;
+    }
+  }
+  return count === 1;
+};
+
+const EdgeOptionBarContainer = ({
+  edgeId,
+  labelX,
+  labelY,
+  zoom,
+}: {
+  edgeId: string;
+  labelX: number;
+  labelY: number;
+  zoom: number;
+}) => {
+  const isOnlySelected = useStore(isOnlySelectedSelector);
+
+  if (!isOnlySelected) {
+    return null;
+  }
+
+  return (
+    <EdgeLabelRenderer>
+      <div
+        style={{
+          position: "absolute",
+          // counter-scale by 1/zoom so the bar stays the same visual size at any zoom level
+          transform: `translate(-50%, -50%) translate(${labelX}px,${labelY}px) scale(${1 / zoom})`,
+          pointerEvents: "all",
+          zIndex: 1000,
+        }}
+        className="nodrag nopan"
+      >
+        <EdgeOptionBar edgeId={edgeId} />
+      </div>
+    </EdgeLabelRenderer>
   );
 };
