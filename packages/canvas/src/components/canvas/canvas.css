@@ -22,8 +22,10 @@
 }
 
 .custom-handle {
-  width: 20px;
-  height: 20px;
+  width: 6px !important;
+  height: 6px !important;
+  min-width: 6px !important;
+  min-height: 6px !important;
   background: transparent !important;
   border: none !important;
 }
