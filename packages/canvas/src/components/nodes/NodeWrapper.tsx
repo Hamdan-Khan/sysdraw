@@ -51,7 +51,7 @@ export const NodeWrapper = ({ children, handles = defaultHandles, selected }: No
         minHeight={40}
         isVisible={selected}
         keepAspectRatio
-        lineStyle={{ borderWidth: 0.1 / zoom }}
+        lineStyle={{ borderWidth: 1 / zoom }}
       />
       <NodeToolbar className="flex gap-2">
         <OptionBar type="node" />

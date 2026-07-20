@@ -6,7 +6,7 @@ import {
   RegisteredGroups,
   RegisteredNodes,
 } from "@sysdraw/models";
-import { Node, OnNodeDrag, Rect, useReactFlow } from "@xyflow/react";
+import { addEdge, Node, OnNodeDrag, Rect, useReactFlow, type OnConnect } from "@xyflow/react";
 import { nanoid } from "nanoid";
 import { useCallback } from "react";
 import { toast } from "sonner";
@@ -29,7 +29,7 @@ import { useHistory } from "./useHistory";
 const selector = (state: CanvasStoreState) => ({
   setNodes: state.setNodes,
   setEdges: state.setEdges,
-  onConnect: state.onConnect,
+  globalEdgeType: state.globalEdgeType,
 });
 
 /** minimum overlapping area percentage to trigger reparenting */
@@ -41,12 +41,20 @@ type CandidateGroupNode = { group: Node; groupRect: NodeRect; ratio: number };
  * event handlers for the canvas (drag, drop, re-parenting, etc.)
  */
 export const useCanvasHandlers = (canvasState: StoreApi<CanvasStoreState>) => {
-  const { setNodes, onConnect } = useStore(canvasState, useShallow(selector));
+  const { setNodes, setEdges, globalEdgeType } = useStore(canvasState, useShallow(selector));
 
   const { screenToFlowPosition, getIntersectingNodes, getInternalNode, getNodesBounds, getNodes } =
     useReactFlow();
 
   const { commit } = useHistory(canvasState);
+
+  const onConnect: OnConnect = useCallback(
+    (connection) => {
+      commit();
+      setEdges((edges) => addEdge({ ...connection, type: globalEdgeType }, edges));
+    },
+    [commit, setEdges, globalEdgeType],
+  );
 
   /**
    * drag over (from toolbar)

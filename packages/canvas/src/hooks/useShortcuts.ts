@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
+import { ContextMenuState } from "src/components/context-menu/types";
 import { StoreApi, useStore } from "zustand";
 import { useShallow } from "zustand/shallow";
 import { CanvasStoreState } from "../store";
@@ -10,11 +11,6 @@ const selector = (state: CanvasStoreState) => ({
   setNodes: state.setNodes,
   setEdges: state.setEdges,
 });
-
-export interface ContextMenuState {
-  x: number;
-  y: number;
-}
 
 /**
  * hook to enable global keyboard shortcuts and a right-click context menu.

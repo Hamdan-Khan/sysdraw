@@ -1,16 +1,44 @@
+import { RegisteredEdges } from "@sysdraw/models";
 import { useReactFlow } from "@xyflow/react";
-import { ArchiveRestoreIcon, Lock, Maximize, Redo, Save, Undo, Unlock } from "lucide-react";
+import {
+  ArchiveRestoreIcon,
+  CornerDownRight,
+  GitCommit,
+  Lock,
+  Maximize,
+  Minus,
+  Redo,
+  Save,
+  Spline,
+  Undo,
+  Unlock,
+} from "lucide-react";
 import { StoreApi, useStore } from "zustand";
+import { useShallow } from "zustand/shallow";
 import { useCanvasStorage, useHistory } from "../../hooks";
 import { CanvasStoreState } from "../../store";
-import { Tooltip } from "../common";
+import { Dropdown, DropdownOption, Tooltip } from "../common";
+
+const edgeTypeOptions: DropdownOption<RegisteredEdges>[] = [
+  { value: RegisteredEdges.STRAIGHT, label: "Straight", icon: Minus },
+  { value: RegisteredEdges.STEP, label: "Step", icon: CornerDownRight },
+  { value: RegisteredEdges.SMOOTHSTEP, label: "Smooth Step", icon: GitCommit },
+  { value: RegisteredEdges.BEZIER, label: "Bezier", icon: Spline },
+];
 
 export const ControlsBar = ({ canvasState }: { canvasState: StoreApi<CanvasStoreState> }) => {
   const { onSave, onRestore } = useCanvasStorage(canvasState);
   const { undo, redo, canUndo, canRedo } = useHistory(canvasState);
   const { fitView } = useReactFlow();
-  const isInteractive = useStore(canvasState, (s) => s.isInteractive);
-  const setIsInteractive = useStore(canvasState, (s) => s.setIsInteractive);
+  const { isInteractive, setIsInteractive, globalEdgeType, setGlobalEdgeType } = useStore(
+    canvasState,
+    useShallow((s) => ({
+      isInteractive: s.isInteractive,
+      setIsInteractive: s.setIsInteractive,
+      globalEdgeType: s.globalEdgeType,
+      setGlobalEdgeType: s.setGlobalEdgeType,
+    })),
+  );
 
   const handleToggleInteractivity = () => setIsInteractive(!isInteractive);
 
@@ -90,6 +118,18 @@ export const ControlsBar = ({ canvasState }: { canvasState: StoreApi<CanvasStore
           </div>
         );
       })}
+
+      <div className="relative flex items-center justify-center group">
+        <Dropdown
+          id="controls-edge-type"
+          options={edgeTypeOptions}
+          value={globalEdgeType}
+          onChange={setGlobalEdgeType}
+          preferredDirection="down"
+          aria-label="Edge type"
+        />
+        <Tooltip direction="down" text="Edge Type" />
+      </div>
     </div>
   );
 };

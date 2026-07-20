@@ -1,6 +1,3 @@
-import { RegisteredEdges } from "@sysdraw/models";
-import { HttpEdgeComponent } from "./Http";
-
-export const edgeTypes = {
-  [RegisteredEdges.HTTP_CALL]: HttpEdgeComponent,
-};
+export * from "./EdgeOptionBar";
+export * from "./EdgeTypes";
+export * from "./EdgeWrapper";

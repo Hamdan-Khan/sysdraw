@@ -21,3 +21,4 @@ export default App;
 - [] add custom context menu on right click
 - [] add keyboard shortcuts in root component
 - [] improve context-menu (right click) wroking i.e. it should auto-select the node on which right click is performed, should not open when clicked on non canvas elements (toolbar, etc.)
+- [] make import of icons (nodes/edges) pluggable

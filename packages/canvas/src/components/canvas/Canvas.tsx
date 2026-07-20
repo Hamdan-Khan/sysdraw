@@ -6,7 +6,7 @@ import { StoreApi, useStore } from "zustand";
 import { useShallow } from "zustand/shallow";
 import { useCanvasHandlers, useShortcuts } from "../../hooks";
 import { CanvasStoreState } from "../../store";
-import { CanvasContextMenu } from "../common";
+import { CanvasContextMenu } from "../context-menu";
 import { ControlsBar } from "../controls";
 import { DndWrapper } from "../dnd";
 import { edgeTypes } from "../edges";
