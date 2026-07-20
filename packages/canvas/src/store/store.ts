@@ -33,16 +33,18 @@ interface CanvasStoreState {
   edges: Edge[];
   history: HistoryState;
   globalEdgeType: RegisteredEdges;
+  isInteractive: boolean;
+  grid: boolean;
   onNodesChange: OnNodesChange<Node>;
   onEdgesChange: OnEdgesChange;
-  setGlobalEdgeType: (type: RegisteredEdges) => void;
   setNodes: (nodes: Node[] | ((prev: Node[]) => Node[])) => void;
   setEdges: (edges: Edge[] | ((prev: Edge[]) => Edge[])) => void;
   commit: () => void;
   undo: () => void;
   redo: () => void;
-  isInteractive: boolean;
   setIsInteractive: (value: boolean) => void;
+  setGlobalEdgeType: (type: RegisteredEdges) => void;
+  setGrid: (value: boolean) => void;
 }
 
 /**
@@ -58,6 +60,7 @@ const createCanvasStore = (storeState: InitialCanvasStoreState) => {
     },
     isInteractive: true,
     globalEdgeType: storeState.selectedEdgeType ?? RegisteredEdges.STRAIGHT,
+    grid: true,
     onNodesChange: (changes) => {
       set({
         nodes: applyNodeChanges(changes, get().nodes),
@@ -68,7 +71,6 @@ const createCanvasStore = (storeState: InitialCanvasStoreState) => {
         edges: applyEdgeChanges(changes, get().edges),
       });
     },
-    setGlobalEdgeType: (type) => set({ globalEdgeType: type }),
     setNodes: (nodes) => {
       set({ nodes: typeof nodes === "function" ? nodes(get().nodes) : nodes });
     },
@@ -108,6 +110,8 @@ const createCanvasStore = (storeState: InitialCanvasStoreState) => {
       });
     },
     setIsInteractive: (value) => set({ isInteractive: value }),
+    setGlobalEdgeType: (type) => set({ globalEdgeType: type }),
+    setGrid: (value) => set({ grid: value }),
   }));
 };
 

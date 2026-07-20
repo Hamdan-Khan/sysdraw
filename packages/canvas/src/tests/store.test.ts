@@ -264,3 +264,30 @@ describe("isInteractive / setIsInteractive", () => {
     expect(store.getState().edges.map((e) => e.id)).toEqual(["e1"]);
   });
 });
+
+describe("grid / setGrid", () => {
+  it("defaults to true", () => {
+    const store = makeStore();
+
+    expect(store.getState().grid).toBe(true);
+  });
+
+  it("setGrid(false) hides the grid", () => {
+    const store = makeStore();
+    const { setGrid } = store.getState();
+
+    setGrid(false);
+
+    expect(store.getState().grid).toBe(false);
+  });
+
+  it("setGrid(true) shows the grid after hiding", () => {
+    const store = makeStore();
+    const { setGrid } = store.getState();
+
+    setGrid(false);
+    setGrid(true);
+
+    expect(store.getState().grid).toBe(true);
+  });
+});

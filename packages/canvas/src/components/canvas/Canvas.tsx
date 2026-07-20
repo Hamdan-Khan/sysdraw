@@ -14,6 +14,7 @@ import { groupTypes } from "../groups";
 import { nodeTypes as coreNodeTypes } from "../nodes";
 import { Toolbar } from "../toolbar";
 import "./canvas.css";
+import { CanvasGrid } from "./CanvasGrid";
 
 interface CanvasProps {
   canvasState: StoreApi<CanvasStoreState>;
@@ -65,7 +66,9 @@ const CanvasElement = ({ canvasState }: CanvasProps) => {
           fitView
           className="bg-transparent"
           proOptions={{ hideAttribution: true }}
-        />
+        >
+          <CanvasGrid canvasState={canvasState} />
+        </ReactFlow>
       </DndWrapper>
       <CanvasContextMenu canvasState={canvasState} />
     </div>

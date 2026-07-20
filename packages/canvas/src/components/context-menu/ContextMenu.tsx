@@ -92,7 +92,6 @@ export const CanvasContextMenu = ({ canvasState }: CanvasContextMenuProps) => {
       label: "Select All",
       shortcut: "Ctrl + A",
       icon: <Maximize size={14} />,
-      divider: true,
       action: () => {
         setNodes((prev) => prev.map((n) => ({ ...n, selected: true })));
         setEdges((prev) => prev.map((e) => ({ ...e, selected: true })));
