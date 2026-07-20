@@ -1,5 +1,5 @@
 import { BaseGroupData, RegisteredGroups } from "@sysdraw/models";
-import { NodeComponentType, NodePropsType } from "../canvas";
+import { NodeComponentType, NodePropsType } from "../../canvas";
 import { GenericGroup } from "./GenericGroup";
 import { GroupWrapper } from "./GroupWrapper";
 

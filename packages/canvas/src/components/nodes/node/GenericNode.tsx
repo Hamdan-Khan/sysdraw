@@ -1,5 +1,5 @@
 import { RegisteredNodes } from "@sysdraw/models";
-import { IconsMap } from "../../assets";
+import { IconsMap } from "../../../assets";
 
 export const GenericNode = ({ type }: { type: RegisteredNodes }) => {
   const Icon = IconsMap[type];

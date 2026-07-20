@@ -28,3 +28,4 @@ export default App;
 - [] dropping a node from sidebar on a group should reparent it
 - [] add labels on edges
 - [] fix multi nodes on ctrl+v paste
+- [] remove barrel imports for components

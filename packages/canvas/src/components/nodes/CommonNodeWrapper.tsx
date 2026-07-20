@@ -11,18 +11,35 @@ import { useState } from "react";
 import { OptionBar } from "../common";
 import { CustomHandle } from "../common/CustomHandle";
 
-export interface NodeWrapperProps {
+export interface CommonNodeWrapperProps {
   children: React.ReactNode;
   handles?: NodeHandleConfig[];
   selected?: boolean;
+  type: "node" | "group";
+  className?: string;
+  style?: React.CSSProperties;
+  minWidth?: number;
+  minHeight?: number;
+  keepAspectRatio?: boolean;
+  resizerBorderWidth?: number;
 }
 
 const defaultHandles: NodeHandleConfig[] = [];
 
-export const NodeWrapper = ({ children, handles = defaultHandles, selected }: NodeWrapperProps) => {
+export const CommonNodeWrapper = ({
+  children,
+  handles = defaultHandles,
+  selected,
+  type,
+  className,
+  style,
+  minWidth,
+  minHeight,
+  keepAspectRatio,
+  resizerBorderWidth = 1,
+}: CommonNodeWrapperProps) => {
   const [isHovered, setIsHovered] = useState(false);
   const nodeId = useNodeId();
-
   const { deleteElements } = useReactFlow();
   const { zoom } = useViewport();
 
@@ -38,29 +55,24 @@ export const NodeWrapper = ({ children, handles = defaultHandles, selected }: No
 
   return (
     <div
-      className="flex flex-col items-center justify-center min-w-10 min-h-10 relative"
+      className={className}
+      style={style}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       onKeyDown={handleDelete}
-      tabIndex={0} // enables keyboard events on div
+      tabIndex={0}
     >
       <NodeResizer
-        minWidth={40}
-        minHeight={40}
+        minWidth={minWidth}
+        minHeight={minHeight}
         isVisible={selected}
-        keepAspectRatio
-        lineStyle={{ borderWidth: 1 / zoom }}
+        keepAspectRatio={keepAspectRatio}
+        lineStyle={{ borderWidth: resizerBorderWidth / zoom }}
       />
       <NodeToolbar className="flex gap-2">
-        <OptionBar type="node" />
+        <OptionBar type={type} />
       </NodeToolbar>
       {handles.map((handle) => {
-        // const hasConnection = connections.some((c) =>
-        //   handle.type === "target"
-        //     ? c.target === nodeId && c.targetHandle === handle.id
-        //     : c.source === nodeId && c.sourceHandle === handle.id,
-        // );
-
         return (
           <CustomHandle
             key={handle.id}
