@@ -27,3 +27,4 @@ export default App;
 - [] clicking a node on the toolbar should drop it in the middle of the screen
 - [] dropping a node from sidebar on a group should reparent it
 - [] add labels on edges
+- [] fix multi nodes on ctrl+v paste

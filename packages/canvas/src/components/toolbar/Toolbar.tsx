@@ -4,6 +4,10 @@ import {
   RegisteredGroups,
   RegisteredNodes,
 } from "@sysdraw/models";
+import { toast } from "sonner";
+import { CanvasStoreState } from "src/store";
+import { StoreApi, useStore } from "zustand";
+import { useShallow } from "zustand/shallow";
 import { IconsMap } from "../../assets";
 import type { DnDTransferData } from "../canvas";
 import { Divider, Tooltip } from "../common";
@@ -13,15 +17,25 @@ const GROUP_TYPES = Object.values(RegisteredGroups);
 
 export const SYSDRAW_DRAG_DATA_FORMAT = "application/sysdraw";
 
-/**
- * Handler for when a node or group is dragged from the toolbar
- */
-function onDragStart(event: React.DragEvent<HTMLDivElement>, data: DnDTransferData) {
-  event.dataTransfer.setData(SYSDRAW_DRAG_DATA_FORMAT, JSON.stringify(data));
-  event.dataTransfer.effectAllowed = "move";
-}
+const selector = (state: CanvasStoreState) => ({
+  isInteractive: state.isInteractive,
+});
 
-export const Toolbar = () => {
+export const Toolbar = ({ canvasState }: { canvasState: StoreApi<CanvasStoreState> }) => {
+  const { isInteractive } = useStore(canvasState, useShallow(selector));
+
+  /**
+   * Handler for when a node or group is dragged from the toolbar
+   */
+  function onDragStart(event: React.DragEvent<HTMLDivElement>, data: DnDTransferData) {
+    if (!isInteractive) {
+      toast.error("Please unlock the canvas to add nodes and groups.");
+      return;
+    }
+    event.dataTransfer.setData(SYSDRAW_DRAG_DATA_FORMAT, JSON.stringify(data));
+    event.dataTransfer.effectAllowed = "move";
+  }
+
   return (
     <div className="absolute left-4 top-1/2 -translate-y-1/2 z-10 bg-surface border border-border rounded-lg py-2 flex flex-col gap-3 shadow-md">
       <div className="grid grid-cols-3 gap-3 px-4">

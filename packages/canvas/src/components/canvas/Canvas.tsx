@@ -46,7 +46,7 @@ const CanvasElement = ({ canvasState }: CanvasProps) => {
   return (
     <div className="w-screen h-screen bg-bg relative" style={{ width: "100%", height: "100%" }}>
       <DndWrapper wrapperRef={dndWrapperRef} onDrop={onDrop} onDragOver={onDragOver}>
-        <Toolbar />
+        <Toolbar canvasState={canvasState} />
         <ControlsBar canvasState={canvasState} />
         <ReactFlow
           nodes={nodes}

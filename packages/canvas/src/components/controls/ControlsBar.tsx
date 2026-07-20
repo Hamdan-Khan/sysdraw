@@ -26,21 +26,30 @@ const edgeTypeOptions: DropdownOption<RegisteredEdges>[] = [
   { value: RegisteredEdges.BEZIER, label: "Bezier", icon: Spline },
 ];
 
+const selector = (s: CanvasStoreState) => ({
+  isInteractive: s.isInteractive,
+  setIsInteractive: s.setIsInteractive,
+  globalEdgeType: s.globalEdgeType,
+  setGlobalEdgeType: s.setGlobalEdgeType,
+  setEdges: s.setEdges,
+  setNodes: s.setNodes,
+});
+
 export const ControlsBar = ({ canvasState }: { canvasState: StoreApi<CanvasStoreState> }) => {
   const { onSave, onRestore } = useCanvasStorage(canvasState);
   const { undo, redo, canUndo, canRedo } = useHistory(canvasState);
   const { fitView } = useReactFlow();
-  const { isInteractive, setIsInteractive, globalEdgeType, setGlobalEdgeType } = useStore(
-    canvasState,
-    useShallow((s) => ({
-      isInteractive: s.isInteractive,
-      setIsInteractive: s.setIsInteractive,
-      globalEdgeType: s.globalEdgeType,
-      setGlobalEdgeType: s.setGlobalEdgeType,
-    })),
-  );
+  const { isInteractive, setIsInteractive, globalEdgeType, setGlobalEdgeType, setNodes, setEdges } =
+    useStore(canvasState, useShallow(selector));
 
-  const handleToggleInteractivity = () => setIsInteractive(!isInteractive);
+  const handleToggleInteractivity = () => {
+    // un-select any nodes/group/edges when turning off interactivity
+    if (isInteractive) {
+      setNodes((n) => n.map((node) => ({ ...node, selected: false })));
+      setEdges((e) => e.map((edge) => ({ ...edge, selected: false })));
+    }
+    setIsInteractive(!isInteractive);
+  };
 
   const buttons = [
     {
