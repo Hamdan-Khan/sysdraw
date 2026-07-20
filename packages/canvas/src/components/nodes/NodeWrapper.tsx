@@ -1,16 +1,15 @@
 import type { NodeHandleConfig } from "@sysdraw/models";
 import {
-  Handle,
   NodeResizer,
   NodeToolbar,
   Position,
-  useNodeConnections,
   useNodeId,
   useReactFlow,
   useViewport,
 } from "@xyflow/react";
 import { useState } from "react";
 import { OptionBar } from "../common";
+import { CustomHandle } from "../common/CustomHandle";
 
 export interface NodeWrapperProps {
   children: React.ReactNode;
@@ -22,7 +21,6 @@ const defaultHandles: NodeHandleConfig[] = [];
 
 export const NodeWrapper = ({ children, handles = defaultHandles, selected }: NodeWrapperProps) => {
   const [isHovered, setIsHovered] = useState(false);
-  const connections = useNodeConnections();
   const nodeId = useNodeId();
 
   const { deleteElements } = useReactFlow();
@@ -57,22 +55,19 @@ export const NodeWrapper = ({ children, handles = defaultHandles, selected }: No
         <OptionBar type="node" />
       </NodeToolbar>
       {handles.map((handle) => {
-        const hasConnection = connections.some((c) =>
-          handle.type === "target"
-            ? c.target === nodeId && c.targetHandle === handle.id
-            : c.source === nodeId && c.sourceHandle === handle.id,
-        );
+        // const hasConnection = connections.some((c) =>
+        //   handle.type === "target"
+        //     ? c.target === nodeId && c.targetHandle === handle.id
+        //     : c.source === nodeId && c.sourceHandle === handle.id,
+        // );
 
         return (
-          <Handle
+          <CustomHandle
             key={handle.id}
             id={handle.id}
             type={handle.type}
             position={handle.position || Position.Top}
-            style={{
-              opacity: isHovered || hasConnection ? 1 : 0,
-              ...handle.style,
-            }}
+            isHovered={isHovered}
           />
         );
       })}

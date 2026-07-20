@@ -1,5 +1,5 @@
 import { useNodeId, useReactFlow } from "@xyflow/react";
-import { Copy, Lock, MessageSquare, Trash2 } from "lucide-react";
+import { Copy, Lock, Trash2 } from "lucide-react";
 import { useCallback } from "react";
 import { toast } from "sonner";
 import { useCopyPaste } from "../../hooks";
@@ -34,7 +34,8 @@ export const OptionBar = ({ type }: OptionBarProps) => {
   const options = [
     { icon: Copy, label: "Copy", action: handleCopy },
     { icon: Lock, label: "Lock", action: () => {} },
-    { icon: MessageSquare, label: "Comment", action: () => {} },
+    // todo: add individual element comments/descriptions later with a comment box
+    // { icon: MessageSquare, label: "Comment", action: () => {} },
     { icon: Trash2, label: "Delete", action: handleDelete },
   ];
 

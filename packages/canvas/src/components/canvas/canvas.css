@@ -20,3 +20,24 @@
 .animate-context-menu {
   animation: context-menu-in 0.12s ease-out forwards;
 }
+
+.custom-handle {
+  width: 20px;
+  height: 20px;
+  background: transparent !important;
+  border: none !important;
+}
+
+.custom-handle__arrow {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 20px;
+  height: 16px;
+  margin-top: -8px;
+  transform-origin: 0% 50%;
+  overflow: visible;
+  color: #555;
+  transition: opacity 0.15s ease;
+  pointer-events: auto;
+}
