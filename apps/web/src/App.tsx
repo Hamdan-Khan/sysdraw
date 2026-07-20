@@ -1,10 +1,11 @@
-import { Canvas } from "@sysdraw/canvas";
+import { Canvas, createCanvasStore } from "@sysdraw/canvas";
 
 function App() {
+  const canvasState = createCanvasStore({ nodes: [], edges: [] });
+
   return (
     <>
-      <h1>SysDraw</h1>
-      <Canvas canvasState={{ edges: [], nodes: [] }} />
+      <Canvas canvasState={canvasState} />
     </>
   );
 }
