@@ -33,6 +33,8 @@ interface CanvasStoreState {
   edges: Edge[];
   history: HistoryState;
   globalEdgeType: RegisteredEdges;
+  globalEdgeAnimated: boolean;
+  globalEdgeMarkerEnd: Edge["markerEnd"];
   isInteractive: boolean;
   grid: boolean;
   onNodesChange: OnNodesChange<Node>;
@@ -44,6 +46,8 @@ interface CanvasStoreState {
   redo: () => void;
   setIsInteractive: (value: boolean) => void;
   setGlobalEdgeType: (type: RegisteredEdges) => void;
+  setGlobalEdgeAnimated: (animated: boolean) => void;
+  setGlobalEdgeMarkerEnd: (markerEnd?: Edge["markerEnd"]) => void;
   setGrid: (value: boolean) => void;
 }
 
@@ -60,6 +64,8 @@ const createCanvasStore = (storeState: InitialCanvasStoreState) => {
     },
     isInteractive: true,
     globalEdgeType: storeState.selectedEdgeType ?? RegisteredEdges.STRAIGHT,
+    globalEdgeAnimated: false,
+    globalEdgeMarkerEnd: undefined,
     grid: true,
     onNodesChange: (changes) => {
       set({
@@ -112,6 +118,8 @@ const createCanvasStore = (storeState: InitialCanvasStoreState) => {
     },
     setIsInteractive: (value) => set({ isInteractive: value }),
     setGlobalEdgeType: (type) => set({ globalEdgeType: type }),
+    setGlobalEdgeAnimated: (animated) => set({ globalEdgeAnimated: animated }),
+    setGlobalEdgeMarkerEnd: (markerEnd) => set({ globalEdgeMarkerEnd: markerEnd }),
     setGrid: (value) => set({ grid: value }),
   }));
 };

@@ -105,6 +105,39 @@ describe("globalEdgeType / setGlobalEdgeType", () => {
   });
 });
 
+describe("globalEdgeAnimated / setGlobalEdgeAnimated", () => {
+  it("defaults to false", () => {
+    const store = makeStore();
+    expect(store.getState().globalEdgeAnimated).toBe(false);
+  });
+
+  it("updates globalEdgeAnimated", () => {
+    const store = makeStore();
+    const { setGlobalEdgeAnimated } = store.getState();
+
+    setGlobalEdgeAnimated(true);
+
+    expect(store.getState().globalEdgeAnimated).toBe(true);
+  });
+});
+
+describe("globalEdgeMarkerEnd / setGlobalEdgeMarkerEnd", () => {
+  it("defaults to undefined", () => {
+    const store = makeStore();
+    expect(store.getState().globalEdgeMarkerEnd).toBeUndefined();
+  });
+
+  it("updates globalEdgeMarkerEnd", () => {
+    const store = makeStore();
+    const { setGlobalEdgeMarkerEnd } = store.getState();
+
+    const marker = { type: "arrowclosed" as any };
+    setGlobalEdgeMarkerEnd(marker);
+
+    expect(store.getState().globalEdgeMarkerEnd).toEqual(marker);
+  });
+});
+
 describe("commit / undo / redo", () => {
   beforeEach(() => vi.clearAllMocks());
 

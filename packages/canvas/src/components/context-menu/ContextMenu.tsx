@@ -1,5 +1,6 @@
 import { RegisteredEdges } from "@sysdraw/models";
-import { ClipboardPaste, Copy, Maximize } from "lucide-react";
+import { Edge, MarkerType } from "@xyflow/react";
+import { ArrowRight, ClipboardPaste, Copy, Maximize } from "lucide-react";
 import { useEffect, useMemo, useRef } from "react";
 import { useShallow } from "zustand/shallow";
 import { useCopyPaste, useHistory } from "../../hooks";
@@ -22,6 +23,10 @@ const storeSelector = (state: CanvasStoreState) => ({
   setEdges: state.setEdges,
   globalEdgeType: state.globalEdgeType,
   setGlobalEdgeType: state.setGlobalEdgeType,
+  globalEdgeAnimated: state.globalEdgeAnimated,
+  setGlobalEdgeAnimated: state.setGlobalEdgeAnimated,
+  globalEdgeMarkerEnd: state.globalEdgeMarkerEnd,
+  setGlobalEdgeMarkerEnd: state.setGlobalEdgeMarkerEnd,
 });
 
 /**
@@ -31,9 +36,18 @@ export const CanvasContextMenu = ({ contextMenu, closeContextMenu }: CanvasConte
   const menuRef = useRef<HTMLDivElement>(null);
   const { copy, paste, isClipboardEmpty } = useCopyPaste();
   const { commit } = useHistory();
-  const { nodes, edges, setNodes, setEdges, globalEdgeType, setGlobalEdgeType } = useCanvasStore(
-    useShallow(storeSelector),
-  );
+  const {
+    nodes,
+    edges,
+    setNodes,
+    setEdges,
+    globalEdgeType,
+    setGlobalEdgeType,
+    globalEdgeAnimated,
+    setGlobalEdgeAnimated,
+    globalEdgeMarkerEnd,
+    setGlobalEdgeMarkerEnd,
+  } = useCanvasStore(useShallow(storeSelector));
 
   // close on outside click or Escape
   useEffect(() => {
@@ -71,11 +85,45 @@ export const CanvasContextMenu = ({ contextMenu, closeContextMenu }: CanvasConte
     }
   };
 
+  const updateEdgeAnimated = () => {
+    if (selectedEdges.length > 0) {
+      commit();
+      const isCurrentlyAnimated = selectedEdges.every((e) => Boolean(e.animated));
+      const nextState = !isCurrentlyAnimated;
+      const selectedEdgeIds = new Set(selectedEdges.map((e) => e.id));
+      setEdges((prev) =>
+        prev.map((e) => (selectedEdgeIds.has(e.id) ? { ...e, animated: nextState } : e)),
+      );
+    } else {
+      setGlobalEdgeAnimated(!globalEdgeAnimated);
+    }
+  };
+
+  const updateEdgeMarkerEnd = (markerEnd?: Edge["markerEnd"]) => {
+    if (selectedEdges.length > 0) {
+      commit();
+      const selectedEdgeIds = new Set(selectedEdges.map((e) => e.id));
+      setEdges((prev) => prev.map((e) => (selectedEdgeIds.has(e.id) ? { ...e, markerEnd } : e)));
+    } else {
+      setGlobalEdgeMarkerEnd(markerEnd);
+    }
+  };
+
   if (!contextMenu) {
     return null;
   }
 
   const { x, y } = contextMenu;
+
+  const arrowOptions = [
+    { label: "None", value: undefined, typeStr: null },
+    {
+      label: "Closed Arrow",
+      value: { type: MarkerType.ArrowClosed },
+      typeStr: MarkerType.ArrowClosed,
+    },
+    { label: "Open Arrow", value: { type: MarkerType.Arrow }, typeStr: MarkerType.Arrow },
+  ];
 
   const items: ContextMenuItem[] = [
     {
@@ -116,6 +164,30 @@ export const CanvasContextMenu = ({ contextMenu, closeContextMenu }: CanvasConte
           icon: opt.icon,
           checked: isChecked,
           action: () => updateEdgeType(opt.value),
+        };
+      }),
+    },
+    {
+      label: "Animated",
+      checked:
+        selectedEdges.length > 0
+          ? selectedEdges.every((e) => Boolean(e.animated))
+          : globalEdgeAnimated,
+      action: () => updateEdgeAnimated(),
+    },
+    {
+      label: "Arrow Head",
+      icon: ArrowRight,
+      submenu: arrowOptions.map((opt) => {
+        const isChecked =
+          selectedEdges.length > 0
+            ? selectedEdges.every((e) => e.markerEnd === opt.typeStr)
+            : globalEdgeMarkerEnd === opt.typeStr;
+
+        return {
+          label: opt.label,
+          checked: isChecked,
+          action: () => updateEdgeMarkerEnd(opt.value),
         };
       }),
     },

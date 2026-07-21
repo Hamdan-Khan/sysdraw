@@ -39,6 +39,8 @@ const selector = (state: CanvasStoreState) => ({
   setNodes: state.setNodes,
   setEdges: state.setEdges,
   globalEdgeType: state.globalEdgeType,
+  globalEdgeAnimated: state.globalEdgeAnimated,
+  globalEdgeMarkerEnd: state.globalEdgeMarkerEnd,
 });
 
 /** minimum overlapping area percentage to trigger reparenting */
@@ -55,6 +57,8 @@ export const useCanvasHandlers = () => {
     setNodes,
     setEdges,
     globalEdgeType,
+    globalEdgeAnimated,
+    globalEdgeMarkerEnd,
   } = useCanvasStore(useShallow(selector));
 
   const { screenToFlowPosition, getIntersectingNodes, getInternalNode, getNodesBounds } =
@@ -67,9 +71,19 @@ export const useCanvasHandlers = () => {
   const onConnect: OnConnect = useCallback(
     (connection) => {
       commit();
-      setEdges((edges) => addEdge({ ...connection, type: globalEdgeType }, edges));
+      setEdges((edges) =>
+        addEdge(
+          {
+            ...connection,
+            type: globalEdgeType,
+            animated: globalEdgeAnimated,
+            markerEnd: globalEdgeMarkerEnd,
+          },
+          edges,
+        ),
+      );
     },
-    [commit, setEdges, globalEdgeType],
+    [commit, setEdges, globalEdgeType, globalEdgeAnimated, globalEdgeMarkerEnd],
   );
 
   /**
