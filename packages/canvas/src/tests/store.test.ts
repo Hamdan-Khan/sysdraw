@@ -210,6 +210,18 @@ describe("commit / undo / redo", () => {
     redo();
     expect(store.getState().nodes.map((n) => n.id)).toEqual(["a"]);
     expect(store.getState().history.past).toHaveLength(1);
+    expect(store.getState().history.past[0].nodes.map((n) => n.id)).toEqual(["initial"]);
+    expect(store.getState().history.future.map((f) => f.nodes[0].id)).toEqual(["b"]);
+
+    // second redo restores "b"
+    redo();
+    expect(store.getState().nodes.map((n) => n.id)).toEqual(["b"]);
+    expect(store.getState().history.past.map((p) => p.nodes[0].id)).toEqual(["initial", "a"]);
+    expect(store.getState().history.future).toHaveLength(0);
+
+    // single undo from "b" should go straight back to "a"
+    undo();
+    expect(store.getState().nodes.map((n) => n.id)).toEqual(["a"]);
   });
 
   it("caps history at HISTORY_LIMIT (30) entries", () => {

@@ -98,7 +98,8 @@ const createCanvasStore = (storeState: InitialCanvasStoreState) => {
       });
     },
     redo: () => {
-      const { past, future } = get().history;
+      const { nodes, edges, history } = get();
+      const { past, future } = history;
       if (future.length === 0) {
         return;
       }
@@ -106,7 +107,7 @@ const createCanvasStore = (storeState: InitialCanvasStoreState) => {
       set({
         nodes: next.nodes,
         edges: next.edges,
-        history: { past: [...past, next], future: future.slice(1) },
+        history: { past: [...past, { nodes, edges }], future: future.slice(1) },
       });
     },
     setIsInteractive: (value) => set({ isInteractive: value }),

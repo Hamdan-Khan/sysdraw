@@ -2,6 +2,7 @@ import { RegisteredEdges } from "@sysdraw/models";
 import { Edge, MarkerType, useReactFlow } from "@xyflow/react";
 import { ArrowRight, Trash2, Zap } from "lucide-react";
 import { toast } from "sonner";
+import { useHistory } from "../../hooks";
 import { Dropdown, Tooltip } from "../common";
 import { edgeTypeOptions } from "./EdgeTypes";
 
@@ -19,6 +20,7 @@ type OptionBarButton = {
 export const EdgeOptionBar = ({ edgeId }: EdgeOptionBarProps) => {
   const { getEdge, setEdges, deleteElements } = useReactFlow();
   const edge = getEdge(edgeId);
+  const { commit } = useHistory();
 
   if (!edge) {
     return null;
@@ -33,6 +35,7 @@ export const EdgeOptionBar = ({ edgeId }: EdgeOptionBarProps) => {
   };
 
   const handleDelete = () => {
+    commit();
     deleteElements({ edges: [{ id: edgeId }] });
     toast.success("Edge deleted.");
   };

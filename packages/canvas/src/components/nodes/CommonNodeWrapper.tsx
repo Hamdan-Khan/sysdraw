@@ -7,6 +7,7 @@ import {
   useReactFlow,
   useViewport,
 } from "@xyflow/react";
+import { useHistory } from "../../hooks";
 import { OptionBar } from "../common";
 import { CustomHandle } from "../common/CustomHandle";
 
@@ -40,11 +41,15 @@ export const CommonNodeWrapper = ({
   const nodeId = useNodeId();
   const { deleteElements } = useReactFlow();
   const { zoom } = useViewport();
+  const { commit } = useHistory();
 
   const handleDelete = (e: React.KeyboardEvent) => {
     switch (e.key) {
       case "Delete":
-        if (nodeId) deleteElements({ nodes: [{ id: nodeId }] });
+        if (nodeId) {
+          commit();
+          deleteElements({ nodes: [{ id: nodeId }] });
+        }
         break;
       default:
         break;
