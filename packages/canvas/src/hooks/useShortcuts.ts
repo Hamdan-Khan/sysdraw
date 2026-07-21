@@ -1,8 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { ContextMenuState } from "src/components/context-menu/types";
-import { StoreApi, useStore } from "zustand";
 import { useShallow } from "zustand/shallow";
-import { CanvasStoreState } from "../store";
+import { CanvasStoreState, useCanvasStore } from "../store";
 import { useCopyPaste } from "./useCopyPaste";
 import { useHistory } from "./useHistory";
 
@@ -18,11 +17,11 @@ const selector = (state: CanvasStoreState) => ({
  *
  * should be called once at the root canvas level.
  */
-export function useShortcuts(canvasState: StoreApi<CanvasStoreState>) {
+export function useShortcuts() {
   const { copy, paste } = useCopyPaste();
-  const { undo, redo } = useHistory(canvasState);
+  const { undo, redo } = useHistory();
 
-  const { setNodes, setEdges } = useStore(canvasState, useShallow(selector));
+  const { setNodes, setEdges } = useCanvasStore(useShallow(selector));
 
   const [contextMenu, setContextMenu] = useState<ContextMenuState | null>(null);
 

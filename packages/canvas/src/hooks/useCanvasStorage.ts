@@ -1,9 +1,8 @@
 import { Edge, Node, ReactFlowJsonObject, useReactFlow } from "@xyflow/react";
 import { useCallback } from "react";
 import { toast } from "sonner";
-import { CanvasStoreState } from "src/store";
-import { StoreApi, useStore } from "zustand";
 import { useShallow } from "zustand/shallow";
+import { CanvasStoreState, useCanvasStore } from "../store";
 
 const selector = (state: CanvasStoreState) => ({
   nodes: state.nodes,
@@ -14,8 +13,8 @@ const selector = (state: CanvasStoreState) => ({
 
 export const CANVAS_LOCALSTORAGE_KEY = "sysdraw-canvas-snapshot";
 
-export const useCanvasStorage = (canvasState: StoreApi<CanvasStoreState>) => {
-  const { nodes, edges, setEdges, setNodes } = useStore(canvasState, useShallow(selector));
+export const useCanvasStorage = () => {
+  const { nodes, edges, setEdges, setNodes } = useCanvasStore(useShallow(selector));
 
   const { setViewport } = useReactFlow();
 
