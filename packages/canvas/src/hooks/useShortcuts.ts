@@ -4,6 +4,7 @@ import { StoreApi, useStore } from "zustand";
 import { useShallow } from "zustand/shallow";
 import { CanvasStoreState } from "../store";
 import { useCopyPaste } from "./useCopyPaste";
+import { useHistory } from "./useHistory";
 
 const selector = (state: CanvasStoreState) => ({
   nodes: state.nodes,
@@ -19,6 +20,7 @@ const selector = (state: CanvasStoreState) => ({
  */
 export function useShortcuts(canvasState: StoreApi<CanvasStoreState>) {
   const { copy, paste } = useCopyPaste();
+  const { undo, redo } = useHistory(canvasState);
 
   const { setNodes, setEdges } = useStore(canvasState, useShallow(selector));
 
@@ -51,6 +53,12 @@ export function useShortcuts(canvasState: StoreApi<CanvasStoreState>) {
         case "v":
           paste();
           break;
+        case "z":
+          undo();
+          break;
+        case "y":
+          redo();
+          break;
         case "a":
           e.preventDefault();
           selectAll();
@@ -62,7 +70,7 @@ export function useShortcuts(canvasState: StoreApi<CanvasStoreState>) {
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [copy, paste, selectAll]);
+  }, [copy, paste, selectAll, undo, redo]);
 
   // right-click context menu
   useEffect(() => {

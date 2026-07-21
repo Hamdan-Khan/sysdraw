@@ -61,7 +61,6 @@ const CanvasElement = ({ canvasState }: CanvasProps) => {
           onNodeDragStop={onNodeDragStop}
           nodesDraggable={isInteractive}
           nodesConnectable={isInteractive}
-          // todo: fix nodes being able to be deleted after selected and switched to un-interative mode
           elementsSelectable={isInteractive}
           fitView
           className="bg-transparent"

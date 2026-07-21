@@ -11,8 +11,6 @@ const ARROW_ROTATION: Record<Position, number> = {
 export const CustomHandle = memo(({ position, ...props }: HandleProps) => {
   const { zoom } = useViewport();
   const [isHovered, setIsHovered] = useState(false);
-  console.log(props.id);
-
   const connections = useNodeConnections({ handleType: props.type, handleId: props.id! });
   const isConnected = connections.length > 0;
 
