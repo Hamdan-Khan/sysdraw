@@ -1,13 +1,5 @@
 import type { NodeHandleConfig } from "@sysdraw/models";
-import {
-  NodeResizer,
-  NodeToolbar,
-  Position,
-  useNodeId,
-  useReactFlow,
-  useViewport,
-} from "@xyflow/react";
-import { useHistory } from "../../hooks";
+import { NodeResizer, NodeToolbar, Position, useViewport } from "@xyflow/react";
 import { OptionBar } from "../common";
 import { CustomHandle } from "../common/CustomHandle";
 
@@ -38,26 +30,10 @@ export const CommonNodeWrapper = ({
   keepAspectRatio,
   resizerBorderWidth = 1,
 }: CommonNodeWrapperProps) => {
-  const nodeId = useNodeId();
-  const { deleteElements } = useReactFlow();
   const { zoom } = useViewport();
-  const { commit } = useHistory();
-
-  const handleDelete = (e: React.KeyboardEvent) => {
-    switch (e.key) {
-      case "Delete":
-        if (nodeId) {
-          commit();
-          deleteElements({ nodes: [{ id: nodeId }] });
-        }
-        break;
-      default:
-        break;
-    }
-  };
 
   return (
-    <div className={className} style={style} onKeyDown={handleDelete} tabIndex={0}>
+    <div className={className} style={style}>
       <NodeResizer
         minWidth={minWidth}
         minHeight={minHeight}

@@ -84,6 +84,35 @@ describe("useShortcuts", () => {
       expect(store.getState().edges.every((e) => e.selected)).toBe(true);
     });
 
+    it("deletes selected nodes and edges on Delete key and commits state", () => {
+      const nodeA = { ...makeNode("a"), selected: true };
+      const nodeB = { ...makeNode("b"), selected: false };
+      const edgeAB = { ...makeEdge("e1", "a", "b"), selected: false };
+      const store = makeStore([nodeA, nodeB], [edgeAB]);
+      mount(store);
+
+      act(() => {
+        window.dispatchEvent(new KeyboardEvent("keydown", { key: "Delete", bubbles: true }));
+      });
+
+      // Selected nodeA deleted, and connected edgeAB also deleted
+      expect(store.getState().nodes).toHaveLength(1);
+      expect(store.getState().nodes[0].id).toBe("b");
+      expect(store.getState().edges).toHaveLength(0);
+    });
+
+    it("deletes selected nodes on Backspace key", () => {
+      const nodeA = { ...makeNode("a"), selected: true };
+      const store = makeStore([nodeA], []);
+      mount(store);
+
+      act(() => {
+        window.dispatchEvent(new KeyboardEvent("keydown", { key: "Backspace", bubbles: true }));
+      });
+
+      expect(store.getState().nodes).toHaveLength(0);
+    });
+
     it("ignores unrelated modifier+key combos", () => {
       mount();
       // not handled

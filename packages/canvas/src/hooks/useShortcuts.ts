@@ -19,9 +19,9 @@ const selector = (state: CanvasStoreState) => ({
  */
 export function useShortcuts() {
   const { copy, paste } = useCopyPaste();
-  const { undo, redo } = useHistory();
+  const { undo, redo, commit } = useHistory();
 
-  const { setNodes, setEdges } = useCanvasStore(useShallow(selector));
+  const { nodes, edges, setNodes, setEdges } = useCanvasStore(useShallow(selector));
 
   const [contextMenu, setContextMenu] = useState<ContextMenuState | null>(null);
 
@@ -32,16 +32,43 @@ export function useShortcuts() {
     setEdges((prev) => prev.map((e) => ({ ...e, selected: true })));
   }, [setEdges, setNodes]);
 
+  const deleteSelected = useCallback(() => {
+    const selectedNodes = nodes.filter((n) => n.selected);
+    const selectedEdges = edges.filter((e) => e.selected);
+
+    if (selectedNodes.length === 0 && selectedEdges.length === 0) {
+      return;
+    }
+
+    commit();
+
+    const selectedNodeIds = new Set(selectedNodes.map((n) => n.id));
+
+    setNodes((prev) => prev.filter((n) => !n.selected));
+    setEdges((prev) =>
+      prev.filter(
+        (e) => !e.selected && !selectedNodeIds.has(e.source) && !selectedNodeIds.has(e.target),
+      ),
+    );
+  }, [nodes, edges, commit, setNodes, setEdges]);
+
   // keyboard shortcuts
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (!(e.ctrlKey || e.metaKey)) {
-        return;
-      }
-
       const target = e.target as HTMLElement;
       // shoudn't trigger on editable elements
       if (target.tagName === "INPUT" || target.tagName === "TEXTAREA" || target.isContentEditable) {
+        return;
+      }
+
+      // delete nodes
+      if (e.key === "Delete" || e.key === "Backspace") {
+        deleteSelected();
+        return;
+      }
+
+      // rest are ctrl combinations
+      if (!(e.ctrlKey || e.metaKey)) {
         return;
       }
 
@@ -69,7 +96,7 @@ export function useShortcuts() {
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [copy, paste, selectAll, undo, redo]);
+  }, [copy, paste, selectAll, undo, redo, deleteSelected]);
 
   // right-click context menu
   useEffect(() => {
