@@ -1,9 +1,8 @@
 import { useReactFlow } from "@xyflow/react";
 import { ArchiveRestoreIcon, Lock, Maximize, Redo, Save, Undo, Unlock } from "lucide-react";
-import { StoreApi, useStore } from "zustand";
 import { useShallow } from "zustand/shallow";
 import { useCanvasStorage, useHistory } from "../../hooks";
-import { CanvasStoreState } from "../../store";
+import { CanvasStoreState, useCanvasStore } from "../../store";
 import { Dropdown, Tooltip } from "../common";
 import { edgeTypeOptions } from "../edges";
 
@@ -16,12 +15,12 @@ const selector = (s: CanvasStoreState) => ({
   setNodes: s.setNodes,
 });
 
-export const ControlsBar = ({ canvasState }: { canvasState: StoreApi<CanvasStoreState> }) => {
-  const { onSave, onRestore } = useCanvasStorage(canvasState);
-  const { undo, redo, canUndo, canRedo } = useHistory(canvasState);
+export const ControlsBar = () => {
+  const { onSave, onRestore } = useCanvasStorage();
+  const { undo, redo, canUndo, canRedo } = useHistory();
   const { fitView } = useReactFlow();
   const { isInteractive, setIsInteractive, globalEdgeType, setGlobalEdgeType, setNodes, setEdges } =
-    useStore(canvasState, useShallow(selector));
+    useCanvasStore(useShallow(selector));
 
   const handleToggleInteractivity = () => {
     // un-select any nodes/group/edges when turning off interactivity

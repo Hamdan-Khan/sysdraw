@@ -10,7 +10,6 @@ import { addEdge, Node, OnNodeDrag, Rect, useReactFlow, type OnConnect } from "@
 import { nanoid } from "nanoid";
 import { useCallback, useMemo } from "react";
 import { toast } from "sonner";
-import { StoreApi, useStore } from "zustand";
 import { useShallow } from "zustand/shallow";
 import {
   clampPositionInsideGroup,
@@ -23,7 +22,7 @@ import {
   sortNodesAndGroups,
 } from "../components/canvas";
 import { SYSDRAW_DRAG_DATA_FORMAT } from "../components/toolbar";
-import { CanvasStoreState } from "../store";
+import { CanvasStoreState, useCanvasStore } from "../store";
 import { useHistory } from "./useHistory";
 
 const selector = (state: CanvasStoreState) => ({
@@ -41,18 +40,18 @@ type CandidateGroupNode = { group: Node; groupRect: NodeRect; ratio: number };
 /**
  * event handlers for the canvas (drag, drop, re-parenting, etc.)
  */
-export const useCanvasHandlers = (canvasState: StoreApi<CanvasStoreState>) => {
+export const useCanvasHandlers = () => {
   const {
     nodes: nodesList,
     setNodes,
     setEdges,
     globalEdgeType,
-  } = useStore(canvasState, useShallow(selector));
+  } = useCanvasStore(useShallow(selector));
 
   const { screenToFlowPosition, getIntersectingNodes, getInternalNode, getNodesBounds } =
     useReactFlow();
 
-  const { commit } = useHistory(canvasState);
+  const { commit } = useHistory();
 
   const nodesMap = useMemo(() => new Map(nodesList.map((n) => [n.id, n])), [nodesList]);
 

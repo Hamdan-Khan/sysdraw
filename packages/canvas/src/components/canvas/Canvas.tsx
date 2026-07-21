@@ -2,10 +2,10 @@ import { ReactFlow, ReactFlowProvider } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
 import { createRef } from "react";
 import { Toaster } from "sonner";
-import { StoreApi, useStore } from "zustand";
+import { StoreApi } from "zustand";
 import { useShallow } from "zustand/shallow";
 import { useCanvasHandlers, useShortcuts } from "../../hooks";
-import { CanvasStoreState } from "../../store";
+import { CanvasStoreProvider, CanvasStoreState, useCanvasStore } from "../../store";
 import { CanvasContextMenu } from "../context-menu";
 import { ControlsBar } from "../controls";
 import { DndWrapper } from "../dnd";
@@ -30,24 +30,23 @@ const selector = (state: CanvasStoreState) => ({
 
 const combinedNodeTypes = { ...coreNodeTypes, ...groupTypes };
 
-const CanvasElement = ({ canvasState }: CanvasProps) => {
+const CanvasElement = () => {
   const dndWrapperRef = createRef<HTMLDivElement>();
 
-  const { edges, nodes, onEdgesChange, onNodesChange, isInteractive } = useStore(
-    canvasState,
+  const { edges, nodes, onEdgesChange, onNodesChange, isInteractive } = useCanvasStore(
     useShallow(selector),
   );
 
   const { onDragOver, onDrop, onConnect, onNodeDragStart, onNodeDrag, onNodeDragStop } =
-    useCanvasHandlers(canvasState);
+    useCanvasHandlers();
 
-  const { contextMenu, closeContextMenu } = useShortcuts(canvasState);
+  const { contextMenu, closeContextMenu } = useShortcuts();
 
   return (
     <div className="w-screen h-screen bg-bg relative" style={{ width: "100%", height: "100%" }}>
       <DndWrapper wrapperRef={dndWrapperRef} onDrop={onDrop} onDragOver={onDragOver}>
-        <Toolbar canvasState={canvasState} />
-        <ControlsBar canvasState={canvasState} />
+        <Toolbar />
+        <ControlsBar />
         <ReactFlow
           nodes={nodes}
           nodeTypes={combinedNodeTypes}
@@ -66,14 +65,10 @@ const CanvasElement = ({ canvasState }: CanvasProps) => {
           className="bg-transparent"
           proOptions={{ hideAttribution: true }}
         >
-          <CanvasGrid canvasState={canvasState} />
+          <CanvasGrid />
         </ReactFlow>
       </DndWrapper>
-      <CanvasContextMenu
-        canvasState={canvasState}
-        contextMenu={contextMenu}
-        closeContextMenu={closeContextMenu}
-      />
+      <CanvasContextMenu contextMenu={contextMenu} closeContextMenu={closeContextMenu} />
     </div>
   );
 };
@@ -81,12 +76,14 @@ const CanvasElement = ({ canvasState }: CanvasProps) => {
 /**
  * The complete canvas for rendering everything
  */
-const Canvas = (props: CanvasProps) => {
+const Canvas = ({ canvasState }: CanvasProps) => {
   return (
-    <ReactFlowProvider>
-      <Toaster />
-      <CanvasElement {...props} />
-    </ReactFlowProvider>
+    <CanvasStoreProvider store={canvasState}>
+      <ReactFlowProvider>
+        <Toaster />
+        <CanvasElement />
+      </ReactFlowProvider>
+    </CanvasStoreProvider>
   );
 };
 

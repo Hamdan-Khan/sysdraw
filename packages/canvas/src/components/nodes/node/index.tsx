@@ -1,5 +1,5 @@
 import { BaseNodeData, RegisteredNodes, defaultNodesMap } from "@sysdraw/models";
-import { NodeComponentType, NodePropsType } from "../canvas";
+import { NodeComponentType, NodePropsType } from "../../canvas";
 import { GenericNode } from "./GenericNode";
 import { NodeWrapper } from "./NodeWrapper";
 

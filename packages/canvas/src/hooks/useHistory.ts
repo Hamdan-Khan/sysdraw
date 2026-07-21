@@ -1,6 +1,5 @@
-import { StoreApi, useStore } from "zustand";
 import { useShallow } from "zustand/shallow";
-import { CanvasStoreState } from "../store";
+import { CanvasStoreState, useCanvasStore } from "../store";
 
 const selector = (state: CanvasStoreState) => ({
   history: state.history,
@@ -9,8 +8,8 @@ const selector = (state: CanvasStoreState) => ({
   redo: state.redo,
 });
 
-export const useHistory = (canvasState: StoreApi<CanvasStoreState>) => {
-  const { history, commit, undo, redo } = useStore(canvasState, useShallow(selector));
+export const useHistory = () => {
+  const { history, commit, undo, redo } = useCanvasStore(useShallow(selector));
 
   const canUndo = history.past.length > 0;
   const canRedo = history.future.length > 0;

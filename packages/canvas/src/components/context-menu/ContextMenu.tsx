@@ -1,9 +1,8 @@
 import { ClipboardPaste, Copy, Maximize } from "lucide-react";
 import { useEffect, useRef } from "react";
-import { StoreApi, useStore } from "zustand";
 import { useShallow } from "zustand/shallow";
 import { useCopyPaste } from "../../hooks";
-import { CanvasStoreState } from "../../store";
+import { CanvasStoreState, useCanvasStore } from "../../store";
 import { edgeTypeMetadata, edgeTypeOptions } from "../edges";
 import { SubMenuItem } from "./SubMenu";
 import { ContextMenuItem, ContextMenuState } from "./types";
@@ -11,7 +10,6 @@ import { ContextMenuItem, ContextMenuState } from "./types";
 const MENU_WIDTH = 192;
 
 interface CanvasContextMenuProps {
-  canvasState: StoreApi<CanvasStoreState>;
   contextMenu: ContextMenuState | null;
   closeContextMenu: () => void;
 }
@@ -26,15 +24,10 @@ const storeSelector = (state: CanvasStoreState) => ({
 /**
  * context menu for the canvas
  */
-export const CanvasContextMenu = ({
-  canvasState,
-  contextMenu,
-  closeContextMenu,
-}: CanvasContextMenuProps) => {
+export const CanvasContextMenu = ({ contextMenu, closeContextMenu }: CanvasContextMenuProps) => {
   const menuRef = useRef<HTMLDivElement>(null);
   const { copy, paste } = useCopyPaste();
-  const { setNodes, setEdges, globalEdgeType, setGlobalEdgeType } = useStore(
-    canvasState,
+  const { setNodes, setEdges, globalEdgeType, setGlobalEdgeType } = useCanvasStore(
     useShallow(storeSelector),
   );
 

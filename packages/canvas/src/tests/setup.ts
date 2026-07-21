@@ -1,3 +1,4 @@
+import { RegisteredEdges } from "@sysdraw/models";
 import { vi } from "vitest";
 import { StoreApi } from "zustand";
 import { CanvasStoreState } from "../store";
@@ -6,11 +7,25 @@ type Selector = (state: Partial<CanvasStoreState>) => Partial<CanvasStoreState>;
 
 vi.mock("zustand", async (importOriginal) => {
   const actual = await importOriginal<typeof import("zustand")>();
-  const { mockSetNodes, mockSetEdges, mockOnConnect } = await import("./mocks");
+  const { mockSetNodes, mockSetEdges } = await import("./mocks");
   return {
     ...actual,
-    useStore: (_store: StoreApi<CanvasStoreState>, selector: Selector) =>
-      selector({ setNodes: mockSetNodes, setEdges: mockSetEdges, onConnect: mockOnConnect }),
+    useStore: (store: StoreApi<CanvasStoreState>, selector: Selector) =>
+      store?.getState
+        ? selector(store.getState())
+        : selector({
+            nodes: [],
+            edges: [],
+            history: { past: [], future: [] },
+            commit: vi.fn(),
+            undo: vi.fn(),
+            redo: vi.fn(),
+            setNodes: mockSetNodes,
+            setEdges: mockSetEdges,
+            globalEdgeType: RegisteredEdges.STRAIGHT,
+            isInteractive: true,
+            grid: true,
+          }),
   };
 });
 

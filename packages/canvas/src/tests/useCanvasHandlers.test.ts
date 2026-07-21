@@ -1,9 +1,11 @@
 import { RegisteredEdges } from "@sysdraw/models";
 import { act, renderHook } from "@testing-library/react";
 import { Node } from "@xyflow/react";
+import React, { createElement } from "react";
 import { toast } from "sonner";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { useCanvasHandlers } from "../hooks/useCanvasHandlers";
+import { CanvasStoreProvider } from "../store";
 import {
   mockGetInternalNode,
   mockGetIntersectingNodes,
@@ -71,12 +73,17 @@ const makeEvent = (kind: string, type: string) => ({
   },
 });
 
+const createWrapper = (store: any = {}) => {
+  return ({ children }: { children: React.ReactNode }) =>
+    createElement(CanvasStoreProvider, { store }, children);
+};
+
 describe("useCanvasHandlers", () => {
   beforeEach(() => vi.clearAllMocks());
 
   describe("onDrop", () => {
     it("does nothing if no drag data is present", () => {
-      const { result } = renderHook(() => useCanvasHandlers({} as any));
+      const { result } = renderHook(() => useCanvasHandlers(), { wrapper: createWrapper() });
       act(() =>
         result.current.onDrop({
           preventDefault: vi.fn(),
@@ -87,7 +94,7 @@ describe("useCanvasHandlers", () => {
     });
 
     it("prepends a dropped group, appends a dropped node", () => {
-      const { result } = renderHook(() => useCanvasHandlers({} as any));
+      const { result } = renderHook(() => useCanvasHandlers(), { wrapper: createWrapper() });
       const existing = [{ id: "existing", type: "rectangle", position: { x: 0, y: 0 }, data: {} }];
 
       act(() => result.current.onDrop(makeEvent("node", "rectangle") as any));
@@ -103,7 +110,7 @@ describe("useCanvasHandlers", () => {
 
   describe("onNodeDragStart", () => {
     it("commites the history", () => {
-      const { result } = renderHook(() => useCanvasHandlers({} as any));
+      const { result } = renderHook(() => useCanvasHandlers(), { wrapper: createWrapper() });
       act(() => result.current.onNodeDragStart({} as any, {} as Node, [] as Node[]));
       expect(mockCommit).toHaveBeenCalledTimes(1);
     });
@@ -131,7 +138,7 @@ describe("useCanvasHandlers", () => {
       // full overlap, ratio 1
       vi.mocked(getIntersectingArea).mockReturnValue(400);
 
-      const { result } = renderHook(() => useCanvasHandlers({} as any));
+      const { result } = renderHook(() => useCanvasHandlers(), { wrapper: createWrapper() });
       const bigNode = { ...draggedNode, measured: { width: 150, height: 150 } };
       act(() => result.current.onNodeDragStop({} as any, bigNode as any, [bigNode] as any));
 
@@ -143,7 +150,7 @@ describe("useCanvasHandlers", () => {
       const { getIntersectingArea } = await import("../components/canvas");
       vi.mocked(getIntersectingArea).mockReturnValue(400);
 
-      const { result } = renderHook(() => useCanvasHandlers({} as any));
+      const { result } = renderHook(() => useCanvasHandlers(), { wrapper: createWrapper() });
       act(() => result.current.onNodeDragStop({} as any, draggedNode as any, [draggedNode] as any));
 
       expect(mockSetNodes).toHaveBeenCalledTimes(1);
@@ -157,7 +164,7 @@ describe("useCanvasHandlers", () => {
       mockGetIntersectingNodes.mockReturnValue([]);
       const parented = { ...draggedNode, parentId: "old-group" };
 
-      const { result } = renderHook(() => useCanvasHandlers({} as any));
+      const { result } = renderHook(() => useCanvasHandlers(), { wrapper: createWrapper() });
       act(() => result.current.onNodeDragStop({} as any, parented as any, [parented] as any));
 
       const updated = mockSetNodes.mock.calls[0][0]([parented]);
@@ -177,7 +184,9 @@ describe("useCanvasHandlers", () => {
         }),
       };
 
-      const { result } = renderHook(() => useCanvasHandlers(mockStore as any));
+      const { result } = renderHook(() => useCanvasHandlers(), {
+        wrapper: createWrapper(mockStore),
+      });
 
       act(() => {
         result.current.onConnect({

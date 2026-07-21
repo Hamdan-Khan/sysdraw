@@ -1,14 +1,13 @@
 import { Background, BackgroundVariant, useViewport } from "@xyflow/react";
-import { StoreApi, useStore } from "zustand";
 import { useShallow } from "zustand/shallow";
-import { CanvasStoreState } from "../../store";
+import { CanvasStoreState, useCanvasStore } from "../../store";
 
 const selector = (state: CanvasStoreState) => ({
   grid: state.grid,
 });
 
-export const CanvasGrid = ({ canvasState }: { canvasState: StoreApi<CanvasStoreState> }) => {
-  const { grid } = useStore(canvasState, useShallow(selector));
+export const CanvasGrid = () => {
+  const { grid } = useCanvasStore(useShallow(selector));
   const { zoom } = useViewport();
 
   if (!grid) {

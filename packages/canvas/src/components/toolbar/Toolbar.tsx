@@ -5,10 +5,9 @@ import {
   RegisteredNodes,
 } from "@sysdraw/models";
 import { toast } from "sonner";
-import { CanvasStoreState } from "src/store";
-import { StoreApi, useStore } from "zustand";
 import { useShallow } from "zustand/shallow";
 import { IconsMap } from "../../assets";
+import { CanvasStoreState, useCanvasStore } from "../../store";
 import type { DnDTransferData } from "../canvas";
 import { Divider, Tooltip } from "../common";
 
@@ -21,8 +20,8 @@ const selector = (state: CanvasStoreState) => ({
   isInteractive: state.isInteractive,
 });
 
-export const Toolbar = ({ canvasState }: { canvasState: StoreApi<CanvasStoreState> }) => {
-  const { isInteractive } = useStore(canvasState, useShallow(selector));
+export const Toolbar = () => {
+  const { isInteractive } = useCanvasStore(useShallow(selector));
 
   /**
    * Handler for when a node or group is dragged from the toolbar

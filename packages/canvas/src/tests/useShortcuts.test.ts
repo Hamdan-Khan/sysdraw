@@ -1,7 +1,9 @@
 import { act, renderHook } from "@testing-library/react";
+import React, { createElement } from "react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { useShortcuts } from "../hooks";
-import { mockSetEdges, mockSetNodes } from "./mocks";
+import { CanvasStoreProvider } from "../store";
+import { mockSetNodes } from "./mocks";
 import { makeEdge, makeNode, makeStore } from "./utils";
 
 /** fires a keydown on window with the given modifier + key */
@@ -45,8 +47,10 @@ describe("useShortcuts", () => {
     vi.clearAllMocks();
   });
 
-  const mount = (canvasState: any = {} as any) => {
-    const hook = renderHook(() => useShortcuts(canvasState));
+  const mount = (store: any = makeStore()) => {
+    const wrapper = ({ children }: { children: React.ReactNode }) =>
+      createElement(CanvasStoreProvider, { store }, children);
+    const hook = renderHook(() => useShortcuts(), { wrapper });
     unmount = hook.unmount;
     return hook;
   };
@@ -76,14 +80,8 @@ describe("useShortcuts", () => {
 
       fireKey("a");
 
-      // invoke mockSetNodes/mockSetEdges receive updater callbacks to inspect the result
-      expect(mockSetNodes).toHaveBeenCalledOnce();
-      const updatedNodes = mockSetNodes.mock.calls[0][0]([makeNode("a"), makeNode("b")]);
-      expect(updatedNodes.every((n: any) => n.selected)).toBe(true);
-
-      expect(mockSetEdges).toHaveBeenCalledOnce();
-      const updatedEdges = mockSetEdges.mock.calls[0][0]([makeEdge("e1", "a", "b")]);
-      expect(updatedEdges.every((e: any) => e.selected)).toBe(true);
+      expect(store.getState().nodes.every((n) => n.selected)).toBe(true);
+      expect(store.getState().edges.every((e) => e.selected)).toBe(true);
     });
 
     it("ignores unrelated modifier+key combos", () => {
