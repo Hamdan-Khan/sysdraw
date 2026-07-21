@@ -30,3 +30,5 @@ export default App;
 - [x] fix multi nodes on ctrl+v paste
 - [ ] remove barrel imports for components
 - [ ] add edges arrow head option in the option bar
+- [ ] export as png, svg and .sysdraw
+- [ ] optimize undo/redo history state

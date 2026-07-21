@@ -37,8 +37,17 @@ const CanvasElement = () => {
     useShallow(selector),
   );
 
-  const { onDragOver, onDrop, onConnect, onNodeDragStart, onNodeDrag, onNodeDragStop } =
-    useCanvasHandlers();
+  const {
+    onDragOver,
+    onDrop,
+    onConnect,
+    onNodeDragStart,
+    onNodeDrag,
+    onNodeDragStop,
+    onNodeContextMenu,
+    onEdgeContextMenu,
+    onPaneContextMenu,
+  } = useCanvasHandlers();
 
   const { contextMenu, closeContextMenu } = useShortcuts();
 
@@ -58,6 +67,9 @@ const CanvasElement = () => {
           onNodeDragStart={onNodeDragStart}
           onNodeDrag={onNodeDrag}
           onNodeDragStop={onNodeDragStop}
+          onNodeContextMenu={onNodeContextMenu}
+          onEdgeContextMenu={onEdgeContextMenu}
+          onPaneContextMenu={onPaneContextMenu}
           nodesDraggable={isInteractive}
           nodesConnectable={isInteractive}
           elementsSelectable={isInteractive}

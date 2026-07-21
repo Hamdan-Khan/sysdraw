@@ -6,7 +6,16 @@ import {
   RegisteredGroups,
   RegisteredNodes,
 } from "@sysdraw/models";
-import { addEdge, Node, OnNodeDrag, Rect, useReactFlow, type OnConnect } from "@xyflow/react";
+import {
+  addEdge,
+  Edge,
+  Node,
+  OnNodeDrag,
+  ReactFlowProps,
+  Rect,
+  useReactFlow,
+  type OnConnect,
+} from "@xyflow/react";
 import { nanoid } from "nanoid";
 import { useCallback, useMemo } from "react";
 import { toast } from "sonner";
@@ -340,5 +349,73 @@ export const useCanvasHandlers = () => {
     [getBestDropGroup, getInternalNode, setNodes],
   );
 
-  return { onDragOver, onDrop, onConnect, onNodeDragStart, onNodeDrag, onNodeDragStop };
+  /**
+   * node context menu (right click) automatically selects the node if not selected
+   */
+  const onNodeContextMenu: ReactFlowProps["onNodeContextMenu"] = useCallback(
+    (_event: React.MouseEvent, node: Node) => {
+      if (!node.selected) {
+        setNodes((nodes) =>
+          nodes.map((n) => ({
+            ...n,
+            selected: n.id === node.id,
+          })),
+        );
+        setEdges((edges) =>
+          edges.map((e) => ({
+            ...e,
+            selected: false,
+          })),
+        );
+      }
+    },
+    [setNodes, setEdges],
+  );
+
+  /**
+   * edge context menu (right click on edge) - automatically selects the edge if not selected
+   */
+  const onEdgeContextMenu: ReactFlowProps["onEdgeContextMenu"] = useCallback(
+    (_event: React.MouseEvent, edge: Edge) => {
+      if (!edge.selected) {
+        setNodes((nodes) =>
+          nodes.some((n) => n.selected) ? nodes.map((n) => ({ ...n, selected: false })) : nodes,
+        );
+        setEdges((edges) =>
+          edges.map((e) => ({
+            ...e,
+            selected: e.id === edge.id,
+          })),
+        );
+      }
+    },
+    [setNodes, setEdges],
+  );
+
+  /**
+   * pane context menu (right click on background) - deselects all nodes and edges
+   */
+  const onPaneContextMenu: ReactFlowProps["onPaneContextMenu"] = useCallback(
+    (_event: MouseEvent | React.MouseEvent) => {
+      setNodes((nodes) =>
+        nodes.some((n) => n.selected) ? nodes.map((n) => ({ ...n, selected: false })) : nodes,
+      );
+      setEdges((edges) =>
+        edges.some((e) => e.selected) ? edges.map((e) => ({ ...e, selected: false })) : edges,
+      );
+    },
+    [setNodes, setEdges],
+  );
+
+  return {
+    onDragOver,
+    onDrop,
+    onConnect,
+    onNodeDragStart,
+    onNodeDrag,
+    onNodeDragStop,
+    onNodeContextMenu,
+    onEdgeContextMenu,
+    onPaneContextMenu,
+  };
 };

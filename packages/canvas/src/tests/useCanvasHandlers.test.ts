@@ -211,4 +211,91 @@ describe("useCanvasHandlers", () => {
       expect(updatedEdges[0].type).toBe(RegisteredEdges.SMOOTHSTEP);
     });
   });
+
+  describe("onNodeContextMenu", () => {
+    it("selects unselected node and deselects other nodes and edges", () => {
+      const { result } = renderHook(() => useCanvasHandlers(), { wrapper: createWrapper() });
+
+      const node1 = { id: "n1", selected: false } as Node;
+      const node2 = { id: "n2", selected: true } as Node;
+      const edge1 = { id: "e1", selected: true };
+
+      act(() => {
+        result.current.onNodeContextMenu({} as any, node1);
+      });
+
+      expect(mockSetNodes).toHaveBeenCalledTimes(1);
+      expect(mockSetEdges).toHaveBeenCalledTimes(1);
+
+      const nodesUpdater = mockSetNodes.mock.calls[0][0];
+      const updatedNodes = nodesUpdater([node1, node2]);
+      expect(updatedNodes.find((n: any) => n.id === "n1").selected).toBe(true);
+      expect(updatedNodes.find((n: any) => n.id === "n2").selected).toBe(false);
+
+      const edgesUpdater = mockSetEdges.mock.calls[0][0];
+      const updatedEdges = edgesUpdater([edge1]);
+      expect(updatedEdges[0].selected).toBe(false);
+    });
+
+    it("does nothing to selection if node is already selected", () => {
+      const { result } = renderHook(() => useCanvasHandlers(), { wrapper: createWrapper() });
+
+      const node1 = { id: "n1", selected: true } as Node;
+
+      act(() => {
+        result.current.onNodeContextMenu({} as any, node1);
+      });
+
+      expect(mockSetNodes).not.toHaveBeenCalled();
+      expect(mockSetEdges).not.toHaveBeenCalled();
+    });
+  });
+
+  describe("onEdgeContextMenu", () => {
+    it("selects unselected edge and deselects nodes", () => {
+      const { result } = renderHook(() => useCanvasHandlers(), { wrapper: createWrapper() });
+
+      const node1 = { id: "n1", selected: true } as Node;
+      const edge1 = { id: "e1", selected: false } as any;
+
+      act(() => {
+        result.current.onEdgeContextMenu({} as any, edge1);
+      });
+
+      expect(mockSetNodes).toHaveBeenCalledTimes(1);
+      expect(mockSetEdges).toHaveBeenCalledTimes(1);
+
+      const nodesUpdater = mockSetNodes.mock.calls[0][0];
+      const updatedNodes = nodesUpdater([node1]);
+      expect(updatedNodes[0].selected).toBe(false);
+
+      const edgesUpdater = mockSetEdges.mock.calls[0][0];
+      const updatedEdges = edgesUpdater([edge1]);
+      expect(updatedEdges[0].selected).toBe(true);
+    });
+  });
+
+  describe("onPaneContextMenu", () => {
+    it("deselects all nodes and edges when right clicking pane background", () => {
+      const { result } = renderHook(() => useCanvasHandlers(), { wrapper: createWrapper() });
+
+      const node1 = { id: "n1", selected: true } as Node;
+      const edge1 = { id: "e1", selected: true } as any;
+
+      act(() => {
+        result.current.onPaneContextMenu({} as any);
+      });
+
+      expect(mockSetNodes).toHaveBeenCalledTimes(1);
+      expect(mockSetEdges).toHaveBeenCalledTimes(1);
+
+      const nodesUpdater = mockSetNodes.mock.calls[0][0];
+      const updatedNodes = nodesUpdater([node1]);
+      expect(updatedNodes[0].selected).toBe(false);
+
+      const edgesUpdater = mockSetEdges.mock.calls[0][0];
+      const updatedEdges = edgesUpdater([edge1]);
+      expect(updatedEdges[0].selected).toBe(false);
+    });
+  });
 });
