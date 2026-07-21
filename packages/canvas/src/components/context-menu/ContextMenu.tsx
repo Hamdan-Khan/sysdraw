@@ -1,7 +1,8 @@
+import { RegisteredEdges } from "@sysdraw/models";
 import { ClipboardPaste, Copy, Maximize } from "lucide-react";
 import { useEffect, useMemo, useRef } from "react";
 import { useShallow } from "zustand/shallow";
-import { useCopyPaste } from "../../hooks";
+import { useCopyPaste, useHistory } from "../../hooks";
 import { CanvasStoreState, useCanvasStore } from "../../store";
 import { edgeTypeMetadata, edgeTypeOptions } from "../edges";
 import { SubMenuItem } from "./SubMenu";
@@ -16,6 +17,7 @@ interface CanvasContextMenuProps {
 
 const storeSelector = (state: CanvasStoreState) => ({
   nodes: state.nodes,
+  edges: state.edges,
   setNodes: state.setNodes,
   setEdges: state.setEdges,
   globalEdgeType: state.globalEdgeType,
@@ -28,7 +30,8 @@ const storeSelector = (state: CanvasStoreState) => ({
 export const CanvasContextMenu = ({ contextMenu, closeContextMenu }: CanvasContextMenuProps) => {
   const menuRef = useRef<HTMLDivElement>(null);
   const { copy, paste, isClipboardEmpty } = useCopyPaste();
-  const { nodes, setNodes, setEdges, globalEdgeType, setGlobalEdgeType } = useCanvasStore(
+  const { commit } = useHistory();
+  const { nodes, edges, setNodes, setEdges, globalEdgeType, setGlobalEdgeType } = useCanvasStore(
     useShallow(storeSelector),
   );
 
@@ -53,6 +56,20 @@ export const CanvasContextMenu = ({ contextMenu, closeContextMenu }: CanvasConte
   }, [closeContextMenu]);
 
   const hasSelection = useMemo(() => nodes.some((n) => n.selected), [nodes]);
+
+  const selectedEdges = useMemo(() => edges.filter((e) => e.selected), [edges]);
+
+  const updateEdgeType = (type: RegisteredEdges) => {
+    // if multiple nodes / edges are selected, update those specific elements,
+    // otherwise update the edge type globally
+    if (selectedEdges.length > 0) {
+      commit();
+      const selectedEdgeIds = new Set(selectedEdges.map((e) => e.id));
+      setEdges((prev) => prev.map((e) => (selectedEdgeIds.has(e.id) ? { ...e, type } : e)));
+    } else {
+      setGlobalEdgeType(type);
+    }
+  };
 
   if (!contextMenu) {
     return null;
@@ -89,11 +106,16 @@ export const CanvasContextMenu = ({ contextMenu, closeContextMenu }: CanvasConte
       divider: true,
       icon: edgeTypeMetadata[globalEdgeType].icon,
       submenu: edgeTypeOptions.map((opt) => {
+        const isChecked =
+          selectedEdges.length > 0
+            ? selectedEdges.every((e) => e.type === opt.value)
+            : globalEdgeType === opt.value;
+
         return {
           label: opt.label,
           icon: opt.icon,
-          checked: globalEdgeType === opt.value,
-          action: () => setGlobalEdgeType(opt.value),
+          checked: isChecked,
+          action: () => updateEdgeType(opt.value),
         };
       }),
     },
