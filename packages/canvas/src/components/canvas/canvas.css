@@ -43,3 +43,8 @@
   transition: opacity 0.15s ease;
   pointer-events: auto;
 }
+
+/* prevents hover state flickering when dragging a node */
+.react-flow__node.dragging .custom-handle__arrow {
+  pointer-events: none !important;
+}

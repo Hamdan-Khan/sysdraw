@@ -3,12 +3,12 @@ import { useReactFlow } from "@xyflow/react";
 import {
   ArchiveRestoreIcon,
   CornerDownRight,
-  GitCommit,
   Lock,
   Maximize,
-  Minus,
   Redo,
+  Route,
   Save,
+  Slash,
   Spline,
   Undo,
   Unlock,
@@ -20,9 +20,9 @@ import { CanvasStoreState } from "../../store";
 import { Dropdown, DropdownOption, Tooltip } from "../common";
 
 const edgeTypeOptions: DropdownOption<RegisteredEdges>[] = [
-  { value: RegisteredEdges.STRAIGHT, label: "Straight", icon: Minus },
+  { value: RegisteredEdges.STRAIGHT, label: "Straight", icon: Slash },
   { value: RegisteredEdges.STEP, label: "Step", icon: CornerDownRight },
-  { value: RegisteredEdges.SMOOTHSTEP, label: "Smooth Step", icon: GitCommit },
+  { value: RegisteredEdges.SMOOTHSTEP, label: "Smooth Step", icon: Route },
   { value: RegisteredEdges.BEZIER, label: "Bezier", icon: Spline },
 ];
 

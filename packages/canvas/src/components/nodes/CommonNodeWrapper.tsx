@@ -7,7 +7,6 @@ import {
   useReactFlow,
   useViewport,
 } from "@xyflow/react";
-import { useState } from "react";
 import { OptionBar } from "../common";
 import { CustomHandle } from "../common/CustomHandle";
 
@@ -38,7 +37,6 @@ export const CommonNodeWrapper = ({
   keepAspectRatio,
   resizerBorderWidth = 1,
 }: CommonNodeWrapperProps) => {
-  const [isHovered, setIsHovered] = useState(false);
   const nodeId = useNodeId();
   const { deleteElements } = useReactFlow();
   const { zoom } = useViewport();
@@ -54,14 +52,7 @@ export const CommonNodeWrapper = ({
   };
 
   return (
-    <div
-      className={className}
-      style={style}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-      onKeyDown={handleDelete}
-      tabIndex={0}
-    >
+    <div className={className} style={style} onKeyDown={handleDelete} tabIndex={0}>
       <NodeResizer
         minWidth={minWidth}
         minHeight={minHeight}
@@ -79,7 +70,6 @@ export const CommonNodeWrapper = ({
             id={handle.id}
             type={handle.type}
             position={handle.position || Position.Top}
-            isHovered={isHovered}
           />
         );
       })}
