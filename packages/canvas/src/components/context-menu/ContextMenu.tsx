@@ -1,5 +1,5 @@
 import { ClipboardPaste, Copy, Maximize } from "lucide-react";
-import { useEffect, useRef } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import { useShallow } from "zustand/shallow";
 import { useCopyPaste } from "../../hooks";
 import { CanvasStoreState, useCanvasStore } from "../../store";
@@ -15,6 +15,7 @@ interface CanvasContextMenuProps {
 }
 
 const storeSelector = (state: CanvasStoreState) => ({
+  nodes: state.nodes,
   setNodes: state.setNodes,
   setEdges: state.setEdges,
   globalEdgeType: state.globalEdgeType,
@@ -26,8 +27,8 @@ const storeSelector = (state: CanvasStoreState) => ({
  */
 export const CanvasContextMenu = ({ contextMenu, closeContextMenu }: CanvasContextMenuProps) => {
   const menuRef = useRef<HTMLDivElement>(null);
-  const { copy, paste } = useCopyPaste();
-  const { setNodes, setEdges, globalEdgeType, setGlobalEdgeType } = useCanvasStore(
+  const { copy, paste, isClipboardEmpty } = useCopyPaste();
+  const { nodes, setNodes, setEdges, globalEdgeType, setGlobalEdgeType } = useCanvasStore(
     useShallow(storeSelector),
   );
 
@@ -51,6 +52,8 @@ export const CanvasContextMenu = ({ contextMenu, closeContextMenu }: CanvasConte
     };
   }, [closeContextMenu]);
 
+  const hasSelection = useMemo(() => nodes.some((n) => n.selected), [nodes]);
+
   if (!contextMenu) {
     return null;
   }
@@ -62,12 +65,14 @@ export const CanvasContextMenu = ({ contextMenu, closeContextMenu }: CanvasConte
       label: "Copy",
       shortcut: "Ctrl + C",
       icon: Copy,
+      disabled: !hasSelection,
       action: () => copy(),
     },
     {
       label: "Paste",
       shortcut: "Ctrl + V",
       icon: ClipboardPaste,
+      disabled: isClipboardEmpty(),
       action: () => paste({ x, y }),
     },
     {

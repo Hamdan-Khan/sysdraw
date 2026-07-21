@@ -10,6 +10,16 @@ interface ClipboardData {
 /** module level clipboard reference */
 const clipboardRef: { current: ClipboardData | null } = { current: null };
 
+/** checks if internal clipboard is empty or has no nodes */
+export function isClipboardEmpty(): boolean {
+  return !clipboardRef.current || clipboardRef.current.nodes.length === 0;
+}
+
+/** clears the internal clipboard (useful for testing) */
+export function clearClipboard(): void {
+  clipboardRef.current = null;
+}
+
 /**
  * Custom hook for copy-paste functionality in the canvas.
  */
@@ -126,5 +136,5 @@ export function useCopyPaste() {
     [screenToFlowPosition, setNodes, setEdges],
   );
 
-  return { copy, paste };
+  return { copy, paste, isClipboardEmpty };
 }

@@ -1,7 +1,7 @@
 import { act, renderHook } from "@testing-library/react";
 import type { Edge, Node } from "@xyflow/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { useCopyPaste } from "../hooks";
+import { clearClipboard, isClipboardEmpty, useCopyPaste } from "../hooks";
 import {
   mockGetEdges,
   mockGetNodes,
@@ -18,6 +18,7 @@ vi.mock("nanoid", () => ({
 describe("useCopyPaste", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    clearClipboard();
     idCounter = 1;
   });
 
@@ -138,5 +139,34 @@ describe("useCopyPaste", () => {
     expect(mockScreenToFlowPosition).toHaveBeenCalledWith({ x: 500, y: 500 });
     const newNodes = mockSetNodes.mock.calls[0][0](mockNodes);
     expect(newNodes[2].position.x).toBeCloseTo(560); // 500 + 100 * 1 * 0.6
+  });
+
+  describe("isClipboardEmpty util", () => {
+    it("returns true initially when clipboard is empty", () => {
+      expect(isClipboardEmpty()).toBe(true);
+    });
+
+    it("returns false after copying selected nodes", () => {
+      mockGetNodes.mockReturnValue(mockNodes);
+      mockGetEdges.mockReturnValue(mockEdges);
+      const { result } = renderHook(() => useCopyPaste());
+
+      act(() => result.current.copy());
+      expect(isClipboardEmpty()).toBe(false);
+      expect(result.current.isClipboardEmpty()).toBe(false);
+    });
+
+    it("returns true after clearClipboard is called", () => {
+      mockGetNodes.mockReturnValue(mockNodes);
+      mockGetEdges.mockReturnValue(mockEdges);
+      const { result } = renderHook(() => useCopyPaste());
+
+      act(() => result.current.copy());
+      expect(isClipboardEmpty()).toBe(false);
+
+      clearClipboard();
+      expect(isClipboardEmpty()).toBe(true);
+      expect(result.current.isClipboardEmpty()).toBe(true);
+    });
   });
 });
