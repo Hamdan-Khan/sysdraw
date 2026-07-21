@@ -78,7 +78,10 @@ export const ControlsBar = () => {
   ] as const;
 
   return (
-    <div className="absolute top-4 left-1/2 -translate-x-1/2 z-10 flex items-center gap-0.5 bg-surface border border-border rounded-lg p-1.5 shadow-md">
+    <div
+      data-no-context-menu
+      className="absolute top-4 left-1/2 -translate-x-1/2 z-10 flex items-center gap-0.5 bg-surface border border-border rounded-lg p-1.5 shadow-md"
+    >
       {buttons.map((btn) => {
         const Icon = btn.icon;
         const isDividerBefore = btn.id === "controls-fit-view"; // divider before fit-view group
