@@ -75,7 +75,7 @@ const makeEvent = (kind: string, type: string) => ({
 
 const createWrapper = (store: any = {}) => {
   return ({ children }: { children: React.ReactNode }) =>
-    createElement(CanvasStoreProvider, { store }, children);
+    createElement(CanvasStoreProvider, { store, children });
 };
 
 describe("useCanvasHandlers", () => {

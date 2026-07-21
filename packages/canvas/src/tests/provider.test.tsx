@@ -9,19 +9,19 @@ describe("CanvasStoreProvider & useCanvasStore", () => {
   it("throws an error when useCanvasStore is used outside CanvasStoreProvider", () => {
     // suppress console.error for expected error thrown in render
     const consoleError = vi.spyOn(console, "error").mockImplementation(() => {});
-    expect(() => renderHook(() => useCanvasStore())).toThrow(
+    expect(() => renderHook(() => useCanvasStore((s) => s))).toThrow(
       "useCanvasStore must be used within a CanvasStoreProvider",
     );
     consoleError.mockRestore();
   });
 
-  it("provides store state to useCanvasStore without selector", () => {
+  it("provides store state to useCanvasStore with selector", () => {
     const store = createCanvasStore({ nodes: [], edges: [] });
     const wrapper = ({ children }: { children: React.ReactNode }) => (
       <CanvasStoreProvider store={store}>{children}</CanvasStoreProvider>
     );
 
-    const { result } = renderHook(() => useCanvasStore(), { wrapper });
+    const { result } = renderHook(() => useCanvasStore((s) => s), { wrapper });
     expect(result.current.nodes).toEqual([]);
     expect(result.current.edges).toEqual([]);
     expect(result.current.isInteractive).toBe(true);

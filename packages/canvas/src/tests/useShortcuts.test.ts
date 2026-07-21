@@ -49,7 +49,7 @@ describe("useShortcuts", () => {
 
   const mount = (store: any = makeStore()) => {
     const wrapper = ({ children }: { children: React.ReactNode }) =>
-      createElement(CanvasStoreProvider, { store }, children);
+      createElement(CanvasStoreProvider, { store, children });
     const hook = renderHook(() => useShortcuts(), { wrapper });
     unmount = hook.unmount;
     return hook;
