@@ -12,7 +12,7 @@ vi.unmock("zustand");
 
 const createWrapper = (store: StoreApi<CanvasStoreState>) => {
   return ({ children }: { children: React.ReactNode }) =>
-    createElement(CanvasStoreProvider, { store }, children);
+    createElement(CanvasStoreProvider, { store, children });
 };
 
 describe("useCanvasStorage", () => {
