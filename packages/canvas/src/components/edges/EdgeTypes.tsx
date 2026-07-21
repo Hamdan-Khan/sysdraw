@@ -1,19 +1,19 @@
 import { RegisteredEdges } from "@sysdraw/models";
 import { EdgeTypes } from "@xyflow/react";
-import { CornerDownRight, GitCommit, Minus, Spline } from "lucide-react";
+import { CornerDownRight, LucideIcon, Route, Slash, Spline } from "lucide-react";
 import { EdgePropsType } from "../canvas";
 import { DropdownOption } from "../common";
 import { EdgeWrapper } from "./EdgeWrapper";
 
 export type EdgeTypeMetadata = {
   label: string;
-  icon: React.ElementType;
+  icon: LucideIcon;
 };
 
 export const edgeTypeMetadata: Record<RegisteredEdges, EdgeTypeMetadata> = {
-  [RegisteredEdges.STRAIGHT]: { label: "Straight", icon: Minus },
+  [RegisteredEdges.STRAIGHT]: { label: "Straight", icon: Slash },
   [RegisteredEdges.STEP]: { label: "Step", icon: CornerDownRight },
-  [RegisteredEdges.SMOOTHSTEP]: { label: "Smooth Step", icon: GitCommit },
+  [RegisteredEdges.SMOOTHSTEP]: { label: "Smooth Step", icon: Route },
   [RegisteredEdges.BEZIER]: { label: "Bezier", icon: Spline },
 };
 

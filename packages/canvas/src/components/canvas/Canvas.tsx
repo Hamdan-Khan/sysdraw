@@ -41,7 +41,7 @@ const CanvasElement = ({ canvasState }: CanvasProps) => {
   const { onDragOver, onDrop, onConnect, onNodeDragStart, onNodeDrag, onNodeDragStop } =
     useCanvasHandlers(canvasState);
 
-  useShortcuts(canvasState);
+  const { contextMenu, closeContextMenu } = useShortcuts(canvasState);
 
   return (
     <div className="w-screen h-screen bg-bg relative" style={{ width: "100%", height: "100%" }}>
@@ -70,7 +70,11 @@ const CanvasElement = ({ canvasState }: CanvasProps) => {
           <CanvasGrid canvasState={canvasState} />
         </ReactFlow>
       </DndWrapper>
-      <CanvasContextMenu canvasState={canvasState} />
+      <CanvasContextMenu
+        canvasState={canvasState}
+        contextMenu={contextMenu}
+        closeContextMenu={closeContextMenu}
+      />
     </div>
   );
 };

@@ -1,34 +1,20 @@
-import { RegisteredEdges } from "@sysdraw/models";
-import {
-  ClipboardPaste,
-  Copy,
-  CornerDownRight,
-  GitCommit,
-  Maximize,
-  Minus,
-  Spline,
-} from "lucide-react";
+import { ClipboardPaste, Copy, Maximize } from "lucide-react";
 import { useEffect, useRef } from "react";
 import { StoreApi, useStore } from "zustand";
 import { useShallow } from "zustand/shallow";
-import { useCopyPaste, useShortcuts } from "../../hooks";
+import { useCopyPaste } from "../../hooks";
 import { CanvasStoreState } from "../../store";
-import { edgeTypeMetadata } from "../edges";
+import { edgeTypeMetadata, edgeTypeOptions } from "../edges";
 import { SubMenuItem } from "./SubMenu";
-import { ContextMenuItem } from "./types";
+import { ContextMenuItem, ContextMenuState } from "./types";
 
 const MENU_WIDTH = 192;
 
 interface CanvasContextMenuProps {
   canvasState: StoreApi<CanvasStoreState>;
+  contextMenu: ContextMenuState | null;
+  closeContextMenu: () => void;
 }
-
-const edgeTypeOptions: { value: RegisteredEdges; label: string; icon: React.ReactNode }[] = [
-  { value: RegisteredEdges.STRAIGHT, label: "Straight", icon: <Minus size={14} /> },
-  { value: RegisteredEdges.STEP, label: "Step", icon: <CornerDownRight size={14} /> },
-  { value: RegisteredEdges.SMOOTHSTEP, label: "Smooth Step", icon: <GitCommit size={14} /> },
-  { value: RegisteredEdges.BEZIER, label: "Bezier", icon: <Spline size={14} /> },
-];
 
 const storeSelector = (state: CanvasStoreState) => ({
   setNodes: state.setNodes,
@@ -40,9 +26,12 @@ const storeSelector = (state: CanvasStoreState) => ({
 /**
  * context menu for the canvas
  */
-export const CanvasContextMenu = ({ canvasState }: CanvasContextMenuProps) => {
+export const CanvasContextMenu = ({
+  canvasState,
+  contextMenu,
+  closeContextMenu,
+}: CanvasContextMenuProps) => {
   const menuRef = useRef<HTMLDivElement>(null);
-  const { contextMenu, closeContextMenu } = useShortcuts(canvasState);
   const { copy, paste } = useCopyPaste();
   const { setNodes, setEdges, globalEdgeType, setGlobalEdgeType } = useStore(
     canvasState,
@@ -79,19 +68,19 @@ export const CanvasContextMenu = ({ canvasState }: CanvasContextMenuProps) => {
     {
       label: "Copy",
       shortcut: "Ctrl + C",
-      icon: <Copy size={14} />,
+      icon: Copy,
       action: () => copy(),
     },
     {
       label: "Paste",
       shortcut: "Ctrl + V",
-      icon: <ClipboardPaste size={14} />,
+      icon: ClipboardPaste,
       action: () => paste({ x, y }),
     },
     {
       label: "Select All",
       shortcut: "Ctrl + A",
-      icon: <Maximize size={14} />,
+      icon: Maximize,
       action: () => {
         setNodes((prev) => prev.map((n) => ({ ...n, selected: true })));
         setEdges((prev) => prev.map((e) => ({ ...e, selected: true })));
@@ -100,10 +89,7 @@ export const CanvasContextMenu = ({ canvasState }: CanvasContextMenuProps) => {
     {
       label: "Edge Type",
       divider: true,
-      icon: (() => {
-        const Icon = edgeTypeMetadata[globalEdgeType].icon;
-        return <Icon size={14} />;
-      })(),
+      icon: edgeTypeMetadata[globalEdgeType].icon,
       submenu: edgeTypeOptions.map((opt) => {
         return {
           label: opt.label,

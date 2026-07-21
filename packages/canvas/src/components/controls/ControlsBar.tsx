@@ -1,30 +1,11 @@
-import { RegisteredEdges } from "@sysdraw/models";
 import { useReactFlow } from "@xyflow/react";
-import {
-  ArchiveRestoreIcon,
-  CornerDownRight,
-  Lock,
-  Maximize,
-  Redo,
-  Route,
-  Save,
-  Slash,
-  Spline,
-  Undo,
-  Unlock,
-} from "lucide-react";
+import { ArchiveRestoreIcon, Lock, Maximize, Redo, Save, Undo, Unlock } from "lucide-react";
 import { StoreApi, useStore } from "zustand";
 import { useShallow } from "zustand/shallow";
 import { useCanvasStorage, useHistory } from "../../hooks";
 import { CanvasStoreState } from "../../store";
-import { Dropdown, DropdownOption, Tooltip } from "../common";
-
-const edgeTypeOptions: DropdownOption<RegisteredEdges>[] = [
-  { value: RegisteredEdges.STRAIGHT, label: "Straight", icon: Slash },
-  { value: RegisteredEdges.STEP, label: "Step", icon: CornerDownRight },
-  { value: RegisteredEdges.SMOOTHSTEP, label: "Smooth Step", icon: Route },
-  { value: RegisteredEdges.BEZIER, label: "Bezier", icon: Spline },
-];
+import { Dropdown, Tooltip } from "../common";
+import { edgeTypeOptions } from "../edges";
 
 const selector = (s: CanvasStoreState) => ({
   isInteractive: s.isInteractive,

@@ -41,6 +41,8 @@ export const SubMenuItem = ({ item, onClose }: SubMenuItemProps) => {
 
   const hasSubmenu = Boolean(item.submenu?.length);
 
+  const Icon = item.icon;
+
   return (
     <div ref={rowRef} className="relative" onMouseEnter={openSubmenu} onMouseLeave={closeSubmenu}>
       <button
@@ -61,7 +63,11 @@ export const SubMenuItem = ({ item, onClose }: SubMenuItemProps) => {
           {item.checked !== undefined && (
             <span className="w-4 flex justify-center text-primary">{item.checked ? "✓" : ""}</span>
           )}
-          {item.icon && <span className="text-secondary flex items-center">{item.icon}</span>}
+          {Icon && (
+            <span className="text-secondary flex items-center">
+              <Icon size={14} />
+            </span>
+          )}
           {item.label}
         </span>
         <span className="flex items-center gap-1">
