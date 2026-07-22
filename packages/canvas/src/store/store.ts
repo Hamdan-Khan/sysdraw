@@ -28,8 +28,9 @@ export interface HistoryState {
 /** max number of history depth */
 const HISTORY_LIMIT = 30;
 
-const createNodesMap = (nodes: Node[]): Map<string, Node> =>
-  new Map(nodes.map((n) => [n.id, n]));
+const createNodesMap = (nodes: Node[]): Map<string, Node> => {
+  return new Map(nodes.map((n) => [n.id, n]));
+};
 
 interface CanvasStoreState {
   nodes: Node[];
@@ -41,6 +42,7 @@ interface CanvasStoreState {
   globalEdgeMarkerEnd: Edge["markerEnd"];
   isInteractive: boolean;
   grid: boolean;
+  isNodeLocked: (id?: string | null) => boolean;
   onNodesChange: OnNodesChange<Node>;
   onEdgesChange: OnEdgesChange;
   setNodes: (nodes: Node[] | ((prev: Node[]) => Node[])) => void;
@@ -72,6 +74,12 @@ const createCanvasStore = (storeState: InitialCanvasStoreState) => {
     globalEdgeAnimated: false,
     globalEdgeMarkerEnd: undefined,
     grid: true,
+    isNodeLocked: (id) => {
+      if (!id) return false;
+      // using draggable as the locking indicator, though there a bunch of other
+      // properties too that go into locking a node (resizable, deletable, etc.)
+      return get().nodesMap.get(id)?.draggable === false;
+    },
     onNodesChange: (changes) => {
       const nextNodes = applyNodeChanges(changes, get().nodes);
       set({

@@ -1,3 +1,4 @@
+import { Node } from "@xyflow/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import {
   clampPositionInsideGroup,
@@ -96,9 +97,11 @@ describe("isGroup", () => {
 });
 
 describe("sortNodesAndGroups", () => {
+  const getMap = (nodes: Node[]) => new Map(nodes.map((n) => [n.id, n]));
+
   it("places group nodes before regular nodes", () => {
     const nodes = [makeRegularNode("r1"), makeGroupNode("g1"), makeRegularNode("r2")];
-    const sorted = sortNodesAndGroups(nodes);
+    const sorted = sortNodesAndGroups(nodes, getMap(nodes));
 
     const types = sorted.map((n) => (n.type === "group-a" ? "group" : "node"));
     expect(types).toEqual(["group", "node", "node"]);
@@ -110,7 +113,7 @@ describe("sortNodesAndGroups", () => {
     const gChild = makeGroupNode("g-child", "g-parent");
     const nodes = [gChild, gParent, makeRegularNode("r1")];
 
-    const sorted = sortNodesAndGroups(nodes);
+    const sorted = sortNodesAndGroups(nodes, getMap(nodes));
     const groupIds = sorted.filter((n) => n.type === "group-a").map((n) => n.id);
 
     expect(groupIds.indexOf("g-parent")).toBeLessThan(groupIds.indexOf("g-child"));
@@ -120,8 +123,9 @@ describe("sortNodesAndGroups", () => {
     const g1 = makeGroupNode("g1");
     const g2 = makeGroupNode("g2", "g1");
     const g3 = makeGroupNode("g3", "g2");
+    const nodes = [g3, g2, g1];
 
-    const sorted = sortNodesAndGroups([g3, g2, g1]);
+    const sorted = sortNodesAndGroups(nodes, getMap(nodes));
     const ids = sorted.map((n) => n.id);
 
     expect(ids.indexOf("g1")).toBeLessThan(ids.indexOf("g2"));
@@ -132,8 +136,9 @@ describe("sortNodesAndGroups", () => {
     // g1 - g2 - g1 (cycle)
     const g1 = makeGroupNode("g1", "g2");
     const g2 = makeGroupNode("g2", "g1");
+    const nodes = [g1, g2];
 
-    expect(() => sortNodesAndGroups([g1, g2])).not.toThrow();
+    expect(() => sortNodesAndGroups(nodes, getMap(nodes))).not.toThrow();
   });
 });
 

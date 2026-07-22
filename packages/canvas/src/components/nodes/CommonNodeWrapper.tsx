@@ -1,5 +1,6 @@
 import type { NodeHandleConfig } from "@sysdraw/models";
-import { NodeResizer, NodeToolbar, Position, useViewport } from "@xyflow/react";
+import { NodeResizer, NodeToolbar, Position, useNodeId, useViewport } from "@xyflow/react";
+import { useCanvasStore } from "../../store";
 import { OptionBar } from "../common";
 import { CustomHandle } from "../common/CustomHandle";
 
@@ -30,6 +31,8 @@ export const CommonNodeWrapper = ({
   keepAspectRatio,
   resizerBorderWidth = 1,
 }: CommonNodeWrapperProps) => {
+  const nodeId = useNodeId();
+  const isNodeLocked = useCanvasStore((s) => s.isNodeLocked(nodeId));
   const { zoom } = useViewport();
 
   return (
@@ -37,7 +40,7 @@ export const CommonNodeWrapper = ({
       <NodeResizer
         minWidth={minWidth}
         minHeight={minHeight}
-        isVisible={selected}
+        isVisible={selected && !isNodeLocked}
         keepAspectRatio={keepAspectRatio}
         lineStyle={{ borderWidth: resizerBorderWidth / zoom }}
       />

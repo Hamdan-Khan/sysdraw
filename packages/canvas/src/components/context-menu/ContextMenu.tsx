@@ -21,6 +21,7 @@ const storeSelector = (state: CanvasStoreState) => ({
   edges: state.edges,
   setNodes: state.setNodes,
   setEdges: state.setEdges,
+  isNodeLocked: state.isNodeLocked,
   globalEdgeType: state.globalEdgeType,
   setGlobalEdgeType: state.setGlobalEdgeType,
   globalEdgeAnimated: state.globalEdgeAnimated,
@@ -41,6 +42,7 @@ export const CanvasContextMenu = ({ contextMenu, closeContextMenu }: CanvasConte
     edges,
     setNodes,
     setEdges,
+    isNodeLocked,
     globalEdgeType,
     setGlobalEdgeType,
     globalEdgeAnimated,
@@ -69,7 +71,10 @@ export const CanvasContextMenu = ({ contextMenu, closeContextMenu }: CanvasConte
     };
   }, [closeContextMenu]);
 
-  const hasSelection = useMemo(() => nodes.some((n) => n.selected), [nodes]);
+  const hasSelection = useMemo(
+    () => nodes.some((n) => n.selected && !isNodeLocked(n.id)),
+    [nodes, isNodeLocked],
+  );
 
   const selectedEdges = useMemo(() => edges.filter((e) => e.selected), [edges]);
 

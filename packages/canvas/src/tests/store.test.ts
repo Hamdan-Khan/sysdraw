@@ -72,14 +72,34 @@ describe("onNodesChange", () => {
     expect(store.getState().nodes[0].id).toBe("n1");
   });
 
-  it("removes a node via a 'remove' change", () => {
-    const store = makeStore([makeNode("n1"), makeNode("n2")]);
+  it("updates nodesMap when onNodesChange adds or removes nodes", () => {
+    const store = makeStore([makeNode("n1")]);
     const { onNodesChange } = store.getState();
 
-    onNodesChange([{ type: "remove", id: "n1" }]);
+    onNodesChange([{ type: "add", item: makeNode("n2") }]);
+    expect(store.getState().nodesMap.has("n2")).toBe(true);
 
-    const ids = store.getState().nodes.map((n) => n.id);
-    expect(ids).toEqual(["n2"]);
+    onNodesChange([{ type: "remove", id: "n1" }]);
+    expect(store.getState().nodesMap.has("n1")).toBe(false);
+  });
+});
+
+describe("isNodeLocked", () => {
+  it("returns false for undefined, missing, or unlocked nodes", () => {
+    const store = makeStore([makeNode("n1", { draggable: true }), makeNode("n2")]);
+    const { isNodeLocked } = store.getState();
+
+    expect(isNodeLocked()).toBe(false);
+    expect(isNodeLocked("unknown")).toBe(false);
+    expect(isNodeLocked("n1")).toBe(false);
+    expect(isNodeLocked("n2")).toBe(false);
+  });
+
+  it("returns true when a node has draggable set to false", () => {
+    const store = makeStore([makeNode("locked", { draggable: false })]);
+    const { isNodeLocked } = store.getState();
+
+    expect(isNodeLocked("locked")).toBe(true);
   });
 });
 
@@ -187,8 +207,10 @@ describe("commit / undo / redo", () => {
 
     undo();
 
-    const { nodes, history } = store.getState();
+    const { nodes, nodesMap, history } = store.getState();
     expect(nodes.map((n) => n.id)).toEqual(["prev"]);
+    expect(nodesMap.has("prev")).toBe(true);
+    expect(nodesMap.has("current")).toBe(false);
     expect(history.past).toHaveLength(0);
     // future holds the state that was live before undo (i.e. "current")
     expect(history.future).toHaveLength(1);

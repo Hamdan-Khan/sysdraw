@@ -10,6 +10,7 @@ const selector = (state: CanvasStoreState) => ({
   edges: state.edges,
   setNodes: state.setNodes,
   setEdges: state.setEdges,
+  isNodeLocked: state.isNodeLocked,
 });
 
 /**
@@ -21,7 +22,7 @@ export function useShortcuts() {
   const { copy, paste } = useCopyPaste();
   const { undo, redo, commit } = useHistory();
 
-  const { nodes, edges, setNodes, setEdges } = useCanvasStore(useShallow(selector));
+  const { nodes, edges, setNodes, setEdges, isNodeLocked } = useCanvasStore(useShallow(selector));
 
   const [contextMenu, setContextMenu] = useState<ContextMenuState | null>(null);
 
@@ -33,7 +34,7 @@ export function useShortcuts() {
   }, [setEdges, setNodes]);
 
   const deleteSelected = useCallback(() => {
-    const selectedNodes = nodes.filter((n) => n.selected);
+    const selectedNodes = nodes.filter((n) => n.selected && !isNodeLocked(n.id));
     const selectedEdges = edges.filter((e) => e.selected);
 
     if (selectedNodes.length === 0 && selectedEdges.length === 0) {
@@ -42,15 +43,15 @@ export function useShortcuts() {
 
     commit();
 
-    const selectedNodeIds = new Set(selectedNodes.map((n) => n.id));
+    const deleteNodeIds = new Set(selectedNodes.map((n) => n.id));
 
-    setNodes((prev) => prev.filter((n) => !n.selected));
+    setNodes((prev) => prev.filter((n) => !deleteNodeIds.has(n.id)));
     setEdges((prev) =>
       prev.filter(
-        (e) => !e.selected && !selectedNodeIds.has(e.source) && !selectedNodeIds.has(e.target),
+        (e) => !e.selected && !deleteNodeIds.has(e.source) && !deleteNodeIds.has(e.target),
       ),
     );
-  }, [nodes, edges, commit, setNodes, setEdges]);
+  }, [nodes, edges, commit, setNodes, setEdges, isNodeLocked]);
 
   // keyboard shortcuts
   useEffect(() => {
