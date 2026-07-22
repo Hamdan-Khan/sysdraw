@@ -1,15 +1,5 @@
 import { Position } from "@xyflow/react";
 import type { BaseNodeData, NodeHandleConfig } from "../types";
-import { apiGatewayDefault } from "./ApiGateway";
-import { cacheDefault } from "./Cache";
-import { cdnDefault } from "./Cdn";
-import { databaseDefault } from "./Database";
-import { loadBalancerDefault } from "./LoadBalancer";
-import { noSqlDbDefault } from "./NoSqlDb";
-import { reverseProxyDefault } from "./ReverseProxy";
-import { sqlDbDefault } from "./SqlDb";
-import { virtualMachineDefault } from "./VirtualMachine";
-import { webServerDefault } from "./WebServer";
 
 const defaultHandles: NodeHandleConfig[] = [
   { id: "top", type: "target", position: Position.Top },
@@ -36,16 +26,20 @@ enum RegisteredNodes {
  * Map of all registered nodes with default data values
  */
 const defaultNodesMap: Record<RegisteredNodes, BaseNodeData> = {
-  [RegisteredNodes.DATABASE]: { ...databaseDefault, handles: defaultHandles },
-  [RegisteredNodes.LOAD_BALANCER]: { ...loadBalancerDefault, handles: defaultHandles },
-  [RegisteredNodes.WEB_SERVER]: { ...webServerDefault, handles: defaultHandles },
-  [RegisteredNodes.VIRTUAL_MACHINE]: { ...virtualMachineDefault, handles: defaultHandles },
-  [RegisteredNodes.CDN]: { ...cdnDefault, handles: defaultHandles },
-  [RegisteredNodes.API_GATEWAY]: { ...apiGatewayDefault, handles: defaultHandles },
-  [RegisteredNodes.REVERSE_PROXY]: { ...reverseProxyDefault, handles: defaultHandles },
-  [RegisteredNodes.SQL_DB]: { ...sqlDbDefault, handles: defaultHandles },
-  [RegisteredNodes.NOSQL_DB]: { ...noSqlDbDefault, handles: defaultHandles },
-  [RegisteredNodes.CACHE]: { ...cacheDefault, handles: defaultHandles },
+  [RegisteredNodes.DATABASE]: { label: "Database", icon: "database", handles: defaultHandles },
+  [RegisteredNodes.LOAD_BALANCER]: {
+    label: "Load Balancer",
+    icon: "scale",
+    handles: defaultHandles,
+  },
+  [RegisteredNodes.WEB_SERVER]: { label: "Web Server", handles: defaultHandles },
+  [RegisteredNodes.VIRTUAL_MACHINE]: { label: "Virtual Machine", handles: defaultHandles },
+  [RegisteredNodes.CDN]: { label: "CDN", handles: defaultHandles },
+  [RegisteredNodes.API_GATEWAY]: { label: "API Gateway", handles: defaultHandles },
+  [RegisteredNodes.REVERSE_PROXY]: { label: "Reverse Proxy", handles: defaultHandles },
+  [RegisteredNodes.SQL_DB]: { label: "SQL DB", handles: defaultHandles },
+  [RegisteredNodes.NOSQL_DB]: { label: "NoSQL DB", handles: defaultHandles },
+  [RegisteredNodes.CACHE]: { label: "Cache", handles: defaultHandles },
 };
 
 export { defaultNodesMap, RegisteredNodes };
