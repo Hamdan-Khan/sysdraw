@@ -1,6 +1,7 @@
 import { useReactFlow, type Edge, type Node } from "@xyflow/react";
 import { nanoid } from "nanoid";
 import { useCallback, useEffect, useRef } from "react";
+import { useCanvasStore } from "../store";
 
 interface ClipboardData {
   nodes: Node[];
@@ -24,6 +25,7 @@ export function clearClipboard(): void {
  * Custom hook for copy-paste functionality in the canvas.
  */
 export function useCopyPaste() {
+  const nodesMap = useCanvasStore((s) => s.nodesMap);
   const { getNodes, getEdges, setNodes, setEdges, screenToFlowPosition } = useReactFlow();
   const lastMousePosition = useRef<{ x: number; y: number } | null>(null);
   /** to add offset to pasted elements */
@@ -45,9 +47,13 @@ export function useCopyPaste() {
       const allNodes = getNodes();
       const allEdges = getEdges();
 
-      const nodesToCopy = explicitNodeId
-        ? allNodes.filter((n) => n.id === explicitNodeId)
-        : allNodes.filter((n) => n.selected);
+      let nodesToCopy: Node[];
+      if (explicitNodeId) {
+        const node = nodesMap.get(explicitNodeId);
+        nodesToCopy = node ? [node] : allNodes.filter((n) => n.id === explicitNodeId);
+      } else {
+        nodesToCopy = allNodes.filter((n) => n.selected);
+      }
 
       if (nodesToCopy.length === 0) {
         return;
@@ -66,7 +72,7 @@ export function useCopyPaste() {
       pasteCount.current = 0;
       lastMousePosition.current = null;
     },
-    [getNodes, getEdges],
+    [getNodes, getEdges, nodesMap],
   );
 
   /**

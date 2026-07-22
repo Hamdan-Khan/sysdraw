@@ -1,7 +1,9 @@
 import { act, renderHook } from "@testing-library/react";
 import type { Edge, Node } from "@xyflow/react";
+import { createElement } from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { clearClipboard, isClipboardEmpty, useCopyPaste } from "../hooks";
+import { CanvasStoreProvider } from "../store";
 import {
   mockGetEdges,
   mockGetNodes,
@@ -9,6 +11,11 @@ import {
   mockSetEdges,
   mockSetNodes,
 } from "./mocks";
+
+const createWrapper = (store: any = {}) => {
+  return ({ children }: { children: React.ReactNode }) =>
+    createElement(CanvasStoreProvider, { store, children });
+};
 
 let idCounter = 1;
 vi.mock("nanoid", () => ({
@@ -45,7 +52,7 @@ describe("useCopyPaste", () => {
     mockGetNodes.mockReturnValue([{ ...mockNodes[0], selected: false }, mockNodes[1]]);
     mockGetEdges.mockReturnValue(mockEdges);
 
-    const { result } = renderHook(() => useCopyPaste());
+    const { result } = renderHook(() => useCopyPaste(), { wrapper: createWrapper() });
 
     act(() => {
       result.current.copy();
@@ -63,7 +70,7 @@ describe("useCopyPaste", () => {
     mockGetNodes.mockReturnValue(mockNodes);
     mockGetEdges.mockReturnValue(mockEdges);
 
-    const { result } = renderHook(() => useCopyPaste());
+    const { result } = renderHook(() => useCopyPaste(), { wrapper: createWrapper() });
 
     act(() => {
       // Node 1 is selected
@@ -102,7 +109,7 @@ describe("useCopyPaste", () => {
     mockGetNodes.mockReturnValue(bothSelectedNodes);
     mockGetEdges.mockReturnValue(mockEdges);
 
-    const { result } = renderHook(() => useCopyPaste());
+    const { result } = renderHook(() => useCopyPaste(), { wrapper: createWrapper() });
 
     act(() => {
       result.current.copy();
@@ -131,7 +138,7 @@ describe("useCopyPaste", () => {
   it("pastes at cursor position when anchor is provided", () => {
     mockGetNodes.mockReturnValue(mockNodes);
     mockGetEdges.mockReturnValue(mockEdges);
-    const { result } = renderHook(() => useCopyPaste());
+    const { result } = renderHook(() => useCopyPaste(), { wrapper: createWrapper() });
 
     act(() => result.current.copy());
     act(() => result.current.paste({ x: 500, y: 500 }));
@@ -149,7 +156,7 @@ describe("useCopyPaste", () => {
     it("returns false after copying selected nodes", () => {
       mockGetNodes.mockReturnValue(mockNodes);
       mockGetEdges.mockReturnValue(mockEdges);
-      const { result } = renderHook(() => useCopyPaste());
+      const { result } = renderHook(() => useCopyPaste(), { wrapper: createWrapper() });
 
       act(() => result.current.copy());
       expect(isClipboardEmpty()).toBe(false);
@@ -159,7 +166,7 @@ describe("useCopyPaste", () => {
     it("returns true after clearClipboard is called", () => {
       mockGetNodes.mockReturnValue(mockNodes);
       mockGetEdges.mockReturnValue(mockEdges);
-      const { result } = renderHook(() => useCopyPaste());
+      const { result } = renderHook(() => useCopyPaste(), { wrapper: createWrapper() });
 
       act(() => result.current.copy());
       expect(isClipboardEmpty()).toBe(false);

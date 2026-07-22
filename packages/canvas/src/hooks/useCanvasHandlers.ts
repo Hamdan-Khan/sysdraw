@@ -17,7 +17,7 @@ import {
   type OnConnect,
 } from "@xyflow/react";
 import { nanoid } from "nanoid";
-import { useCallback, useMemo } from "react";
+import { useCallback } from "react";
 import { toast } from "sonner";
 import { useShallow } from "zustand/shallow";
 import {
@@ -36,6 +36,7 @@ import { useHistory } from "./useHistory";
 
 const selector = (state: CanvasStoreState) => ({
   nodes: state.nodes,
+  nodesMap: state.nodesMap,
   setNodes: state.setNodes,
   setEdges: state.setEdges,
   globalEdgeType: state.globalEdgeType,
@@ -52,21 +53,13 @@ type CandidateGroupNode = { group: Node; groupRect: NodeRect; ratio: number };
  * event handlers for the canvas (drag, drop, re-parenting, etc.)
  */
 export const useCanvasHandlers = () => {
-  const {
-    nodes: nodesList,
-    setNodes,
-    setEdges,
-    globalEdgeType,
-    globalEdgeAnimated,
-    globalEdgeMarkerEnd,
-  } = useCanvasStore(useShallow(selector));
+  const { nodesMap, setNodes, setEdges, globalEdgeType, globalEdgeAnimated, globalEdgeMarkerEnd } =
+    useCanvasStore(useShallow(selector));
 
   const { screenToFlowPosition, getIntersectingNodes, getInternalNode, getNodesBounds } =
     useReactFlow();
 
   const { commit } = useHistory();
-
-  const nodesMap = useMemo(() => new Map(nodesList.map((n) => [n.id, n])), [nodesList]);
 
   const onConnect: OnConnect = useCallback(
     (connection) => {
@@ -309,6 +302,8 @@ export const useCanvasHandlers = () => {
         }
       }
 
+      const draggedNodeIds = new Set(nodes.map((dn) => dn.id));
+
       if (best) {
         const { group: dropTarget, groupRect } = best;
 
@@ -319,8 +314,7 @@ export const useCanvasHandlers = () => {
             if (n.id === dropTarget.id) return { ...n, className: "" };
 
             // Only touch nodes that are part of the current drag selection.
-            const isDragged = nodes.some((dn) => dn.id === n.id);
-            if (!isDragged) return n;
+            if (!draggedNodeIds.has(n.id)) return n;
 
             const nodeInternal = getInternalNode(n.id);
             if (!nodeInternal) return n;
@@ -336,7 +330,7 @@ export const useCanvasHandlers = () => {
             );
             return { ...n, position, parentId: dropTarget.id };
           });
-          return sortNodesAndGroups(updatedNodes);
+          return sortNodesAndGroups(updatedNodes, nodesMap);
         });
       } else {
         // no valid drop target found so unparent every selected node that had a parent
@@ -345,8 +339,7 @@ export const useCanvasHandlers = () => {
           ns.map((n) => {
             if (n.className?.includes("ring-2")) return { ...n, className: "" };
 
-            const isDragged = nodes.some((dn) => dn.id === n.id);
-            if (!isDragged || !n.parentId) return n;
+            if (!draggedNodeIds.has(n.id) || !n.parentId) return n;
 
             const nodeInternal = getInternalNode(n.id);
             if (!nodeInternal) return n;
@@ -360,7 +353,7 @@ export const useCanvasHandlers = () => {
         );
       }
     },
-    [getBestDropGroup, getInternalNode, setNodes],
+    [getBestDropGroup, getInternalNode, setNodes, nodesMap],
   );
 
   /**

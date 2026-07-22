@@ -38,6 +38,7 @@ vi.mock("zustand", async (importOriginal) => {
         ? selector(store.getState())
         : selector({
             nodes: [],
+            nodesMap: new Map(),
             setNodes: mockSetNodes,
             setEdges: mockSetEdges,
             globalEdgeType: "straight",

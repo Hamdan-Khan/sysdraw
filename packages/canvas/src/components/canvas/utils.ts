@@ -82,17 +82,16 @@ export const isGroup = (node: Node): boolean => {
  * array because xyflow renders nodes in the order they appear in the array and it
  * requires parent nodes to be drawn before child nodes
  */
-export const sortNodesAndGroups = (nodes: Node[]): Node[] => {
+export const sortNodesAndGroups = (nodes: Node[], nodesMap: Map<string, Node>): Node[] => {
   const sysdrawNodes = nodes.filter((n) => !RegisteredGroupsSet.has(n.type as RegisteredGroups));
   const sysdrawGroups = nodes.filter((n) => RegisteredGroupsSet.has(n.type as RegisteredGroups));
 
-  const nodeMap = new Map(nodes.map((n) => [n.id, n]));
   const depthCache = new Map<string, number>();
 
   const getDepth = (nodeId: string): number => {
     if (depthCache.has(nodeId)) return depthCache.get(nodeId)!;
 
-    const node = nodeMap.get(nodeId);
+    const node = nodesMap.get(nodeId);
     if (!node || !node.parentId) {
       depthCache.set(nodeId, 0);
       return 0;

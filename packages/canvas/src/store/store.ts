@@ -28,8 +28,12 @@ export interface HistoryState {
 /** max number of history depth */
 const HISTORY_LIMIT = 30;
 
+const createNodesMap = (nodes: Node[]): Map<string, Node> =>
+  new Map(nodes.map((n) => [n.id, n]));
+
 interface CanvasStoreState {
   nodes: Node[];
+  nodesMap: Map<string, Node>;
   edges: Edge[];
   history: HistoryState;
   globalEdgeType: RegisteredEdges;
@@ -57,6 +61,7 @@ interface CanvasStoreState {
 const createCanvasStore = (storeState: InitialCanvasStoreState) => {
   return create<CanvasStoreState>((set, get) => ({
     nodes: storeState.nodes,
+    nodesMap: createNodesMap(storeState.nodes),
     edges: storeState.edges,
     history: {
       past: [],
@@ -68,8 +73,10 @@ const createCanvasStore = (storeState: InitialCanvasStoreState) => {
     globalEdgeMarkerEnd: undefined,
     grid: true,
     onNodesChange: (changes) => {
+      const nextNodes = applyNodeChanges(changes, get().nodes);
       set({
-        nodes: applyNodeChanges(changes, get().nodes),
+        nodes: nextNodes,
+        nodesMap: createNodesMap(nextNodes),
       });
     },
     onEdgesChange: (changes) => {
@@ -78,7 +85,11 @@ const createCanvasStore = (storeState: InitialCanvasStoreState) => {
       });
     },
     setNodes: (nodes) => {
-      set({ nodes: typeof nodes === "function" ? nodes(get().nodes) : nodes });
+      const nextNodes = typeof nodes === "function" ? nodes(get().nodes) : nodes;
+      set({
+        nodes: nextNodes,
+        nodesMap: createNodesMap(nextNodes),
+      });
     },
     setEdges: (edges) => {
       set({ edges: typeof edges === "function" ? edges(get().edges) : edges });
@@ -99,6 +110,7 @@ const createCanvasStore = (storeState: InitialCanvasStoreState) => {
       const previous = past[past.length - 1];
       set({
         nodes: previous.nodes,
+        nodesMap: createNodesMap(previous.nodes),
         edges: previous.edges,
         history: { past: past.slice(0, past.length - 1), future: [{ nodes, edges }, ...future] },
       });
@@ -112,6 +124,7 @@ const createCanvasStore = (storeState: InitialCanvasStoreState) => {
       const next = future[0];
       set({
         nodes: next.nodes,
+        nodesMap: createNodesMap(next.nodes),
         edges: next.edges,
         history: { past: [...past, { nodes, edges }], future: future.slice(1) },
       });

@@ -24,6 +24,21 @@ describe("setNodes", () => {
 
     expect(store.getState().nodes.map((n) => n.id)).toEqual(["a", "b"]);
   });
+
+  it("keeps nodesMap synchronized when setNodes is called", () => {
+    const store = makeStore([makeNode("a")]);
+    expect(store.getState().nodesMap.get("a")).toBeDefined();
+
+    const nodeB = makeNode("b");
+    const nodeC = makeNode("c");
+    store.getState().setNodes([nodeB, nodeC]);
+
+    const { nodesMap } = store.getState();
+    expect(nodesMap.size).toBe(2);
+    expect(nodesMap.get("a")).toBeUndefined();
+    expect(nodesMap.get("b")).toEqual(nodeB);
+    expect(nodesMap.get("c")).toEqual(nodeC);
+  });
 });
 
 describe("setEdges", () => {

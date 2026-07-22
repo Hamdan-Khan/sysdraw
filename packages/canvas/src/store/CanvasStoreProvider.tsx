@@ -21,4 +21,5 @@ function useCanvasStore<T = CanvasStoreState>(selector: (state: CanvasStoreState
   return useStore(store, selector);
 }
 
+// oxlint-disable-next-line react/only-export-components
 export { CanvasStoreContext, CanvasStoreProvider, useCanvasStore };
