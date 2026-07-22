@@ -7,6 +7,7 @@ import {
   getSmoothStepPath,
   getStraightPath,
   ReactFlowState,
+  useReactFlow,
   useStore,
   useViewport,
 } from "@xyflow/react";
@@ -27,8 +28,10 @@ export const EdgeWrapper = ({
   markerStart,
   selected,
   type,
+  label,
 }: EdgeProps) => {
   const { zoom } = useViewport();
+  const { setEdges, setNodes } = useReactFlow();
 
   const pathParams = {
     sourceX,
@@ -62,6 +65,19 @@ export const EdgeWrapper = ({
   // raise z-index when selected so the option bar renders above other edges
   const edgeStyle = selected ? { ...style, zIndex: 1000 } : style;
 
+  const handleLabelClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setNodes((nodes) =>
+      nodes.some((n) => n.selected) ? nodes.map((n) => ({ ...n, selected: false })) : nodes,
+    );
+    setEdges((edges) =>
+      edges.map((edge) => ({
+        ...edge,
+        selected: edge.id === id,
+      })),
+    );
+  };
+
   return (
     <>
       <BaseEdge
@@ -71,6 +87,22 @@ export const EdgeWrapper = ({
         markerStart={markerStart}
         style={edgeStyle}
       />
+      {label && (
+        <EdgeLabelRenderer>
+          <div
+            style={{
+              position: "absolute",
+              transform: `translate(-50%, -50%) translate(${labelX}px, ${labelY}px)`,
+              transformOrigin: "center center",
+              pointerEvents: "all",
+            }}
+            className="nodrag nopan px-2 py-0.5 rounded bg-white text-primary text-xs font-medium whitespace-nowrap cursor-pointer select-none"
+            onClick={handleLabelClick}
+          >
+            {label}
+          </div>
+        </EdgeLabelRenderer>
+      )}
       {selected && (
         <EdgeOptionBarContainer edgeId={id} labelX={labelX} labelY={labelY} zoom={zoom} />
       )}
