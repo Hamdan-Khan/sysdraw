@@ -11,8 +11,10 @@ import {
   mockSetEdges,
   mockSetNodes,
 } from "./mocks";
+import { makeStore } from "./utils";
 
-const createWrapper = (store: any = {}) => {
+const createWrapper = (initial: { nodes?: Node[]; edges?: Edge[] } = {}) => {
+  const store = makeStore(initial.nodes, initial.edges);
   return ({ children }: { children: React.ReactNode }) =>
     createElement(CanvasStoreProvider, { store, children });
 };
@@ -64,6 +66,27 @@ describe("useCopyPaste", () => {
 
     expect(mockSetNodes).not.toHaveBeenCalled();
     expect(mockSetEdges).not.toHaveBeenCalled();
+  });
+
+  it("should skip locked nodes when copying", () => {
+    const lockedNode: Node = {
+      id: "locked",
+      position: { x: 0, y: 0 },
+      data: {},
+      selected: true,
+      draggable: false,
+    };
+    mockGetNodes.mockReturnValue([lockedNode]);
+    mockGetEdges.mockReturnValue([]);
+
+    const { result } = renderHook(() => useCopyPaste(), {
+      wrapper: createWrapper({ nodes: [lockedNode] }),
+    });
+
+    act(() => result.current.copy());
+    act(() => result.current.paste());
+
+    expect(mockSetNodes).not.toHaveBeenCalled();
   });
 
   it("should copy selected nodes and paste them with new IDs", () => {

@@ -17,7 +17,7 @@ export default App;
 
 ## Todos
 
-- [ ] add locking nodes functionality
+- [x] add locking nodes functionality
 - [x] add custom context menu on right click
 - [x] add keyboard shortcuts in root component
 - [x] improve context-menu (right click) wroking i.e. it should auto-select the node on which right click is performed, should not open when clicked on non canvas elements (toolbar, etc.)

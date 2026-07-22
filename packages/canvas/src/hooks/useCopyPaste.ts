@@ -26,6 +26,7 @@ export function clearClipboard(): void {
  */
 export function useCopyPaste() {
   const nodesMap = useCanvasStore((s) => s.nodesMap);
+  const isNodeLocked = useCanvasStore((s) => s.isNodeLocked);
   const { getNodes, getEdges, setNodes, setEdges, screenToFlowPosition } = useReactFlow();
   const lastMousePosition = useRef<{ x: number; y: number } | null>(null);
   /** to add offset to pasted elements */
@@ -49,10 +50,13 @@ export function useCopyPaste() {
 
       let nodesToCopy: Node[];
       if (explicitNodeId) {
+        if (isNodeLocked(explicitNodeId)) {
+          return;
+        }
         const node = nodesMap.get(explicitNodeId);
         nodesToCopy = node ? [node] : allNodes.filter((n) => n.id === explicitNodeId);
       } else {
-        nodesToCopy = allNodes.filter((n) => n.selected);
+        nodesToCopy = allNodes.filter((n) => n.selected && !isNodeLocked(n.id));
       }
 
       if (nodesToCopy.length === 0) {
@@ -72,7 +76,7 @@ export function useCopyPaste() {
       pasteCount.current = 0;
       lastMousePosition.current = null;
     },
-    [getNodes, getEdges, nodesMap],
+    [getNodes, getEdges, nodesMap, isNodeLocked],
   );
 
   /**

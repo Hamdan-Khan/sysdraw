@@ -113,6 +113,21 @@ describe("useShortcuts", () => {
       expect(store.getState().nodes).toHaveLength(0);
     });
 
+    it("preserves locked nodes during deletion when multi-selected", () => {
+      const unlockedNode = { ...makeNode("unlocked"), selected: true };
+      const lockedNode = { ...makeNode("locked", { draggable: false }), selected: true };
+      const store = makeStore([unlockedNode, lockedNode]);
+      mount(store);
+
+      act(() => {
+        window.dispatchEvent(new KeyboardEvent("keydown", { key: "Delete", bubbles: true }));
+      });
+
+      // unlockedNode is deleted, lockedNode is preserved
+      expect(store.getState().nodes).toHaveLength(1);
+      expect(store.getState().nodes[0].id).toBe("locked");
+    });
+
     it("ignores unrelated modifier+key combos", () => {
       mount();
       // not handled
