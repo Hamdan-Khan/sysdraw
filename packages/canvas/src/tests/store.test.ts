@@ -1,6 +1,6 @@
 import { RegisteredEdges } from "@sysdraw/models";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { makeEdge, makeNode, makeStore } from "./utils";
+import { makeEdge, makeNode, makeStore } from "./utils/utils";
 
 vi.unmock("zustand");
 

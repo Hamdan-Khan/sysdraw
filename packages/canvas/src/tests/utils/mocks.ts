@@ -1,6 +1,7 @@
 import { type Mock, vi } from "vitest";
 
 // xyflow mocks
+export const mockGetEdge: Mock = vi.fn();
 export const mockGetEdges: Mock = vi.fn();
 export const mockGetIntersectingNodes: Mock = vi.fn();
 export const mockGetInternalNode: Mock = vi.fn();

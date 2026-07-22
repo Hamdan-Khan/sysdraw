@@ -5,8 +5,8 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { StoreApi } from "zustand";
 import { CANVAS_LOCALSTORAGE_KEY, useCanvasStorage } from "../hooks";
 import { CanvasStoreProvider, CanvasStoreState } from "../store";
-import { mockSetViewport } from "./mocks";
-import { makeEdge, makeNode, makeStore } from "./utils";
+import { mockSetViewport } from "./utils/mocks";
+import { makeEdge, makeNode, makeStore } from "./utils/utils";
 
 vi.unmock("zustand");
 

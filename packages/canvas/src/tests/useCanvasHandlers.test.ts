@@ -12,7 +12,7 @@ import {
   mockGetNodes,
   mockSetEdges,
   mockSetNodes,
-} from "./mocks";
+} from "./utils/mocks";
 
 vi.mock("nanoid", () => ({ nanoid: () => "new-id" }));
 
@@ -30,7 +30,7 @@ vi.mock("../hooks/useHistory", () => ({
 
 vi.mock("zustand", async (importOriginal) => {
   const actual = await importOriginal<typeof import("zustand")>();
-  const { mockSetNodes, mockSetEdges } = await import("./mocks");
+  const { mockSetNodes, mockSetEdges } = await import("./utils/mocks");
   return {
     ...actual,
     useStore: (store: any, selector: any) =>

@@ -3,8 +3,8 @@ import React, { createElement } from "react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { useShortcuts } from "../hooks";
 import { CanvasStoreProvider } from "../store";
-import { mockSetNodes } from "./mocks";
-import { makeEdge, makeNode, makeStore } from "./utils";
+import { mockSetNodes } from "./utils/mocks";
+import { makeEdge, makeNode, makeStore } from "./utils/utils";
 
 /** fires a keydown on window with the given modifier + key */
 const fireKey = (key: string, modifier: "ctrlKey" | "metaKey" = "ctrlKey") =>

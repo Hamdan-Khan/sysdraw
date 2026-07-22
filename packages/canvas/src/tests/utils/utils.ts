@@ -1,5 +1,5 @@
 import type { Edge, Node } from "@xyflow/react";
-import { createCanvasStore } from "../store";
+import { createCanvasStore } from "../../store";
 
 export const makeNode = (id: string, overrides?: Partial<Node>): Node => ({
   id,
