@@ -8,6 +8,7 @@ export default defineConfig({
   plugins: [tailwindcss(), react()],
   resolve: {
     alias: {
+      "@": path.resolve(__dirname, "./src"),
       "@sysdraw/canvas": path.resolve(__dirname, "./src/index.ts"),
     },
   },
