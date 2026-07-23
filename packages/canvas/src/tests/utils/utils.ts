@@ -10,10 +10,10 @@ export const makeNode = (id: string, overrides?: Partial<Node>): Node => ({
 });
 
 export const makeGroupNode = (id: string, parentId?: string): Node =>
-  makeNode(id, { type: "group-a", parentId });
+  makeNode(id, { type: "group-a", parentId, data: { kind: "group" } });
 
 export const makeRegularNode = (id: string, parentId?: string): Node =>
-  makeNode(id, { type: "rectangle", parentId });
+  makeNode(id, { type: "rectangle", parentId, data: { kind: "node" } });
 
 export const makeEdge = (
   id: string,

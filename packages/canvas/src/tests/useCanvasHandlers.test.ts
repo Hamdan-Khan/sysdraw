@@ -1,4 +1,4 @@
-import { RegisteredEdges } from "@sysdraw/models";
+import { LibraryRegistry, LibraryRegistryProvider, RegisteredEdges } from "@sysdraw/models";
 import { act, renderHook } from "@testing-library/react";
 import { Node } from "@xyflow/react";
 import React, { createElement } from "react";
@@ -56,7 +56,7 @@ vi.mock("../components/canvas", async (importOriginal) => {
   const actual = await importOriginal<typeof import("../components/canvas")>();
   return {
     ...actual,
-    isGroup: vi.fn((n) => n.type === "container"),
+    isGroup: vi.fn((n) => n.type === "container" || n.type === "availability-zone"),
     isChildNode: vi.fn(() => false),
     getNodeRect: vi.fn((internal) => internal.rect),
     getIntersectingArea: vi.fn(),
@@ -64,23 +64,31 @@ vi.mock("../components/canvas", async (importOriginal) => {
   };
 });
 
-const makeEvent = (kind: string, type: string) => ({
+const makeEvent = (kind: string, id: string) => ({
   preventDefault: vi.fn(),
   clientX: 100,
   clientY: 100,
   dataTransfer: {
-    getData: () => JSON.stringify({ kind, type }),
+    getData: () => JSON.stringify({ kind, id }),
     dropEffect: "",
   },
 });
 
+const mockLibraryRegistry = new LibraryRegistry();
+
 const createWrapper = (store: any = {}) => {
   return ({ children }: { children: React.ReactNode }) =>
-    createElement(CanvasStoreProvider, { store, children });
+    createElement(LibraryRegistryProvider, {
+      registry: mockLibraryRegistry,
+      children: createElement(CanvasStoreProvider, { store, children }),
+    });
 };
 
 describe("useCanvasHandlers", () => {
-  beforeEach(() => vi.clearAllMocks());
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mockLibraryRegistry.addLibrary("default");
+  });
 
   describe("onDrop", () => {
     it("does nothing if no drag data is present", () => {
@@ -96,16 +104,16 @@ describe("useCanvasHandlers", () => {
 
     it("prepends a dropped group, appends a dropped node", () => {
       const { result } = renderHook(() => useCanvasHandlers(), { wrapper: createWrapper() });
-      const existing = [{ id: "existing", type: "rectangle", position: { x: 0, y: 0 }, data: {} }];
+      const existing = [{ id: "existing", type: "database", position: { x: 0, y: 0 }, data: {} }];
 
-      act(() => result.current.onDrop(makeEvent("node", "rectangle") as any));
+      act(() => result.current.onDrop(makeEvent("node", "database") as any));
       let updated = mockSetNodes.mock.calls[0][0](existing);
-      expect(updated.at(-1).type).toBe("rectangle");
+      expect(updated.at(-1).type).toBe("database");
 
       mockSetNodes.mockClear();
-      act(() => result.current.onDrop(makeEvent("group", "container") as any));
+      act(() => result.current.onDrop(makeEvent("group", "availability-zone") as any));
       updated = mockSetNodes.mock.calls[0][0](existing);
-      expect(updated[0].type).toBe("container");
+      expect(updated[0].type).toBe("availability-zone");
     });
   });
 

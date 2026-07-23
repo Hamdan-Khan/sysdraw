@@ -1,4 +1,4 @@
-import { BaseGroupData, BaseNodeData, NodeKinds, NodeTypes } from "@sysdraw/models";
+import { NodeKinds } from "@sysdraw/models";
 import { Edge, EdgeProps, Node, NodeProps } from "@xyflow/react";
 
 /**
@@ -6,12 +6,12 @@ import { Edge, EdgeProps, Node, NodeProps } from "@xyflow/react";
  */
 export type DnDTransferData = {
   kind: NodeKinds;
-  type: NodeTypes;
+  id: string;
 };
 
-export type NodePropsType<TData extends BaseNodeData | BaseGroupData> = NodeProps<Node<TData>>;
-export type NodeComponentType<TData extends BaseNodeData | BaseGroupData> = React.ComponentType<
-  NodePropsType<TData>
->;
+export type NodePropsType<TData extends Record<string, unknown> = Record<string, unknown>> =
+  NodeProps<Node<TData>>;
+export type NodeComponentType<TData extends Record<string, unknown> = Record<string, unknown>> =
+  React.ComponentType<NodePropsType<TData>>;
 
 export type EdgePropsType = EdgeProps<Edge>;

@@ -1,4 +1,4 @@
-import { NodeTypes, useLibraryRegistryStore } from "@sysdraw/models";
+import { useLibraryRegistryStore } from "@sysdraw/models";
 import { useMemo } from "react";
 import { toast } from "sonner";
 import { useShallow } from "zustand/shallow";
@@ -56,7 +56,7 @@ export const Toolbar = () => {
             <div
               key={id}
               draggable
-              onDragStart={(e) => onDragStart(e, { kind: "node", type: id as NodeTypes })}
+              onDragStart={(e) => onDragStart(e, { kind: "node", id })}
               className="group relative px-3 py-2 bg-bg border border-border rounded text-sm cursor-grab active:cursor-grabbing text-text text-center font-extrabold flex items-center justify-center hover:bg-surface/50 transition-colors"
             >
               <LibraryIcon icon={icon} size={24} />
@@ -76,7 +76,7 @@ export const Toolbar = () => {
             <div
               key={id}
               draggable
-              onDragStart={(e) => onDragStart(e, { kind: "group", type: id as NodeTypes })}
+              onDragStart={(e) => onDragStart(e, { kind: "group", id })}
               className="group relative px-3 py-2 bg-bg border border-dashed border-secondary rounded text-sm cursor-grab active:cursor-grabbing text-text text-center font-medium flex items-center justify-center gap-2 hover:bg-surface/50 transition-colors"
             >
               {icon && <LibraryIcon icon={icon} size={20} />}

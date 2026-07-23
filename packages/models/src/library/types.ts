@@ -1,10 +1,12 @@
+import { NodeKinds } from "../types";
+
 type IconSourceType = "svg" | "url" | string;
 
 type IconType = { kind: IconSourceType; value: string };
 
 interface LibraryNode {
   id: string;
-  type: "node" | "group" | string;
+  type: NodeKinds | string;
   label: string;
   icon?: IconType;
   description?: string;
