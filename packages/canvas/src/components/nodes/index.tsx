@@ -28,8 +28,8 @@ export const createNodeTypes = (
   const allNodes = Object.values(loadedLibs).flatMap((lib) => lib.nodes);
 
   for (const libNode of allNodes) {
-    if (libNode.type === "group") {
-      nodeTypes[libNode.id] = (props: NodePropsType<CanvasNodeData>) => {
+    nodeTypes[libNode.id] = (props: NodePropsType<CanvasNodeData>) => {
+      if (libNode.type === "group") {
         const handles = props.data?.handles || [];
         return (
           <GroupWrapper
@@ -43,19 +43,21 @@ export const createNodeTypes = (
             />
           </GroupWrapper>
         );
-      };
-      continue;
-    }
+      } else {
+        const handles = props.data?.handles || defaultHandles;
+        const icon = props.data?.icon || libNode.icon;
 
-    nodeTypes[libNode.id] = (props: NodePropsType<CanvasNodeData>) => {
-      const handles = props.data?.handles || defaultHandles;
-      const icon = props.data?.icon || libNode.icon;
-
-      return (
-        <NodeWrapper selected={props.selected} handles={handles}>
-          <LibraryIcon icon={icon} className="w-full h-full text-text drop-shadow-sm" />
-        </NodeWrapper>
-      );
+        return (
+          <NodeWrapper
+            selected={props.selected}
+            handles={handles}
+            width={props.width}
+            height={props.height}
+          >
+            <LibraryIcon icon={icon} className="w-full h-full text-text drop-shadow-sm" />
+          </NodeWrapper>
+        );
+      }
     };
   }
 
