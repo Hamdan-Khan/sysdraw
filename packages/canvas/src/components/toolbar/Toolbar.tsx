@@ -1,17 +1,17 @@
 import {
   defaultGroupsMap,
-  defaultNodesMap,
+  NodeTypes,
   RegisteredGroups,
-  RegisteredNodes,
+  useLibraryRegistryStore,
 } from "@sysdraw/models";
+import { useMemo } from "react";
 import { toast } from "sonner";
 import { useShallow } from "zustand/shallow";
-import { IconsMap } from "../../assets";
 import { CanvasStoreState, useCanvasStore } from "../../store";
 import type { DnDTransferData } from "../canvas";
-import { Divider, Tooltip } from "../common";
+import { Divider, LibraryIcon, Tooltip } from "../common";
+import { LibraryDropdown } from "./LibraryDropdown";
 
-const NODE_TYPES = Object.values(RegisteredNodes);
 const GROUP_TYPES = Object.values(RegisteredGroups);
 
 export const SYSDRAW_DRAG_DATA_FORMAT = "application/sysdraw";
@@ -22,6 +22,15 @@ const selector = (state: CanvasStoreState) => ({
 
 export const Toolbar = () => {
   const { isInteractive } = useCanvasStore(useShallow(selector));
+  const { loadedLibs } = useLibraryRegistryStore(useShallow((s) => ({ loadedLibs: s.loadedLibs })));
+
+  const nodeTypes = useMemo(
+    () =>
+      Object.keys(loadedLibs)
+        .map((key) => loadedLibs[key].nodes)
+        .flat(),
+    [loadedLibs],
+  );
 
   /**
    * Handler for when a node or group is dragged from the toolbar
@@ -40,20 +49,23 @@ export const Toolbar = () => {
       data-no-context-menu
       className="absolute left-4 top-1/2 -translate-y-1/2 z-10 bg-surface border border-border rounded-lg py-2 flex flex-col gap-3 shadow-md"
     >
+      <LibraryDropdown />
+      <Divider />
+
       <div className="grid grid-cols-3 gap-3 px-4">
         <h5 className="text-xs text-secondary uppercase col-span-3">Nodes</h5>
-        {NODE_TYPES.map((type) => {
-          const Icon = IconsMap[type];
-          const data = defaultNodesMap[type];
+        {nodeTypes.map((node) => {
+          const { label, type, icon, id } = node;
           return (
             <div
-              key={type}
+              key={id}
               draggable
-              onDragStart={(e) => onDragStart(e, { kind: "node", type })}
+              onDragStart={(e) => onDragStart(e, { kind: "node", type: type as NodeTypes })}
+
               className="group relative px-3 py-2 bg-bg border border-border rounded text-sm cursor-grab active:cursor-grabbing text-text text-center font-extrabold flex items-center justify-center hover:bg-surface/50 transition-colors"
             >
-              <Icon size={24} strokeWidth={1.5} />
-              <Tooltip text={data.label} />
+              <LibraryIcon icon={icon} size={24} />
+              <Tooltip text={label} />
             </div>
           );
         })}

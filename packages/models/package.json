@@ -19,10 +19,13 @@
     "typecheck": "tsc --noEmit"
   },
   "devDependencies": {
+    "@types/react": "catalog:",
     "tsup": "catalog:",
     "typescript": "catalog:"
   },
   "dependencies": {
-    "@xyflow/react": "catalog:"
+    "@xyflow/react": "catalog:",
+    "react": "catalog:",
+    "zustand": "catalog:"
   }
 }

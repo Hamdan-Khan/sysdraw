@@ -1,3 +1,4 @@
+import { LibraryRegistry, LibraryRegistryProvider } from "@sysdraw/models";
 import { ReactFlow, ReactFlowProvider } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
 import { createRef } from "react";
@@ -18,6 +19,7 @@ import { CanvasGrid } from "./CanvasGrid";
 
 interface CanvasProps {
   canvasState: StoreApi<CanvasStoreState>;
+  libraryRegistry: LibraryRegistry;
 }
 
 const selector = (state: CanvasStoreState) => ({
@@ -88,13 +90,15 @@ const CanvasElement = () => {
 /**
  * The complete canvas for rendering everything
  */
-const Canvas = ({ canvasState }: CanvasProps) => {
+const Canvas = ({ canvasState, libraryRegistry }: CanvasProps) => {
   return (
     <CanvasStoreProvider store={canvasState}>
-      <ReactFlowProvider>
-        <Toaster />
-        <CanvasElement />
-      </ReactFlowProvider>
+      <LibraryRegistryProvider registry={libraryRegistry}>
+        <ReactFlowProvider>
+          <Toaster />
+          <CanvasElement />
+        </ReactFlowProvider>
+      </LibraryRegistryProvider>
     </CanvasStoreProvider>
   );
 };
