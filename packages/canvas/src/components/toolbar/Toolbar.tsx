@@ -1,18 +1,12 @@
-import {
-  defaultGroupsMap,
-  NodeTypes,
-  RegisteredGroups,
-  useLibraryRegistryStore,
-} from "@sysdraw/models";
+import { NodeTypes, useLibraryRegistryStore } from "@sysdraw/models";
 import { useMemo } from "react";
 import { toast } from "sonner";
 import { useShallow } from "zustand/shallow";
 import { CanvasStoreState, useCanvasStore } from "../../store";
 import type { DnDTransferData } from "../canvas";
-import { Divider, LibraryIcon, Tooltip } from "../common";
+import { Divider, Tooltip } from "../common";
 import { LibraryDropdown } from "./LibraryDropdown";
-
-const GROUP_TYPES = Object.values(RegisteredGroups);
+import { LibraryIcon } from "./LibraryIcon";
 
 export const SYSDRAW_DRAG_DATA_FORMAT = "application/sysdraw";
 
@@ -24,13 +18,15 @@ export const Toolbar = () => {
   const { isInteractive } = useCanvasStore(useShallow(selector));
   const { loadedLibs } = useLibraryRegistryStore(useShallow((s) => ({ loadedLibs: s.loadedLibs })));
 
-  const nodeTypes = useMemo(
-    () =>
-      Object.keys(loadedLibs)
-        .map((key) => loadedLibs[key].nodes)
-        .flat(),
-    [loadedLibs],
-  );
+  const { nodes, groups } = useMemo(() => {
+    const all = Object.values(loadedLibs)
+      .map((lib) => lib.nodes)
+      .flat();
+    return {
+      nodes: all.filter((n) => n.type === "node"),
+      groups: all.filter((n) => n.type === "group"),
+    };
+  }, [loadedLibs]);
 
   /**
    * Handler for when a node or group is dragged from the toolbar
@@ -54,14 +50,13 @@ export const Toolbar = () => {
 
       <div className="grid grid-cols-3 gap-3 px-4">
         <h5 className="text-xs text-secondary uppercase col-span-3">Nodes</h5>
-        {nodeTypes.map((node) => {
-          const { label, type, icon, id } = node;
+        {nodes.map((node) => {
+          const { label, icon, id } = node;
           return (
             <div
               key={id}
               draggable
-              onDragStart={(e) => onDragStart(e, { kind: "node", type: type as NodeTypes })}
-
+              onDragStart={(e) => onDragStart(e, { kind: "node", type: id as NodeTypes })}
               className="group relative px-3 py-2 bg-bg border border-border rounded text-sm cursor-grab active:cursor-grabbing text-text text-center font-extrabold flex items-center justify-center hover:bg-surface/50 transition-colors"
             >
               <LibraryIcon icon={icon} size={24} />
@@ -75,16 +70,18 @@ export const Toolbar = () => {
 
       <div className="flex flex-col gap-3 px-4 mb-2">
         <h5 className="text-xs text-secondary uppercase">Groups</h5>
-        {GROUP_TYPES.map((type) => {
-          const data = defaultGroupsMap[type];
+        {groups.map((group) => {
+          const { label, icon, id } = group;
           return (
             <div
-              key={type}
+              key={id}
               draggable
-              onDragStart={(e) => onDragStart(e, { kind: "group", type })}
-              className="px-3 py-2 bg-bg border border-dashed border-secondary rounded text-sm cursor-grab active:cursor-grabbing text-text text-center"
+              onDragStart={(e) => onDragStart(e, { kind: "group", type: id as NodeTypes })}
+              className="group relative px-3 py-2 bg-bg border border-dashed border-secondary rounded text-sm cursor-grab active:cursor-grabbing text-text text-center font-medium flex items-center justify-center gap-2 hover:bg-surface/50 transition-colors"
             >
-              {data.label}
+              {icon && <LibraryIcon icon={icon} size={20} />}
+              <span>{label}</span>
+              <Tooltip text={label} />
             </div>
           );
         })}

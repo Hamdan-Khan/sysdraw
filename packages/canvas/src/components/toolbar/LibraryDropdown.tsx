@@ -1,5 +1,3 @@
-import { LibraryMetadata, useLibraryRegistry, useLibraryRegistryStore } from "@sysdraw/models";
-import { ChevronRight, Image } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
@@ -8,7 +6,9 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "../ui/dropdown-menu";
+} from "@/components/ui/dropdown-menu";
+import { LibraryMetadata, useLibraryRegistry, useLibraryRegistryStore } from "@sysdraw/models";
+import { ChevronRight, Image } from "lucide-react";
 
 export const LibraryDropdown = () => {
   const registry = useLibraryRegistry();
@@ -26,28 +26,26 @@ export const LibraryDropdown = () => {
   };
 
   return (
-    <div className="px-4">
+    <div className="w-full px-4">
       <DropdownMenu>
-        <DropdownMenuTrigger>
-          <button
-            type="button"
-            aria-label="Libraries"
-            className="group w-full flex items-center justify-between gap-2 px-3 py-2 text-xs font-medium rounded border transition-all cursor-pointer bg-bg border-border text-primary hover:bg-surface/50 data-[state=open]:bg-dim data-[state=open]:border-primary outline-none"
-          >
-            <div className="flex items-center gap-2">
-              <Image size={16} className="text-secondary" />
-              <span>Icon Pack</span>
-              {selectedCount > 0 && (
-                <span className="bg-primary/20 text-primary text-[10px] px-1.5 py-0.2 rounded-full font-semibold">
-                  {selectedCount}
-                </span>
-              )}
-            </div>
-            <ChevronRight
-              size={14}
-              className="text-secondary transition-transform duration-150 group-data-[state=open]:rotate-90"
-            />
-          </button>
+        <DropdownMenuTrigger
+          type="button"
+          aria-label="Libraries"
+          className="group w-full flex items-center justify-between gap-2 px-3 py-2 text-xs font-medium rounded border transition-all cursor-pointer bg-bg border-border text-primary hover:bg-surface/50 data-popup-open:bg-dim data-popup-open:border-primary data-open:bg-dim data-open:border-primary outline-none"
+        >
+          <div className="flex items-center gap-2">
+            <Image size={16} className="text-secondary" />
+            <span>Icon Pack</span>
+            {selectedCount > 0 && (
+              <span className="bg-primary/20 text-primary text-[10px] px-1.5 py-0.2 rounded-full font-semibold">
+                {selectedCount}
+              </span>
+            )}
+          </div>
+          <ChevronRight
+            size={14}
+            className="text-secondary transition-transform duration-150 group-data-popup-open:rotate-90 group-data-open:rotate-90"
+          />
         </DropdownMenuTrigger>
         <DropdownMenuContent side="right" align="start" sideOffset={8} className="w-52">
           <DropdownMenuGroup>
