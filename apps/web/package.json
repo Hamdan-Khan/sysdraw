@@ -9,6 +9,13 @@
     "lint": "oxlint",
     "preview": "vite preview"
   },
+  "devEngines": {
+    "packageManager": {
+      "name": "pnpm",
+      "version": "^11.8.0",
+      "onFail": "download"
+    }
+  },
   "dependencies": {
     "@sysdraw/canvas": "workspace:*",
     "@sysdraw/models": "workspace:*",
