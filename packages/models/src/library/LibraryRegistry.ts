@@ -1,5 +1,7 @@
+import { IDB_CONFIG_KEY, IDB_DATABASE_NAME, IDB_DATABASE_VERSION } from "@sysdraw/common";
 import { DBSchema, IDBPDatabase, openDB } from "idb";
 import { StoreApi, createStore } from "zustand/vanilla";
+import { AppConfig } from "../config";
 import defaultLibrary from "./default_library.json";
 import { LibraryManifest, LibraryMetadata } from "./types";
 
@@ -15,8 +17,8 @@ interface LibraryRegistryState {
 
 interface SysdrawDB extends DBSchema {
   config: {
-    key: "selectedLibs";
-    value: string[];
+    key: string;
+    value: AppConfig;
   };
   libraries: {
     key: string;
@@ -38,7 +40,7 @@ class LibraryRegistry {
 
   private async initIDB() {
     try {
-      this.idb = await openDB<SysdrawDB>("sysdraw", 1, {
+      this.idb = await openDB<SysdrawDB>(IDB_DATABASE_NAME, IDB_DATABASE_VERSION, {
         upgrade(db) {
           db.createObjectStore("config");
           db.createObjectStore("libraries", {
@@ -54,10 +56,16 @@ class LibraryRegistry {
       }
 
       // after initialization, get all the selected libs from the config and add
-      // them to the store
-      const selectedLibs = await this.idb.get("config", "selectedLibs");
+      // their library manifests to the store
+      let appConfig = await this.idb.get("config", IDB_CONFIG_KEY);
 
-      const promises = selectedLibs?.map((libId) => this.addLibrary(libId));
+      // if no libraries are selected, select the default one and update the config
+      if (!appConfig || !appConfig.selectedLibs || appConfig.selectedLibs.length === 0) {
+        appConfig = { selectedLibs: [defaultLibrary.id] };
+        await this.idb.put("config", appConfig, IDB_CONFIG_KEY);
+      }
+
+      const promises = appConfig?.selectedLibs?.map((libId) => this.addLibrary(libId));
 
       if (promises) {
         await Promise.all(promises);

@@ -464,6 +464,9 @@ importers:
 
   packages/models:
     dependencies:
+      '@sysdraw/common':
+        specifier: workspace:*
+        version: link:../common
       '@xyflow/react':
         specifier: 'catalog:'
         version: 12.11.2(@types/react-dom@19.2.3(@types/react@19.2.17))(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
