@@ -85,9 +85,9 @@ const createWrapper = (store: any = {}) => {
 };
 
 describe("useCanvasHandlers", () => {
-  beforeEach(() => {
+  beforeEach(async () => {
     vi.clearAllMocks();
-    mockLibraryRegistry.addLibrary("default");
+    await mockLibraryRegistry.addLibrary("default");
   });
 
   describe("onDrop", () => {

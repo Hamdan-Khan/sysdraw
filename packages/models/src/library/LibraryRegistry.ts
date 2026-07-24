@@ -29,15 +29,43 @@ interface SysdrawDB extends DBSchema {
 class LibraryRegistry {
   private store: StoreApi<LibraryRegistryState>;
   private idb: IDBPDatabase<SysdrawDB> | null = null;
+  private initPromise: Promise<void>;
 
   public constructor() {
     this.store = createStore<LibraryRegistryState>(() => ({
       loadedLibs: {},
     }));
 
-    this.initIDB();
+    this.initPromise = this.initIDB();
   }
 
+  public whenReady = (): Promise<void> => {
+    return this.initPromise;
+  };
+
+  /** loads library from IDB and adds it to the store if it exists. */
+  private async loadLibraryFromIDB(id: string) {
+    if (this.store.getState().loadedLibs[id]) return;
+
+    if (this.isIDBLoaded) {
+      try {
+        const lib = await this.idb!.get("libraries", id);
+        if (lib) {
+          this.store.setState((s) => ({
+            loadedLibs: { ...s.loadedLibs, [id]: lib },
+          }));
+        }
+      } catch (e) {
+        console.error(`Failed to load library ${id} from IndexedDB`, e);
+      }
+    }
+  }
+
+  /**
+   * initializes the IDB connection and loads all the selected libraries
+   * from the app config. On first load (when app config is empty), it sets
+   * the default library in the config and seeds the database with it.
+   */
   private async initIDB() {
     try {
       this.idb = await openDB<SysdrawDB>(IDB_DATABASE_NAME, IDB_DATABASE_VERSION, {
@@ -65,7 +93,7 @@ class LibraryRegistry {
         await this.idb.put("config", appConfig, IDB_CONFIG_KEY);
       }
 
-      const promises = appConfig?.selectedLibs?.map((libId) => this.addLibrary(libId));
+      const promises = appConfig.selectedLibs.map((libId) => this.loadLibraryFromIDB(libId));
 
       if (promises) {
         await Promise.all(promises);
@@ -75,34 +103,39 @@ class LibraryRegistry {
     }
   }
 
-  private isIDBLoaded = (): boolean => {
+  private get isIDBLoaded(): boolean {
     return this.idb !== null;
-  };
+  }
 
   public listAllLibraries = (): LibraryMetadata[] => {
     return [defaultLibraryMetadata];
   };
 
-  public async addLibrary(id: string) {
+  public addLibrary = async (id: string): Promise<void> => {
+    await this.initPromise;
+
     if (this.store.getState().loadedLibs[id]) return;
 
-    // fetch the lib from the idb and add it to the state store
-    if (this.isIDBLoaded()) {
+    await this.loadLibraryFromIDB(id);
+
+    if (this.isIDBLoaded && this.store.getState().loadedLibs[id]) {
       try {
-        const lib = await this.idb!.get("libraries", id);
-        if (lib) {
-          this.store.setState((s) => ({
-            loadedLibs: { ...s.loadedLibs, [id]: lib },
-          }));
+        let appConfig = await this.idb!.get("config", IDB_CONFIG_KEY);
+        if (!appConfig) {
+          appConfig = { selectedLibs: [] };
+        }
+        if (!appConfig.selectedLibs.includes(id)) {
+          appConfig.selectedLibs = [...appConfig.selectedLibs, id];
+          await this.idb!.put("config", appConfig, IDB_CONFIG_KEY);
         }
       } catch (e) {
-        console.error(`Failed to load library ${id} from IndexedDB`, e);
+        console.error(`Failed to update config in IndexedDB for library ${id}`, e);
       }
     }
-    // todo: else fetch it from the object storage
-  }
+  };
 
-  public removeLibrary = (id: string) => {
+  public removeLibrary = async (id: string): Promise<void> => {
+    // update state store
     this.store.setState((s) => {
       const { [id]: removedLib, ...rest } = s.loadedLibs;
 
@@ -113,6 +146,21 @@ class LibraryRegistry {
 
       return { loadedLibs: rest };
     });
+
+    await this.initPromise;
+
+    // update the indexedDB config
+    if (this.isIDBLoaded) {
+      try {
+        let appConfig = await this.idb!.get("config", IDB_CONFIG_KEY);
+        if (appConfig?.selectedLibs) {
+          appConfig.selectedLibs = appConfig.selectedLibs.filter((libId) => libId !== id);
+          await this.idb!.put("config", appConfig, IDB_CONFIG_KEY);
+        }
+      } catch (e) {
+        console.error(`Failed to update config in IndexedDB when removing library ${id}`, e);
+      }
+    }
   };
 
   public getStore = (): StoreApi<LibraryRegistryState> => {
@@ -121,6 +169,13 @@ class LibraryRegistry {
 
   public getSnapshot = () => {
     return this.store.getState();
+  };
+
+  public close = (): void => {
+    if (this.idb) {
+      this.idb.close();
+      this.idb = null;
+    }
   };
 }
 

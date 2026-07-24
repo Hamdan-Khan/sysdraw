@@ -50,6 +50,7 @@
     "@types/react-dom": "catalog:",
     "@vitejs/plugin-react": "catalog:",
     "autoprefixer": "catalog:",
+    "fake-indexeddb": "catalog:",
     "jsdom": "catalog:",
     "postcss": "catalog:",
     "tailwindcss": "catalog:",

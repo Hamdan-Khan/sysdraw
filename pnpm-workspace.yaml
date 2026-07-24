@@ -27,3 +27,4 @@ catalog:
   jsdom: ^29.1.1
   "@testing-library/react": ^16.3.2
   "@testing-library/jest-dom": ^7.0.0
+  fake-indexeddb: ^6.1.0
