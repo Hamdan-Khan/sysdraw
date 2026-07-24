@@ -309,6 +309,9 @@ importers:
       '@sysdraw/canvas':
         specifier: workspace:*
         version: link:../../packages/canvas
+      '@sysdraw/models':
+        specifier: workspace:*
+        version: link:../../packages/models
       react:
         specifier: 'catalog:'
         version: 19.2.7

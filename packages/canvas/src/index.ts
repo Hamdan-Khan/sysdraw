@@ -1,2 +1,2 @@
-export * from "./components";
+export * from "./components/canvas";
 export * from "./store";
