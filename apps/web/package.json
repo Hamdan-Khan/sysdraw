@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@sysdraw/canvas": "workspace:*",
+    "@sysdraw/models": "workspace:*",
     "react": "catalog:",
     "react-dom": "catalog:",
     "zustand": "catalog:"

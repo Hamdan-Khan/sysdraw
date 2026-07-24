@@ -82,17 +82,16 @@ describe("clampPositionInsideGroup", () => {
 describe("isGroup", () => {
   beforeEach(() => vi.clearAllMocks());
 
-  it("returns true for a node whose type is a registered group", () => {
-    expect(isGroup(makeNode("x", { type: "group-a" }))).toBe(true);
-    expect(isGroup(makeNode("x", { type: "group-b" }))).toBe(true);
+  it("returns true for a node whose data.kind is group", () => {
+    expect(isGroup(makeNode("x", { data: { kind: "group" } }))).toBe(true);
   });
 
-  it("returns false for a node with a non-group type", () => {
-    expect(isGroup(makeNode("x", { type: "rectangle" }))).toBe(false);
+  it("returns false for a node with a non-group kind", () => {
+    expect(isGroup(makeNode("x", { data: { kind: "node" } }))).toBe(false);
   });
 
-  it("returns false for a node with no type", () => {
-    expect(isGroup(makeNode("x", { type: undefined }))).toBe(false);
+  it("returns false for a node with no type or data.kind", () => {
+    expect(isGroup(makeNode("x", { type: undefined, data: {} }))).toBe(false);
   });
 });
 

@@ -1,6 +1,7 @@
+import { LibraryRegistry, LibraryRegistryProvider, useLibraryRegistryStore } from "@sysdraw/models";
 import { ReactFlow, ReactFlowProvider } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
-import { createRef } from "react";
+import { createRef, useMemo } from "react";
 import { Toaster } from "sonner";
 import { StoreApi } from "zustand";
 import { useShallow } from "zustand/shallow";
@@ -10,14 +11,14 @@ import { CanvasContextMenu } from "../context-menu";
 import { ControlsBar } from "../controls";
 import { DndWrapper } from "../dnd";
 import { edgeTypes } from "../edges";
-import { groupTypes } from "../nodes/group";
-import { nodeTypes as coreNodeTypes } from "../nodes/node";
+import { createNodeTypes } from "../nodes";
 import { Toolbar } from "../toolbar";
 import "./canvas.css";
 import { CanvasGrid } from "./CanvasGrid";
 
 interface CanvasProps {
   canvasState: StoreApi<CanvasStoreState>;
+  libraryRegistry: LibraryRegistry;
 }
 
 const selector = (state: CanvasStoreState) => ({
@@ -28,10 +29,12 @@ const selector = (state: CanvasStoreState) => ({
   isInteractive: state.isInteractive,
 });
 
-const combinedNodeTypes = { ...coreNodeTypes, ...groupTypes };
-
 const CanvasElement = () => {
   const dndWrapperRef = createRef<HTMLDivElement>();
+
+  const { loadedLibs } = useLibraryRegistryStore(useShallow((s) => ({ loadedLibs: s.loadedLibs })));
+
+  const nodeTypes = useMemo(() => createNodeTypes(loadedLibs), [loadedLibs]);
 
   const { edges, nodes, onEdgesChange, onNodesChange, isInteractive } = useCanvasStore(
     useShallow(selector),
@@ -58,7 +61,7 @@ const CanvasElement = () => {
         <ControlsBar />
         <ReactFlow
           nodes={nodes}
-          nodeTypes={combinedNodeTypes}
+          nodeTypes={nodeTypes}
           edges={edges}
           edgeTypes={edgeTypes}
           onNodesChange={onNodesChange}
@@ -88,13 +91,15 @@ const CanvasElement = () => {
 /**
  * The complete canvas for rendering everything
  */
-const Canvas = ({ canvasState }: CanvasProps) => {
+const Canvas = ({ canvasState, libraryRegistry }: CanvasProps) => {
   return (
     <CanvasStoreProvider store={canvasState}>
-      <ReactFlowProvider>
-        <Toaster />
-        <CanvasElement />
-      </ReactFlowProvider>
+      <LibraryRegistryProvider registry={libraryRegistry}>
+        <ReactFlowProvider>
+          <Toaster />
+          <CanvasElement />
+        </ReactFlowProvider>
+      </LibraryRegistryProvider>
     </CanvasStoreProvider>
   );
 };

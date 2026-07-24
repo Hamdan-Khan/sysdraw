@@ -1,4 +1,3 @@
 export * from "./edges";
-export * from "./groups";
-export * from "./nodes";
+export * from "./library";
 export * from "./types";

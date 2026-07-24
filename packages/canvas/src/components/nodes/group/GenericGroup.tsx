@@ -1,6 +1,4 @@
-import type { BaseGroupData } from "@sysdraw/models";
-
-export const GenericGroup = ({ data }: { data: BaseGroupData }) => {
+export const GenericGroup = ({ data }: { data: { label: string; color?: string } }) => {
   return (
     <div className="w-full h-full border border-dashed border-dim-border rounded-xl p-2.5 relative bg-dim">
       <div

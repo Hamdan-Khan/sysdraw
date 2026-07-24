@@ -1,4 +1,3 @@
-import { RegisteredGroups } from "@sysdraw/models";
 import { InternalNode, Node } from "@xyflow/react";
 
 /**
@@ -67,14 +66,12 @@ export const clampPositionInsideGroup = (
   return { x, y };
 };
 
-export const RegisteredGroupsSet = new Set(Object.values(RegisteredGroups));
-
 /**
  * returns true if the given node is a sysdraw group node
  */
 export const isGroup = (node: Node): boolean => {
   if (!node.type) return false;
-  return RegisteredGroupsSet.has(node.type as RegisteredGroups);
+  return node.data?.kind === "group";
 };
 
 /**
@@ -83,8 +80,8 @@ export const isGroup = (node: Node): boolean => {
  * requires parent nodes to be drawn before child nodes
  */
 export const sortNodesAndGroups = (nodes: Node[], nodesMap: Map<string, Node>): Node[] => {
-  const sysdrawNodes = nodes.filter((n) => !RegisteredGroupsSet.has(n.type as RegisteredGroups));
-  const sysdrawGroups = nodes.filter((n) => RegisteredGroupsSet.has(n.type as RegisteredGroups));
+  const sysdrawNodes = nodes.filter((n) => !isGroup(n));
+  const sysdrawGroups = nodes.filter((n) => isGroup(n));
 
   const depthCache = new Map<string, number>();
 

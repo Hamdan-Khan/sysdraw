@@ -1,11 +1,5 @@
-import {
-  BaseGroupData,
-  BaseNodeData,
-  defaultGroupsMap,
-  defaultNodesMap,
-  RegisteredGroups,
-  RegisteredNodes,
-} from "@sysdraw/models";
+import { defaultHandles } from "@/components";
+import { useLibraryRegistryStore } from "@sysdraw/models";
 import {
   addEdge,
   Edge,
@@ -55,6 +49,7 @@ type CandidateGroupNode = { group: Node; groupRect: NodeRect; ratio: number };
 export const useCanvasHandlers = () => {
   const { nodesMap, setNodes, setEdges, globalEdgeType, globalEdgeAnimated, globalEdgeMarkerEnd } =
     useCanvasStore(useShallow(selector));
+  const { loadedLibs } = useLibraryRegistryStore(useShallow((s) => ({ loadedLibs: s.loadedLibs })));
 
   const { screenToFlowPosition, getIntersectingNodes, getInternalNode, getNodesBounds } =
     useReactFlow();
@@ -101,26 +96,36 @@ export const useCanvasHandlers = () => {
         return;
       }
 
-      const { kind, type }: DnDTransferData = JSON.parse(raw);
+      const { kind, id }: DnDTransferData = JSON.parse(raw);
 
       // screenToFlowPosition converts client (screen) coords straight to
       // flow coords, accounting for pan/zoom
       const position = screenToFlowPosition({ x: event.clientX, y: event.clientY });
 
-      let defaultData: BaseNodeData | BaseGroupData;
+      const allLibNodes = Object.values(loadedLibs || {}).flatMap((lib) => lib.nodes || []);
+      const nodeDef = allLibNodes.find((n) => n.id === id);
 
-      if (kind === "node") {
-        defaultData = defaultNodesMap[type as RegisteredNodes];
-      } else {
-        defaultData = defaultGroupsMap[type as RegisteredGroups];
-      }
-
-      if (!defaultData) {
-        console.error(`Error getting the default data for the node "${type}" and kind "${kind}"`);
+      if (!nodeDef) {
+        console.error(`Node definition for "${id}" not found in loaded libraries.`);
         return;
       }
 
-      const newNode: Node = { id: nanoid(), type, position, data: defaultData };
+      const nodeData =
+        kind === "node"
+          ? {
+              kind,
+              label: nodeDef.label,
+              description: nodeDef.description,
+              icon: nodeDef.icon,
+              handles: defaultHandles,
+            }
+          : {
+              kind,
+              label: nodeDef.label,
+              description: nodeDef.description,
+            };
+
+      const newNode: Node = { id: nanoid(), type: id, position, data: nodeData };
 
       commit();
       setNodes((prev) => {
@@ -132,7 +137,7 @@ export const useCanvasHandlers = () => {
         return [...prev, newNode];
       });
     },
-    [screenToFlowPosition, setNodes, commit],
+    [screenToFlowPosition, setNodes, commit, loadedLibs],
   );
 
   /**

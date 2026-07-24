@@ -7,8 +7,8 @@
     "format": "prettier --write .",
     "lint": "oxlint",
     "lint:fix": "oxlint . --fix",
-    "test": "cd packages/canvas && pnpm test",
-    "test:ui": "cd packages/canvas && pnpm test:ui",
+    "test": "cd packages/canvas && pnpm test && cd ../models && pnpm test",
+    "test:ui": "cd packages/canvas && pnpm test:ui && cd ../models && pnpm test:ui",
     "postinstall": "pnpm -r build"
   },
   "keywords": [],

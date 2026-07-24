@@ -32,3 +32,4 @@ export default App;
 - [ ] add edges arrow head option in the option bar
 - [ ] export as png, svg and .sysdraw
 - [ ] optimize undo/redo history state
+- [ ] configure rolldown code splitting
