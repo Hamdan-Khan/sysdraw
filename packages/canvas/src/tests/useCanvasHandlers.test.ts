@@ -1,9 +1,9 @@
 import { LibraryRegistry, LibraryRegistryProvider, RegisteredEdges } from "@sysdraw/models";
 import { act, renderHook } from "@testing-library/react";
-import { Node } from "@xyflow/react";
 import React, { createElement } from "react";
 import { toast } from "sonner";
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { SYSDRAW_DRAG_DATA_FORMAT } from "../components/toolbar";
 import { useCanvasHandlers } from "../hooks/useCanvasHandlers";
 import { CanvasStoreProvider } from "../store";
 import {
@@ -13,6 +13,13 @@ import {
   mockSetEdges,
   mockSetNodes,
 } from "./utils/mocks";
+import {
+  makeDragEvent,
+  makeEdge,
+  makeMouseEvent,
+  makeNativeMouseEvent,
+  makeNode,
+} from "./utils/utils";
 
 vi.mock("nanoid", () => ({ nanoid: () => "new-id" }));
 
@@ -64,15 +71,11 @@ vi.mock("../components/canvas", async (importOriginal) => {
   };
 });
 
-const makeEvent = (kind: string, id: string) => ({
-  preventDefault: vi.fn(),
-  clientX: 100,
-  clientY: 100,
-  dataTransfer: {
-    getData: () => JSON.stringify({ kind, id }),
-    dropEffect: "",
-  },
-});
+const makeEvent = (kind: string, id: string) =>
+  makeDragEvent(
+    { [SYSDRAW_DRAG_DATA_FORMAT]: JSON.stringify({ kind, id }) },
+    { clientX: 100, clientY: 100 },
+  );
 
 const mockLibraryRegistry = new LibraryRegistry();
 
@@ -93,12 +96,7 @@ describe("useCanvasHandlers", () => {
   describe("onDrop", () => {
     it("does nothing if no drag data is present", () => {
       const { result } = renderHook(() => useCanvasHandlers(), { wrapper: createWrapper() });
-      act(() =>
-        result.current.onDrop({
-          preventDefault: vi.fn(),
-          dataTransfer: { getData: () => "" },
-        } as any),
-      );
+      act(() => result.current.onDrop(makeDragEvent()));
       expect(mockSetNodes).not.toHaveBeenCalled();
     });
 
@@ -106,12 +104,12 @@ describe("useCanvasHandlers", () => {
       const { result } = renderHook(() => useCanvasHandlers(), { wrapper: createWrapper() });
       const existing = [{ id: "existing", type: "database", position: { x: 0, y: 0 }, data: {} }];
 
-      act(() => result.current.onDrop(makeEvent("node", "database") as any));
+      act(() => result.current.onDrop(makeEvent("node", "database")));
       let updated = mockSetNodes.mock.calls[0][0](existing);
       expect(updated.at(-1).type).toBe("database");
 
       mockSetNodes.mockClear();
-      act(() => result.current.onDrop(makeEvent("group", "availability-zone") as any));
+      act(() => result.current.onDrop(makeEvent("group", "availability-zone")));
       updated = mockSetNodes.mock.calls[0][0](existing);
       expect(updated[0].type).toBe("availability-zone");
     });
@@ -120,14 +118,14 @@ describe("useCanvasHandlers", () => {
   describe("onNodeDragStart", () => {
     it("commites the history", () => {
       const { result } = renderHook(() => useCanvasHandlers(), { wrapper: createWrapper() });
-      act(() => result.current.onNodeDragStart({} as any, {} as Node, [] as Node[]));
+      act(() => result.current.onNodeDragStart(makeNativeMouseEvent(), makeNode("n1"), []));
       expect(mockCommit).toHaveBeenCalledTimes(1);
     });
   });
 
   describe("onNodeDragStop", () => {
-    const draggedNode = { id: "n1", measured: { width: 20, height: 20 } };
-    const group = { id: "g1", type: "container" };
+    const draggedNode = makeNode("n1", { measured: { width: 20, height: 20 } });
+    const group = makeNode("g1", { type: "container" });
 
     beforeEach(() => {
       mockGetNodes.mockReturnValue([draggedNode, group]);
@@ -149,7 +147,7 @@ describe("useCanvasHandlers", () => {
 
       const { result } = renderHook(() => useCanvasHandlers(), { wrapper: createWrapper() });
       const bigNode = { ...draggedNode, measured: { width: 150, height: 150 } };
-      act(() => result.current.onNodeDragStop({} as any, bigNode as any, [bigNode] as any));
+      act(() => result.current.onNodeDragStop(makeNativeMouseEvent(), bigNode, [bigNode]));
 
       expect(toast.error).toHaveBeenCalledWith("Group is too small to contain the node");
       expect(mockSetNodes).not.toHaveBeenCalled();
@@ -160,7 +158,7 @@ describe("useCanvasHandlers", () => {
       vi.mocked(getIntersectingArea).mockReturnValue(400);
 
       const { result } = renderHook(() => useCanvasHandlers(), { wrapper: createWrapper() });
-      act(() => result.current.onNodeDragStop({} as any, draggedNode as any, [draggedNode] as any));
+      act(() => result.current.onNodeDragStop(makeNativeMouseEvent(), draggedNode, [draggedNode]));
 
       expect(mockSetNodes).toHaveBeenCalledTimes(1);
       const updated = mockSetNodes.mock.calls[0][0]([draggedNode, group]);
@@ -174,7 +172,7 @@ describe("useCanvasHandlers", () => {
       const parented = { ...draggedNode, parentId: "old-group" };
 
       const { result } = renderHook(() => useCanvasHandlers(), { wrapper: createWrapper() });
-      act(() => result.current.onNodeDragStop({} as any, parented as any, [parented] as any));
+      act(() => result.current.onNodeDragStop(makeNativeMouseEvent(), parented, [parented]));
 
       const updated = mockSetNodes.mock.calls[0][0]([parented]);
       expect(updated[0].parentId).toBeUndefined();
@@ -225,12 +223,12 @@ describe("useCanvasHandlers", () => {
     it("selects unselected node and deselects other nodes and edges", () => {
       const { result } = renderHook(() => useCanvasHandlers(), { wrapper: createWrapper() });
 
-      const node1 = { id: "n1", selected: false } as Node;
-      const node2 = { id: "n2", selected: true } as Node;
-      const edge1 = { id: "e1", selected: true };
+      const node1 = makeNode("n1", { selected: false });
+      const node2 = makeNode("n2", { selected: true });
+      const edge1 = makeEdge("e1", "s", "t", { selected: true });
 
       act(() => {
-        result.current.onNodeContextMenu({} as any, node1);
+        result.current.onNodeContextMenu(makeMouseEvent(), node1);
       });
 
       expect(mockSetNodes).toHaveBeenCalledTimes(1);
@@ -249,10 +247,10 @@ describe("useCanvasHandlers", () => {
     it("does nothing to selection if node is already selected", () => {
       const { result } = renderHook(() => useCanvasHandlers(), { wrapper: createWrapper() });
 
-      const node1 = { id: "n1", selected: true } as Node;
+      const node1 = makeNode("n1", { selected: true });
 
       act(() => {
-        result.current.onNodeContextMenu({} as any, node1);
+        result.current.onNodeContextMenu(makeMouseEvent(), node1);
       });
 
       expect(mockSetNodes).not.toHaveBeenCalled();
@@ -264,11 +262,11 @@ describe("useCanvasHandlers", () => {
     it("selects unselected edge and deselects nodes", () => {
       const { result } = renderHook(() => useCanvasHandlers(), { wrapper: createWrapper() });
 
-      const node1 = { id: "n1", selected: true } as Node;
-      const edge1 = { id: "e1", selected: false } as any;
+      const node1 = makeNode("n1", { selected: true });
+      const edge1 = makeEdge("e1", "s", "t", { selected: false });
 
       act(() => {
-        result.current.onEdgeContextMenu({} as any, edge1);
+        result.current.onEdgeContextMenu(makeMouseEvent(), edge1);
       });
 
       expect(mockSetNodes).toHaveBeenCalledTimes(1);
@@ -288,11 +286,11 @@ describe("useCanvasHandlers", () => {
     it("deselects all nodes and edges when right clicking pane background", () => {
       const { result } = renderHook(() => useCanvasHandlers(), { wrapper: createWrapper() });
 
-      const node1 = { id: "n1", selected: true } as Node;
-      const edge1 = { id: "e1", selected: true } as any;
+      const node1 = makeNode("n1", { selected: true });
+      const edge1 = makeEdge("e1", "s", "t", { selected: true });
 
       act(() => {
-        result.current.onPaneContextMenu({} as any);
+        result.current.onPaneContextMenu(makeMouseEvent());
       });
 
       expect(mockSetNodes).toHaveBeenCalledTimes(1);

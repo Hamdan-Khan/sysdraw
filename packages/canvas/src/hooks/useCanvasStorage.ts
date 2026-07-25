@@ -1,5 +1,6 @@
+import { useLibraryRegistry } from "@sysdraw/models";
 import { Edge, Node, ReactFlowJsonObject, useReactFlow } from "@xyflow/react";
-import { useCallback } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import { toast } from "sonner";
 import { useShallow } from "zustand/shallow";
 import { CanvasStoreState, useCanvasStore } from "../store";
@@ -15,8 +16,10 @@ export const CANVAS_LOCALSTORAGE_KEY = "sysdraw-canvas-snapshot";
 
 export const useCanvasStorage = () => {
   const { nodes, edges, setEdges, setNodes } = useCanvasStore(useShallow(selector));
+  const reactFlowInstance = useReactFlow();
+  const libraryRegistry = useLibraryRegistry();
 
-  const { setViewport } = useReactFlow();
+  const isRestoredRef = useRef(false);
 
   const onSave = useCallback(() => {
     const flow: ReactFlowJsonObject<Node, Edge> = {
@@ -25,33 +28,62 @@ export const useCanvasStorage = () => {
       viewport: { x: 0, y: 0, zoom: 1 },
     };
     localStorage.setItem(CANVAS_LOCALSTORAGE_KEY, JSON.stringify(flow));
-    toast("Snapshot saved!");
   }, [nodes, edges]);
 
-  const onRestore = useCallback(() => {
-    const restoreFlow = async () => {
-      const stored = localStorage.getItem(CANVAS_LOCALSTORAGE_KEY);
+  // auto restore on mount after library registry is ready
+  useEffect(() => {
+    let isCancelled = false;
 
-      if (!stored) {
-        toast("No stored snapshot found.");
-        return;
+    const performAutoRestore = async () => {
+      if (isRestoredRef.current) return;
+
+      if (libraryRegistry) {
+        try {
+          await libraryRegistry.whenReady();
+        } catch (e) {
+          console.error("Library Registry failed to load:", e);
+        }
       }
 
-      try {
-        const flow: ReactFlowJsonObject<Node, Edge> = JSON.parse(stored);
-        const { x = 0, y = 0, zoom = 1 } = flow.viewport;
-        setNodes(flow.nodes || []);
-        setEdges(flow.edges || []);
-        setViewport({ x, y, zoom });
-        toast("Snapshot restored!");
-      } catch (e) {
-        console.error(e);
-        toast("Failed to restore snapshot.");
+      if (isCancelled || isRestoredRef.current) return;
+      isRestoredRef.current = true;
+
+      const stored = localStorage.getItem(CANVAS_LOCALSTORAGE_KEY);
+      if (stored) {
+        try {
+          const flow: ReactFlowJsonObject<Node, Edge> = JSON.parse(stored);
+          if (flow.nodes || flow.edges) {
+            const { x = 0, y = 0, zoom = 1 } = flow.viewport || {};
+            setNodes(flow.nodes || []);
+            setEdges(flow.edges || []);
+            if (reactFlowInstance?.setViewport) {
+              reactFlowInstance.setViewport({ x, y, zoom });
+            }
+          }
+        } catch (e) {
+          console.error("Auto restore failed:", e);
+          toast("Failed to restore snapshot.");
+        }
       }
     };
 
-    restoreFlow();
-  }, [setNodes, setEdges, setViewport]);
+    performAutoRestore();
 
-  return { onSave, onRestore };
+    return () => {
+      isCancelled = true;
+    };
+  }, [setNodes, setEdges, reactFlowInstance, libraryRegistry]);
+
+  // debounced auto save whenever nodes or edges change
+  useEffect(() => {
+    if (!isRestoredRef.current) return;
+
+    const timer = setTimeout(() => {
+      onSave();
+    }, 300);
+
+    return () => clearTimeout(timer);
+  }, [nodes, edges, onSave]);
+
+  return { onSave };
 };

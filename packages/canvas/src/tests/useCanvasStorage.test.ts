@@ -1,6 +1,6 @@
-import { act, renderHook } from "@testing-library/react";
+import { LibraryRegistry, LibraryRegistryProvider } from "@sysdraw/models";
+import { act, renderHook, waitFor } from "@testing-library/react";
 import React, { createElement } from "react";
-import { toast } from "sonner";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { StoreApi } from "zustand";
 import { CANVAS_LOCALSTORAGE_KEY, useCanvasStorage } from "../hooks";
@@ -10,9 +10,16 @@ import { makeEdge, makeNode, makeStore } from "./utils/utils";
 
 vi.unmock("zustand");
 
-const createWrapper = (store: StoreApi<CanvasStoreState>) => {
+const createWrapper = (store: StoreApi<CanvasStoreState>, registry?: LibraryRegistry) => {
+  const libRegistry = registry || new LibraryRegistry();
   return ({ children }: { children: React.ReactNode }) =>
-    createElement(CanvasStoreProvider, { store, children });
+    createElement(CanvasStoreProvider, {
+      store,
+      children: createElement(LibraryRegistryProvider, {
+        registry: libRegistry,
+        children,
+      }),
+    });
 };
 
 describe("useCanvasStorage", () => {
@@ -21,7 +28,7 @@ describe("useCanvasStorage", () => {
     localStorage.clear();
   });
 
-  it("saves the flow snapshot and notifies", () => {
+  it("saves the flow snapshot when onSave is called directly", () => {
     const store = makeStore([makeNode("1")], []);
     const { result } = renderHook(() => useCanvasStorage(), { wrapper: createWrapper(store) });
 
@@ -34,10 +41,9 @@ describe("useCanvasStorage", () => {
     };
 
     expect(JSON.parse(localStorage.getItem(CANVAS_LOCALSTORAGE_KEY)!)).toEqual(expectedObject);
-    expect(toast).toHaveBeenCalledWith("Snapshot saved!");
   });
 
-  it("restores nodes, edges, and viewport from a saved snapshot", async () => {
+  it("auto-restores nodes, edges, and viewport from localStorage on mount", async () => {
     const flow = {
       nodes: [makeNode("n1")],
       edges: [makeEdge("e1", "n1", "n2")],
@@ -46,67 +52,38 @@ describe("useCanvasStorage", () => {
     localStorage.setItem(CANVAS_LOCALSTORAGE_KEY, JSON.stringify(flow));
 
     const store = makeStore();
-    const { result } = renderHook(() => useCanvasStorage(), { wrapper: createWrapper(store) });
-    await act(async () => result.current.onRestore());
+    const libRegistry = new LibraryRegistry();
+    renderHook(() => useCanvasStorage(), { wrapper: createWrapper(store, libRegistry) });
 
-    expect(store.getState().nodes).toEqual(flow.nodes);
+    await act(async () => {
+      await libRegistry.whenReady();
+    });
+
+    await waitFor(() => {
+      expect(store.getState().nodes).toEqual(flow.nodes);
+    });
+
     expect(store.getState().edges).toEqual(flow.edges);
     expect(mockSetViewport).toHaveBeenCalledWith({ x: 5, y: 6, zoom: 2 });
   });
 
-  describe("onRestore", () => {
-    // to not pollute the test logs with logged errors
-    beforeEach(() => {
-      vi.spyOn(console, "error").mockImplementation(() => {});
+  it("auto-saves when nodes or edges change after mount (debounced)", async () => {
+    const store = makeStore();
+    const libRegistry = new LibraryRegistry();
+    renderHook(() => useCanvasStorage(), { wrapper: createWrapper(store, libRegistry) });
+
+    await act(async () => {
+      await libRegistry.whenReady();
     });
 
-    it("shows a toast and does nothing if no snapshot is stored", async () => {
-      const store = makeStore();
-      const { result } = renderHook(() => useCanvasStorage(), { wrapper: createWrapper(store) });
-      await act(async () => result.current.onRestore());
-
-      expect(toast).toHaveBeenCalledWith("No stored snapshot found.");
-      expect(store.getState().nodes).toEqual([]);
-      expect(mockSetViewport).not.toHaveBeenCalled();
+    const newNode = makeNode("n-auto");
+    act(() => {
+      store.getState().setNodes([newNode]);
     });
 
-    it("restores nodes, edges, and viewport from a valid snapshot", async () => {
-      const flow = {
-        nodes: [makeNode("n1")],
-        edges: [makeEdge("e1", "n1", "n2")],
-        viewport: { x: 5, y: 6, zoom: 2 },
-      };
-      localStorage.setItem(CANVAS_LOCALSTORAGE_KEY, JSON.stringify(flow));
-
-      const store = makeStore();
-      const { result } = renderHook(() => useCanvasStorage(), { wrapper: createWrapper(store) });
-      await act(async () => result.current.onRestore());
-
-      expect(store.getState().nodes).toEqual(flow.nodes);
-      expect(store.getState().edges).toEqual(flow.edges);
-      expect(mockSetViewport).toHaveBeenCalledWith(flow.viewport);
-      expect(toast).toHaveBeenCalledWith("Snapshot restored!");
-    });
-
-    it("falls back to a failure toast on malformed JSON", async () => {
-      localStorage.setItem(CANVAS_LOCALSTORAGE_KEY, "{not valid json");
-      const store = makeStore();
-      const { result } = renderHook(() => useCanvasStorage(), { wrapper: createWrapper(store) });
-      await act(async () => result.current.onRestore());
-
-      expect(toast).toHaveBeenCalledWith("Failed to restore snapshot.");
-      expect(mockSetViewport).not.toHaveBeenCalled();
-    });
-
-    it("falls back to a failure toast when stored JSON has no viewport", async () => {
-      // valid JSON, but missing `viewport`causing the destructure to throw, caught by the try/catch
-      localStorage.setItem(CANVAS_LOCALSTORAGE_KEY, JSON.stringify({ nodes: [], edges: [] }));
-      const store = makeStore();
-      const { result } = renderHook(() => useCanvasStorage(), { wrapper: createWrapper(store) });
-      await act(async () => result.current.onRestore());
-
-      expect(toast).toHaveBeenCalledWith("Failed to restore snapshot.");
-      expect(mockSetViewport).not.toHaveBeenCalled();
+    await waitFor(() => {
+      const stored = JSON.parse(localStorage.getItem(CANVAS_LOCALSTORAGE_KEY)!);
+      expect(stored?.nodes).toEqual([newNode]);
     });
   });
 });

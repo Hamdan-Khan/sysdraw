@@ -5,7 +5,7 @@ import { createRef, useMemo } from "react";
 import { Toaster } from "sonner";
 import { StoreApi } from "zustand";
 import { useShallow } from "zustand/shallow";
-import { useCanvasHandlers, useShortcuts } from "../../hooks";
+import { useCanvasHandlers, useCanvasStorage, useShortcuts } from "../../hooks";
 import { CanvasStoreProvider, CanvasStoreState, useCanvasStore } from "../../store";
 import { CanvasContextMenu } from "../context-menu";
 import { ControlsBar } from "../controls";
@@ -52,7 +52,11 @@ const CanvasElement = () => {
     onPaneContextMenu,
   } = useCanvasHandlers();
 
+  // registers keyboard shortcuts and custom context menu
   const { contextMenu, closeContextMenu } = useShortcuts();
+
+  // syncs current canvas to / from localStorage
+  useCanvasStorage();
 
   return (
     <div className="w-screen h-screen bg-bg relative" style={{ width: "100%", height: "100%" }}>
