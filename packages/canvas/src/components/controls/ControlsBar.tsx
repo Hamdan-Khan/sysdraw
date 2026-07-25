@@ -1,9 +1,12 @@
+import { useCanvasTransfer } from "@/hooks/useCanvasTransfer";
+import { RegisteredEdges } from "@sysdraw/models";
 import { useReactFlow } from "@xyflow/react";
-import { ArchiveRestoreIcon, Lock, Maximize, Redo, Save, Undo, Unlock } from "lucide-react";
+import { ExternalLink, FolderOpen, Lock, Maximize, Redo, Undo, Unlock } from "lucide-react";
 import { useShallow } from "zustand/shallow";
-import { useCanvasStorage, useHistory } from "../../hooks";
+import { useHistory } from "../../hooks";
+import { cn } from "../../lib/utils";
 import { CanvasStoreState, useCanvasStore } from "../../store";
-import { Dropdown, Tooltip } from "../common";
+import { Dropdown, DropdownOption, Tooltip } from "../common";
 import { edgeTypeOptions } from "../edges";
 
 const selector = (s: CanvasStoreState) => ({
@@ -15,8 +18,31 @@ const selector = (s: CanvasStoreState) => ({
   setNodes: s.setNodes,
 });
 
+type ButtonControlItem = {
+  type: "button";
+  id: string;
+  label: string;
+  icon: React.ComponentType<{ size?: number }>;
+  action: () => void;
+  disabled?: boolean;
+  active?: boolean;
+  dividerBefore?: boolean;
+};
+
+type DropdownControlItem<T extends string = string> = {
+  type: "dropdown";
+  id: string;
+  label: string;
+  options: DropdownOption<T>[];
+  value: T;
+  onChange: (value: T) => void;
+  dividerBefore?: boolean;
+};
+
+type ControlItem = ButtonControlItem | DropdownControlItem<RegisteredEdges>;
+
 export const ControlsBar = () => {
-  const { onSave, onRestore } = useCanvasStorage();
+  const { onExport, onOpen } = useCanvasTransfer();
   const { undo, redo, canUndo, canRedo } = useHistory();
   const { fitView } = useReactFlow();
   const { isInteractive, setIsInteractive, globalEdgeType, setGlobalEdgeType, setNodes, setEdges } =
@@ -31,22 +57,25 @@ export const ControlsBar = () => {
     setIsInteractive(!isInteractive);
   };
 
-  const buttons = [
+  const items: ControlItem[] = [
     {
-      id: "controls-save",
-      icon: Save,
-      label: "Save",
-      action: () => onSave(),
+      type: "button",
+      id: "controls-export",
+      icon: ExternalLink,
+      label: "Export",
+      action: () => onExport(),
       disabled: false,
     },
     {
-      id: "controls-restore",
-      icon: ArchiveRestoreIcon,
-      label: "Restore",
-      action: () => onRestore(),
+      type: "button",
+      id: "controls-open",
+      icon: FolderOpen,
+      label: "Open",
+      action: () => onOpen(),
       disabled: false,
     },
     {
+      type: "button",
       id: "controls-undo",
       icon: Undo,
       label: "Undo",
@@ -54,6 +83,7 @@ export const ControlsBar = () => {
       disabled: !canUndo,
     },
     {
+      type: "button",
       id: "controls-redo",
       icon: Redo,
       label: "Redo",
@@ -61,13 +91,16 @@ export const ControlsBar = () => {
       disabled: !canRedo,
     },
     {
+      type: "button",
       id: "controls-fit-view",
       icon: Maximize,
       label: "Fit View",
       action: () => fitView({ padding: 0.1, duration: 300 }),
       disabled: false,
+      dividerBefore: true,
     },
     {
+      type: "button",
       id: "controls-toggle-interactivity",
       icon: isInteractive ? Unlock : Lock,
       label: isInteractive ? "Lock Canvas" : "Unlock Canvas",
@@ -75,53 +108,64 @@ export const ControlsBar = () => {
       disabled: false,
       active: !isInteractive,
     },
-  ] as const;
+    {
+      type: "dropdown",
+      id: "controls-edge-type",
+      label: "Edge Type",
+      options: edgeTypeOptions,
+      value: globalEdgeType,
+      onChange: setGlobalEdgeType,
+    },
+  ];
 
   return (
     <div
       data-no-context-menu
       className="absolute top-4 left-1/2 -translate-x-1/2 z-10 flex items-center gap-0.5 bg-surface border border-border rounded-lg p-1.5 shadow-md"
     >
-      {buttons.map((btn) => {
-        const Icon = btn.icon;
-        const isDividerBefore = btn.id === "controls-fit-view"; // divider before fit-view group
+      {items.map((item) => {
+        const isDividerBefore = item.dividerBefore;
+
         return (
-          <div key={btn.id} className="flex items-center">
+          <div key={item.id} className="flex items-center">
             {isDividerBefore && <div className="w-px h-6 bg-border mx-1" />}
-            <div className="relative flex items-center justify-center group">
-              <button
-                id={btn.id}
-                onClick={btn.action}
-                disabled={btn.disabled}
-                aria-label={btn.label}
-                className={[
-                  "p-2.5 rounded-md transition-all flex items-center justify-center cursor-pointer outline-none",
-                  btn.disabled
-                    ? "text-secondary/40 cursor-not-allowed"
-                    : "active" in btn && btn.active
-                      ? "text-primary bg-dim"
-                      : "text-secondary hover:text-primary hover:bg-dim",
-                ].join(" ")}
-              >
-                <Icon size={18} />
-              </button>
-              <Tooltip direction="down" text={btn.label} />
-            </div>
+
+            {item.type === "button" ? (
+              <div className="relative flex items-center justify-center group">
+                <button
+                  id={item.id}
+                  onClick={item.action}
+                  disabled={item.disabled}
+                  aria-label={item.label}
+                  className={cn(
+                    "p-2.5 rounded-md transition-all flex items-center justify-center cursor-pointer outline-none",
+                    item.disabled
+                      ? "text-secondary/40 cursor-not-allowed"
+                      : item.active
+                        ? "text-primary bg-dim"
+                        : "text-secondary hover:text-primary hover:bg-dim",
+                  )}
+                >
+                  <item.icon size={18} />
+                </button>
+                <Tooltip direction="down" text={item.label} />
+              </div>
+            ) : (
+              <div className="relative flex items-center justify-center group">
+                <Dropdown
+                  id={item.id}
+                  options={item.options}
+                  value={item.value}
+                  onChange={item.onChange}
+                  preferredDirection="down"
+                  aria-label={item.label}
+                />
+                <Tooltip direction="down" text={item.label} />
+              </div>
+            )}
           </div>
         );
       })}
-
-      <div className="relative flex items-center justify-center group">
-        <Dropdown
-          id="controls-edge-type"
-          options={edgeTypeOptions}
-          value={globalEdgeType}
-          onChange={setGlobalEdgeType}
-          preferredDirection="down"
-          aria-label="Edge type"
-        />
-        <Tooltip direction="down" text="Edge Type" />
-      </div>
     </div>
   );
 };
