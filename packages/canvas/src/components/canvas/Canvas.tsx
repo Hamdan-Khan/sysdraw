@@ -1,3 +1,14 @@
+import { CanvasContextMenu } from "@/components/context-menu/ContextMenu";
+import { ControlsBar } from "@/components/controls/ControlsBar";
+import { DndWrapper } from "@/components/dnd/DnDWrapper";
+import { edgeTypes } from "@/components/edges/EdgeTypes";
+import { createNodeTypes } from "@/components/nodes/createNodeTypes";
+import { Toolbar } from "@/components/toolbar/Toolbar";
+import { useCanvasHandlers } from "@/hooks/useCanvasHandlers";
+import { useCanvasStorage } from "@/hooks/useCanvasStorage";
+import { useShortcuts } from "@/hooks/useShortcuts";
+import { CanvasStoreProvider, useCanvasStore } from "@/store/CanvasStoreProvider";
+import { CanvasStoreState } from "@/store/store";
 import { LibraryRegistry, LibraryRegistryProvider, useLibraryRegistryStore } from "@sysdraw/models";
 import { ReactFlow, ReactFlowProvider } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
@@ -5,18 +16,10 @@ import { createRef, useMemo } from "react";
 import { Toaster } from "sonner";
 import { StoreApi } from "zustand";
 import { useShallow } from "zustand/shallow";
-import { useCanvasHandlers, useCanvasStorage, useShortcuts } from "../../hooks";
-import { CanvasStoreProvider, CanvasStoreState, useCanvasStore } from "../../store";
-import { CanvasContextMenu } from "../context-menu";
-import { ControlsBar } from "../controls";
-import { DndWrapper } from "../dnd";
-import { edgeTypes } from "../edges";
-import { createNodeTypes } from "../nodes";
-import { Toolbar } from "../toolbar";
 import "./canvas.css";
 import { CanvasGrid } from "./CanvasGrid";
 
-interface CanvasProps {
+export interface CanvasProps {
   canvasState: StoreApi<CanvasStoreState>;
   libraryRegistry: LibraryRegistry;
 }

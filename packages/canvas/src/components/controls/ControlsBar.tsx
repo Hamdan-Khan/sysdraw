@@ -1,14 +1,16 @@
+import { Dropdown, DropdownOption } from "@/components/common/Dropdown";
+import { Tooltip } from "@/components/common/Tooltip";
+import { edgeTypeOptions } from "@/components/edges/EdgeTypes";
 import { useCanvasTransfer } from "@/hooks/useCanvasTransfer";
+import { useHistory } from "@/hooks/useHistory";
+import { cn } from "@/lib/utils";
+import { useCanvasStore } from "@/store/CanvasStoreProvider";
+import { CanvasStoreState } from "@/store/store";
 import { RegisteredEdges } from "@sysdraw/models";
 import { useReactFlow } from "@xyflow/react";
 import { ExternalLink, FolderOpen, Lock, Maximize, Redo, Undo, Unlock } from "lucide-react";
 import { useState } from "react";
 import { useShallow } from "zustand/shallow";
-import { useHistory } from "../../hooks";
-import { cn } from "../../lib/utils";
-import { CanvasStoreState, useCanvasStore } from "../../store";
-import { Dropdown, DropdownOption, Tooltip } from "../common";
-import { edgeTypeOptions } from "../edges";
 import { ExportDialog } from "./ExportDialog";
 
 const selector = (s: CanvasStoreState) => ({

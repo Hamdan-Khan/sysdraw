@@ -1,11 +1,13 @@
+import { edgeTypeMetadata, edgeTypeOptions } from "@/components/edges/EdgeTypes";
+import { useCopyPaste } from "@/hooks/useCopyPaste";
+import { useHistory } from "@/hooks/useHistory";
+import { useCanvasStore } from "@/store/CanvasStoreProvider";
+import { CanvasStoreState } from "@/store/store";
 import { RegisteredEdges } from "@sysdraw/models";
 import { Edge, MarkerType } from "@xyflow/react";
 import { ArrowRight, ClipboardPaste, Copy, Maximize } from "lucide-react";
 import { useEffect, useMemo, useRef } from "react";
 import { useShallow } from "zustand/shallow";
-import { useCopyPaste, useHistory } from "../../hooks";
-import { CanvasStoreState, useCanvasStore } from "../../store";
-import { edgeTypeMetadata, edgeTypeOptions } from "../edges";
 import { SubMenuItem } from "./SubMenu";
 import { ContextMenuItem, ContextMenuState } from "./types";
 

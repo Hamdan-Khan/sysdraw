@@ -1,7 +1,8 @@
+import { CanvasStoreProvider, useCanvasStore } from "@/store/CanvasStoreProvider";
+import { createCanvasStore } from "@/store/store";
 import { act, renderHook } from "@testing-library/react";
 import React from "react";
 import { describe, expect, it, vi } from "vitest";
-import { CanvasStoreProvider, createCanvasStore, useCanvasStore } from "../store";
 
 vi.unmock("zustand");
 

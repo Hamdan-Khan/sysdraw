@@ -1,4 +1,17 @@
-import { defaultHandles } from "@/components";
+import type { DnDTransferData } from "@/components/canvas/types";
+import {
+  clampPositionInsideGroup,
+  getIntersectingArea,
+  getNodeRect,
+  isChildNode,
+  isGroup,
+  NodeRect,
+  sortNodesAndGroups,
+} from "@/components/canvas/utils";
+import { defaultHandles } from "@/components/nodes/createNodeTypes";
+import { SYSDRAW_DRAG_DATA_FORMAT } from "@/components/toolbar/Toolbar";
+import { useCanvasStore } from "@/store/CanvasStoreProvider";
+import { CanvasStoreState } from "@/store/store";
 import { useLibraryRegistryStore } from "@sysdraw/models";
 import {
   addEdge,
@@ -14,18 +27,6 @@ import { nanoid } from "nanoid";
 import { useCallback } from "react";
 import { toast } from "sonner";
 import { useShallow } from "zustand/shallow";
-import {
-  clampPositionInsideGroup,
-  DnDTransferData,
-  getIntersectingArea,
-  getNodeRect,
-  isChildNode,
-  isGroup,
-  NodeRect,
-  sortNodesAndGroups,
-} from "../components/canvas";
-import { SYSDRAW_DRAG_DATA_FORMAT } from "../components/toolbar";
-import { CanvasStoreState, useCanvasStore } from "../store";
 import { useHistory } from "./useHistory";
 
 const selector = (state: CanvasStoreState) => ({

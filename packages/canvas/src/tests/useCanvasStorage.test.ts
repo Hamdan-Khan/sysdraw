@@ -1,10 +1,11 @@
+import { CANVAS_LOCALSTORAGE_KEY, useCanvasStorage } from "@/hooks/useCanvasStorage";
+import { CanvasStoreProvider } from "@/store/CanvasStoreProvider";
+import { CanvasStoreState } from "@/store/store";
 import { LibraryRegistry, LibraryRegistryProvider } from "@sysdraw/models";
 import { act, renderHook, waitFor } from "@testing-library/react";
 import React, { createElement } from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { StoreApi } from "zustand";
-import { CANVAS_LOCALSTORAGE_KEY, useCanvasStorage } from "../hooks";
-import { CanvasStoreProvider, CanvasStoreState } from "../store";
 import { mockSetViewport } from "./utils/mocks";
 import { makeEdge, makeNode, makeStore } from "./utils/utils";
 

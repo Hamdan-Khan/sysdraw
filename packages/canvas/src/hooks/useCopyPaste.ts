@@ -1,7 +1,7 @@
+import { useCanvasStore } from "@/store/CanvasStoreProvider";
 import { useReactFlow, type Edge, type Node } from "@xyflow/react";
 import { nanoid } from "nanoid";
 import { useCallback, useEffect, useRef } from "react";
-import { useCanvasStore } from "../store";
 
 interface ClipboardData {
   nodes: Node[];

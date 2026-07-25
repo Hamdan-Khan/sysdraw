@@ -1,6 +1,7 @@
+import { useCanvasStore } from "@/store/CanvasStoreProvider";
+import { CanvasStoreState } from "@/store/store";
 import { Background, BackgroundVariant, useViewport } from "@xyflow/react";
 import { useShallow } from "zustand/shallow";
-import { CanvasStoreState, useCanvasStore } from "../../store";
 
 const selector = (state: CanvasStoreState) => ({
   grid: state.grid,

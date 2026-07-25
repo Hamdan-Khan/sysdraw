@@ -1,10 +1,12 @@
+import type { DnDTransferData } from "@/components/canvas/types";
+import { Divider } from "@/components/common/Divider";
+import { Tooltip } from "@/components/common/Tooltip";
+import { useCanvasStore } from "@/store/CanvasStoreProvider";
+import { CanvasStoreState } from "@/store/store";
 import { useLibraryRegistryStore } from "@sysdraw/models";
 import { useMemo } from "react";
 import { toast } from "sonner";
 import { useShallow } from "zustand/shallow";
-import { CanvasStoreState, useCanvasStore } from "../../store";
-import type { DnDTransferData } from "../canvas";
-import { Divider, Tooltip } from "../common";
 import { LibraryDropdown } from "./LibraryDropdown";
 import { LibraryIcon } from "./LibraryIcon";
 

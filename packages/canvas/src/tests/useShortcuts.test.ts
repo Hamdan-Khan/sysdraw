@@ -1,8 +1,8 @@
+import { useShortcuts } from "@/hooks/useShortcuts";
+import { CanvasStoreProvider } from "@/store/CanvasStoreProvider";
 import { act, renderHook } from "@testing-library/react";
 import React, { createElement } from "react";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { useShortcuts } from "../hooks";
-import { CanvasStoreProvider } from "../store";
 import { mockSetNodes } from "./utils/mocks";
 import { makeEdge, makeNode, makeStore } from "./utils/utils";
 
@@ -34,7 +34,7 @@ const fireContextMenu = (x = 100, y = 200, target: Element = document.body) =>
 const mockCopy = vi.fn();
 const mockPaste = vi.fn();
 
-vi.mock("../hooks/useCopyPaste", () => ({
+vi.mock("@/hooks/useCopyPaste", () => ({
   useCopyPaste: () => ({ copy: mockCopy, paste: mockPaste }),
 }));
 

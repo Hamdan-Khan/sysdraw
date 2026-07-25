@@ -1,4 +1,5 @@
-import { CanvasStoreState, useCanvasStore } from "@/store";
+import { useCanvasStore } from "@/store/CanvasStoreProvider";
+import { CanvasStoreState } from "@/store/store";
 import { getNodesBounds, getViewportForBounds } from "@xyflow/react";
 import { toPng } from "html-to-image";
 import { useCallback, useState } from "react";

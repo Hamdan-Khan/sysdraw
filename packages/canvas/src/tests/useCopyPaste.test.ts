@@ -1,9 +1,9 @@
+import { clearClipboard, isClipboardEmpty, useCopyPaste } from "@/hooks/useCopyPaste";
+import { CanvasStoreProvider } from "@/store/CanvasStoreProvider";
 import { act, renderHook } from "@testing-library/react";
 import type { Edge, Node } from "@xyflow/react";
 import { createElement } from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { clearClipboard, isClipboardEmpty, useCopyPaste } from "../hooks";
-import { CanvasStoreProvider } from "../store";
 import {
   mockGetEdges,
   mockGetNodes,

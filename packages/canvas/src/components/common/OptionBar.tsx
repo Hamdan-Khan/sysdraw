@@ -1,9 +1,10 @@
+import { useCopyPaste } from "@/hooks/useCopyPaste";
+import { useHistory } from "@/hooks/useHistory";
+import { useCanvasStore } from "@/store/CanvasStoreProvider";
 import { useNodeId, useReactFlow } from "@xyflow/react";
 import { Copy, Lock, Trash2, Unlock } from "lucide-react";
 import { useCallback } from "react";
 import { toast } from "sonner";
-import { useCopyPaste, useHistory } from "../../hooks";
-import { useCanvasStore } from "../../store";
 import { Tooltip } from "./Tooltip";
 
 interface OptionBarProps {

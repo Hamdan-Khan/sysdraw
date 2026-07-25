@@ -1,7 +1,8 @@
+import { ContextMenuState } from "@/components/context-menu/types";
+import { useCanvasStore } from "@/store/CanvasStoreProvider";
+import { CanvasStoreState } from "@/store/store";
 import { useCallback, useEffect, useState } from "react";
-import { ContextMenuState } from "src/components/context-menu/types";
 import { useShallow } from "zustand/shallow";
-import { CanvasStoreState, useCanvasStore } from "../store";
 import { useCopyPaste } from "./useCopyPaste";
 import { useHistory } from "./useHistory";
 
