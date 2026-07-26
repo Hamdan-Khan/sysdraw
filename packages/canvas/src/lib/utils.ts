@@ -1,6 +1,19 @@
+import { type ExportFormat } from "@/hooks/useCanvasExport";
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
+
+/**
+ * downloads an image from a data URL
+ */
+export const downloadImage = (dataUrl: string, fileName: string, format: ExportFormat) => {
+  const a = document.createElement("a");
+  a.href = dataUrl;
+  a.download = fileName.endsWith(`.${format}`) ? fileName : `${fileName}.${format}`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+};

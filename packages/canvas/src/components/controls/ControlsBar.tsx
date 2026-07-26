@@ -1,7 +1,6 @@
 import { Dropdown, DropdownOption } from "@/components/common/Dropdown";
 import { Tooltip } from "@/components/common/Tooltip";
 import { edgeTypeOptions } from "@/components/edges/EdgeTypes";
-import { useCanvasTransfer } from "@/hooks/useCanvasTransfer";
 import { useHistory } from "@/hooks/useHistory";
 import { cn } from "@/lib/utils";
 import { useCanvasStore } from "@/store/CanvasStoreProvider";
@@ -10,6 +9,7 @@ import { RegisteredEdges } from "@sysdraw/models";
 import { useReactFlow } from "@xyflow/react";
 import { ExternalLink, FolderOpen, Lock, Maximize, Redo, Undo, Unlock } from "lucide-react";
 import { useState } from "react";
+import { toast } from "sonner";
 import { useShallow } from "zustand/shallow";
 import { ExportDialog } from "./ExportDialog";
 
@@ -47,7 +47,6 @@ type ControlItem = ButtonControlItem | DropdownControlItem<RegisteredEdges>;
 
 export const ControlsBar = () => {
   const [isExportDialogOpen, setIsExportDialogOpen] = useState(false);
-  const { onOpen } = useCanvasTransfer();
   const { undo, redo, canUndo, canRedo } = useHistory();
   const { fitView } = useReactFlow();
   const { isInteractive, setIsInteractive, globalEdgeType, setGlobalEdgeType, setNodes, setEdges } =
@@ -119,7 +118,7 @@ export const ControlsBar = () => {
       id: "controls-open",
       icon: FolderOpen,
       label: "Open",
-      action: () => onOpen(),
+      action: () => toast("Todo"),
       disabled: false,
     },
   ];

@@ -53,4 +53,5 @@ function Button({
   );
 }
 
+// oxlint-disable-next-line react/only-export-components
 export { Button, buttonVariants };
