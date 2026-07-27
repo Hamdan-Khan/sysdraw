@@ -103,9 +103,11 @@ export function useShortcuts() {
   // right-click context menu
   useEffect(() => {
     const handleContextMenu = (e: MouseEvent) => {
-      // only open on the canvas pane itself, not on overlaying UI controls
+      // only open on the canvas pane itself, not on overlaying UI controls or non react-flow elements
       const target = e.target as HTMLElement;
-      if (target.closest("[data-no-context-menu]")) return;
+      if (!target.closest(".react-flow") || target.closest("[data-no-context-menu]")) {
+        return;
+      }
 
       e.preventDefault();
       setContextMenu({ x: e.clientX, y: e.clientY });
