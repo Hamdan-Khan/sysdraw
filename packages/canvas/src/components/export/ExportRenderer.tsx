@@ -1,8 +1,7 @@
-// export/ExportRenderer.tsx
 import { useCanvasStore } from "@/store/CanvasStoreProvider";
 import { CanvasStoreState } from "@/store/store";
 import { useLibraryRegistryStore } from "@sysdraw/models";
-import { getNodesBounds, ReactFlow, ReactFlowProvider } from "@xyflow/react";
+import { ReactFlow, ReactFlowProvider, useReactFlow } from "@xyflow/react";
 import { useLayoutEffect, useMemo, useRef } from "react";
 import { createPortal } from "react-dom";
 import { useShallow } from "zustand/shallow";
@@ -26,11 +25,14 @@ const selector = (state: CanvasStoreState) => ({
   exportOptions: state.exportOptions,
 });
 
+export const EXPORT_CANVAS_GRID_ID = "export";
+
 const MIN_CANVAS_DIMENSION = 100;
 
 export function ExportRenderer({ onReady }: ExportRendererProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const { nodes, edges, exportOptions } = useCanvasStore(useShallow(selector));
+  const { getNodesBounds } = useReactFlow();
 
   const { loadedLibs } = useLibraryRegistryStore(useShallow((s) => ({ loadedLibs: s.loadedLibs })));
   const nodeTypes = useMemo(() => createNodeTypes(loadedLibs), [loadedLibs]);
@@ -40,7 +42,7 @@ export function ExportRenderer({ onReady }: ExportRendererProps) {
   const cleanEdges = useMemo(() => edges.map((e) => ({ ...e, selected: false })), [edges]);
 
   /** diagram's bounding rect for getting its position and width/height on the canvas */
-  const bounds = useMemo(() => getNodesBounds(cleanNodes), [cleanNodes]);
+  const bounds = useMemo(() => getNodesBounds(cleanNodes), [cleanNodes, getNodesBounds]);
   const { padding, showGrid, background } = exportOptions;
 
   // add padding to the diagram's bounding rect to calculate total width
@@ -127,7 +129,7 @@ export function ExportRenderer({ onReady }: ExportRendererProps) {
           proOptions={{ hideAttribution: true }}
           style={{ width: canvasWidth, height: canvasHeight, backgroundColor: bgColor }}
         >
-          {showGrid && <CanvasGrid id="export" />}
+          {showGrid && <CanvasGrid id={EXPORT_CANVAS_GRID_ID} />}
         </ReactFlow>
       </ReactFlowProvider>
     </div>,

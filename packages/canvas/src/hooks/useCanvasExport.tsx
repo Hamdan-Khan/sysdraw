@@ -1,4 +1,5 @@
 import { ExportReadyPayload, ExportRenderer } from "@/components/export/ExportRenderer";
+import { renderToNativeSvg } from "@/lib/svgExport";
 import { downloadImage } from "@/lib/utils";
 import { CanvasStoreContext, useCanvasStore } from "@/store/CanvasStoreProvider";
 import { CanvasStoreState } from "@/store/store";
@@ -62,50 +63,58 @@ export const useCanvasExport = () => {
   /**
    * mounts the renderer, waits for it to signal readiness, then captures and returns a data URL
    */
-  const captureImage = useCallback(async (): Promise<string | null> => {
-    const { setIsExporting, exportOptions: expOptions } = storeApi.getState();
+  const captureImage = useCallback(
+    async (format: ExportFormat = "png"): Promise<string | null> => {
+      const { setIsExporting, exportOptions: expOptions } = storeApi.getState();
 
-    setIsExporting(true);
+      setIsExporting(true);
 
-    let payload: ExportReadyPayload;
-    try {
-      const { promise, resolve } = Promise.withResolvers<ExportReadyPayload>();
-      pendingResolve = resolve;
-      payload = await promise;
-    } catch {
-      setIsExporting(false);
-      return null;
-    }
+      let payload: ExportReadyPayload;
+      try {
+        const { promise, resolve } = Promise.withResolvers<ExportReadyPayload>();
+        pendingResolve = resolve;
+        payload = await promise;
+      } catch {
+        setIsExporting(false);
+        return null;
+      }
 
-    const { scale, background } = expOptions;
-    const bgColor = background === "white" ? "#ffffff" : undefined;
-    const { flowEl, width, height } = payload;
+      const { scale, background } = expOptions;
+      const bgColor = background === "white" ? "#ffffff" : undefined;
+      const { flowEl, width, height } = payload;
 
-    try {
-      const dataUrl = await toPng(flowEl, {
-        width,
-        height,
-        backgroundColor: bgColor,
-        pixelRatio: scale,
-        style: {
-          width: `${width}px`,
-          height: `${height}px`,
-        },
-      });
-      return dataUrl;
-    } catch (error) {
-      console.error(error);
-      toast.error("Failed to capture diagram");
-      return null;
-    } finally {
-      setIsExporting(false);
-    }
-  }, [storeApi]);
+      try {
+        let dataUrl: string | null = null;
+        if (format === "png") {
+          dataUrl = await toPng(flowEl, {
+            width,
+            height,
+            backgroundColor: bgColor,
+            pixelRatio: scale,
+            style: {
+              width: `${width}px`,
+              height: `${height}px`,
+            },
+          });
+        } else if (format === "svg") {
+          dataUrl = renderToNativeSvg(flowEl, width, height, bgColor);
+        }
+        return dataUrl;
+      } catch (error) {
+        console.error(error);
+        toast.error("Failed to capture diagram");
+        return null;
+      } finally {
+        setIsExporting(false);
+      }
+    },
+    [storeApi],
+  );
 
   /** downloads the diagram as a PNG file */
   const exportAsPng = useCallback(
     async (fileName: string) => {
-      const dataUrl = await captureImage();
+      const dataUrl = await captureImage("png");
       if (!dataUrl) {
         toast.error("Failed to export diagram");
         return;
@@ -123,9 +132,24 @@ export const useCanvasExport = () => {
   );
 
   /** downloads the diagram as a SVG file */
-  const exportAsSvg = useCallback(async (_fileName = "diagram") => {
-    toast.info("SVG export is not yet supported.");
-  }, []);
+  const exportAsSvg = useCallback(
+    async (fileName: string) => {
+      const dataUrl = await captureImage("svg");
+      if (!dataUrl) {
+        toast.error("Failed to export diagram");
+        return;
+      }
+
+      try {
+        downloadImage(dataUrl, fileName, "svg");
+        toast.success("Diagram exported as svg successfully");
+      } catch (error) {
+        console.error(error);
+        toast.error("Failed to export diagram");
+      }
+    },
+    [captureImage],
+  );
 
   /**
    * mounts the export renderer only while a capture is under way

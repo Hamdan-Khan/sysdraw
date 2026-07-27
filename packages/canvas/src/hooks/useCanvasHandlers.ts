@@ -12,6 +12,7 @@ import { defaultHandles } from "@/components/nodes/createNodeTypes";
 import { SYSDRAW_DRAG_DATA_FORMAT } from "@/components/toolbar/Toolbar";
 import { useCanvasStore } from "@/store/CanvasStoreProvider";
 import { CanvasStoreState } from "@/store/store";
+import { NODE_WRAPPER_CLASS_ID } from "@sysdraw/common";
 import { useLibraryRegistryStore } from "@sysdraw/models";
 import {
   addEdge,
@@ -126,7 +127,13 @@ export const useCanvasHandlers = () => {
               description: nodeDef.description,
             };
 
-      const newNode: Node = { id: nanoid(), type: id, position, data: nodeData };
+      const newNode: Node = {
+        id: nanoid(),
+        type: id,
+        position,
+        data: nodeData,
+        className: NODE_WRAPPER_CLASS_ID,
+      };
 
       commit();
       setNodes((prev) => {
@@ -278,11 +285,11 @@ export const useCanvasHandlers = () => {
           if (n.id === best?.group.id) {
             return {
               ...n,
-              className: "ring-2 ring-primary bg-primary/5 rounded-xl transition-all",
+              className: `${NODE_WRAPPER_CLASS_ID} ring-2 ring-primary bg-primary/5 rounded-xl transition-all`,
             };
           }
           if (n.className?.includes("ring-2")) {
-            return { ...n, className: "" };
+            return { ...n, className: NODE_WRAPPER_CLASS_ID };
           }
           return n;
         }),
@@ -317,7 +324,7 @@ export const useCanvasHandlers = () => {
         setNodes((ns) => {
           const updatedNodes = ns.map((n) => {
             // Clear the drop-target highlight ring.
-            if (n.id === dropTarget.id) return { ...n, className: "" };
+            if (n.id === dropTarget.id) return { ...n, className: NODE_WRAPPER_CLASS_ID };
 
             // Only touch nodes that are part of the current drag selection.
             if (!draggedNodeIds.has(n.id)) return n;
@@ -343,7 +350,7 @@ export const useCanvasHandlers = () => {
         // then restore its absolute position and clean up any highlight rings.
         setNodes((ns) =>
           ns.map((n) => {
-            if (n.className?.includes("ring-2")) return { ...n, className: "" };
+            if (n.className?.includes("ring-2")) return { ...n, className: NODE_WRAPPER_CLASS_ID };
 
             if (!draggedNodeIds.has(n.id) || !n.parentId) return n;
 

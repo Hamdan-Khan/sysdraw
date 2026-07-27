@@ -1,3 +1,4 @@
+import { NODE_ICON_CLASS_ID } from "@sysdraw/common";
 import type { IconType } from "@sysdraw/models";
 
 export interface LibraryIconProps {
@@ -19,7 +20,7 @@ export const LibraryIcon = ({ icon, size, className = "", style }: LibraryIconPr
   if (icon.kind === "svg") {
     return (
       <span
-        className={`inline-flex items-center justify-center [&>svg]:w-full [&>svg]:h-full [&>svg]:shrink-0 ${className}`}
+        className={`inline-flex items-center justify-center [&>svg]:w-full [&>svg]:h-full [&>svg]:shrink-0 ${NODE_ICON_CLASS_ID} ${className}`}
         style={{ ...sizeStyle, ...style }}
         dangerouslySetInnerHTML={{ __html: icon.value }}
       />
@@ -31,7 +32,7 @@ export const LibraryIcon = ({ icon, size, className = "", style }: LibraryIconPr
       <img
         src={icon.value}
         alt=""
-        className={`object-contain shrink-0 ${className}`}
+        className={`object-contain shrink-0 ${NODE_ICON_CLASS_ID} ${className}`}
         style={{ ...sizeStyle, ...style }}
       />
     );
