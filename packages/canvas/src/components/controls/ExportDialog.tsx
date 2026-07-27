@@ -52,7 +52,7 @@ export const ExportDialog = ({ open, onOpenChange }: ExportDialogProps) => {
     }
     setDataUrl(null);
     setIsLoadingPreview(true);
-    captureImage().then((url) => {
+    captureImage(format ?? "png").then((url) => {
       setDataUrl(url);
       setIsLoadingPreview(false);
     });
@@ -62,6 +62,7 @@ export const ExportDialog = ({ open, onOpenChange }: ExportDialogProps) => {
     exportOptions.scale,
     exportOptions.padding,
     exportOptions.showGrid,
+    format,
     captureImage,
   ]);
 
@@ -208,7 +209,7 @@ export const ExportDialog = ({ open, onOpenChange }: ExportDialogProps) => {
                   const val = Math.max(0, Number(e.target.value));
                   setExportOptions({ padding: val });
                 }}
-                className="h-8 w-20 text-xs text-right"
+                className="h-8 w-20 text-xs text-right [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
               />
               <span className="text-xs text-secondary">px</span>
             </div>
