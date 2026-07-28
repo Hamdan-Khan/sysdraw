@@ -2,11 +2,13 @@ import { Dropdown, DropdownOption } from "@/components/common/Dropdown";
 import { Tooltip } from "@/components/common/Tooltip";
 import { edgeTypeOptions } from "@/components/edges/EdgeTypes";
 import { useHistory } from "@/hooks/useHistory";
+import { parseProjectFile } from "@/lib/import/importFile";
 import { cn } from "@/lib/utils";
 import { useCanvasStore } from "@/store/CanvasStoreProvider";
 import { CanvasStoreState } from "@/store/store";
+import { FILE_EXTENSIONS } from "@sysdraw/common";
 import { RegisteredEdges } from "@sysdraw/models";
-import { useReactFlow } from "@xyflow/react";
+import { Edge, Node, useReactFlow } from "@xyflow/react";
 import {
   Download,
   ExternalLink,
@@ -17,13 +19,16 @@ import {
   Undo,
   Unlock,
 } from "lucide-react";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { toast } from "sonner";
 import { useShallow } from "zustand/shallow";
 import { ExportDialog } from "./ExportDialog";
+import { ImportConfirmDialog } from "./ImportConfirmDialog";
 import { SaveProjectDialog } from "./SaveProjectDialog";
 
 const selector = (s: CanvasStoreState) => ({
+  nodes: s.nodes,
+  edges: s.edges,
   isInteractive: s.isInteractive,
   setIsInteractive: s.setIsInteractive,
   globalEdgeType: s.globalEdgeType,
@@ -65,18 +70,85 @@ export const ControlsBar = ({
   setIsSaveDialogOpen,
 }: ControlsBarProps) => {
   const [isExportDialogOpen, setIsExportDialogOpen] = useState(false);
+  const [isImportConfirmOpen, setIsImportConfirmOpen] = useState(false);
   const { undo, redo, canUndo, canRedo } = useHistory();
-  const { fitView } = useReactFlow();
-  const { isInteractive, setIsInteractive, globalEdgeType, setGlobalEdgeType, setNodes, setEdges } =
-    useCanvasStore(useShallow(selector));
+  const { fitView, setViewport } = useReactFlow();
+  const {
+    nodes,
+    edges,
+    isInteractive,
+    setIsInteractive,
+    globalEdgeType,
+    setGlobalEdgeType,
+    setNodes,
+    setEdges,
+  } = useCanvasStore(useShallow(selector));
 
   const handleToggleInteractivity = () => {
-    // un-select any nodes/group/edges when turning off interactivity
+    // un-select every nodes/group/edges when turning off interactivity
     if (isInteractive) {
       setNodes((n) => n.map((node) => ({ ...node, selected: false })));
       setEdges((e) => e.map((edge) => ({ ...edge, selected: false })));
     }
     setIsInteractive(!isInteractive);
+  };
+
+  const fileOpenInput = useRef<HTMLInputElement>(null);
+
+  const openProjectFile = () => {
+    fileOpenInput.current?.click();
+  };
+
+  /**
+   * if its an empty canvas, open input window right away
+   * otherwise, ask for a confirmation
+   */
+  const handleOpenClick = () => {
+    if (nodes.length > 0 || edges.length > 0) {
+      setIsImportConfirmOpen(true);
+    } else {
+      openProjectFile();
+    }
+  };
+
+  const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) {
+      return;
+    }
+
+    if (!file.name.endsWith(`.${FILE_EXTENSIONS.PROJECT}`)) {
+      toast.error(`Please select a .${FILE_EXTENSIONS.PROJECT} file`);
+      if (fileOpenInput.current) {
+        fileOpenInput.current.value = "";
+      }
+      return;
+    }
+
+    try {
+      const text = await file.text();
+      const json = JSON.parse(text);
+      const parsed = parseProjectFile(json);
+
+      if (!parsed) {
+        toast.error("Failed to parse project file");
+        return;
+      }
+
+      setNodes(parsed.nodes as Node[]);
+      setEdges(parsed.edges as Edge[]);
+      if (parsed.viewport) {
+        setViewport(parsed.viewport);
+      }
+      toast.success("Project loaded successfully");
+    } catch (error) {
+      console.error(error);
+      toast.error("Failed to parse project file");
+    } finally {
+      if (fileOpenInput.current) {
+        fileOpenInput.current.value = "";
+      }
+    }
   };
 
   const items: ControlItem[] = [
@@ -85,7 +157,7 @@ export const ControlsBar = ({
       id: "controls-open",
       icon: FolderOpen,
       label: "Open",
-      action: () => toast("Todo"),
+      action: handleOpenClick,
       disabled: false,
     },
     {
@@ -122,7 +194,6 @@ export const ControlsBar = ({
       value: globalEdgeType,
       onChange: setGlobalEdgeType,
     },
-
     {
       type: "button",
       id: "controls-undo",
@@ -199,10 +270,23 @@ export const ControlsBar = ({
           );
         })}
       </div>
+      <input
+        type="file"
+        id="open-project-file"
+        ref={fileOpenInput}
+        accept={`.${FILE_EXTENSIONS.PROJECT}`}
+        onChange={handleFileChange}
+        className="hidden"
+      />
       <ExportDialog open={isExportDialogOpen} onOpenChange={setIsExportDialogOpen} />
       <SaveProjectDialog
         isSaveDialogOpen={isSaveDialogOpen}
         setIsSaveDialogOpen={(open) => setIsSaveDialogOpen?.(open)}
+      />
+      <ImportConfirmDialog
+        isOpen={isImportConfirmOpen}
+        onOpenChange={setIsImportConfirmOpen}
+        onConfirm={openProjectFile}
       />
     </>
   );

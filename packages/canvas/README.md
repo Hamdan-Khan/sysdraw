@@ -34,3 +34,4 @@ export default App;
 - [ ] optimize undo/redo history state
 - [ ] configure rolldown code splitting
 - [ ] add error boundary
+- [ ] fix layering (z indexes)
