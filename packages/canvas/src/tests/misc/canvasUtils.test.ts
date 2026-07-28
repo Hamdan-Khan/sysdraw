@@ -6,8 +6,8 @@ import {
   isChildNode,
   isGroup,
   sortNodesAndGroups,
-} from "../components/canvas/utils";
-import { makeGroupNode, makeNode, makeRegularNode } from "./utils/utils";
+} from "../../components/canvas/utils";
+import { makeGroupNode, makeNode, makeRegularNode } from "../utils/utils";
 
 // mock @sysdraw/models so tests aren't coupled to the real registered group list
 vi.mock("@sysdraw/models", async (importOriginal) => {

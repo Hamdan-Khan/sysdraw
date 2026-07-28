@@ -10,8 +10,8 @@ import {
   mockScreenToFlowPosition,
   mockSetEdges,
   mockSetNodes,
-} from "./utils/mocks";
-import { makeStore } from "./utils/utils";
+} from "../utils/mocks";
+import { makeStore } from "../utils/utils";
 
 const createWrapper = (initial: { nodes?: Node[]; edges?: Edge[] } = {}) => {
   const store = makeStore(initial.nodes, initial.edges);

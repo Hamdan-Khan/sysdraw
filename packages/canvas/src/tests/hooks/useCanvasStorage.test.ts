@@ -6,8 +6,8 @@ import { act, renderHook, waitFor } from "@testing-library/react";
 import React, { createElement } from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { StoreApi } from "zustand";
-import { mockSetViewport } from "./utils/mocks";
-import { makeEdge, makeNode, makeStore } from "./utils/utils";
+import { mockSetViewport } from "../utils/mocks";
+import { makeEdge, makeNode, makeStore } from "../utils/utils";
 
 vi.unmock("zustand");
 

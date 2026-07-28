@@ -12,14 +12,14 @@ import {
   mockGetNodes,
   mockSetEdges,
   mockSetNodes,
-} from "./utils/mocks";
+} from "../utils/mocks";
 import {
   makeDragEvent,
   makeEdge,
   makeMouseEvent,
   makeNativeMouseEvent,
   makeNode,
-} from "./utils/utils";
+} from "../utils/utils";
 
 vi.mock("nanoid", () => ({ nanoid: () => "new-id" }));
 
@@ -37,7 +37,7 @@ vi.mock("@/hooks/useHistory", () => ({
 
 vi.mock("zustand", async (importOriginal) => {
   const actual = await importOriginal<typeof import("zustand")>();
-  const { mockSetNodes, mockSetEdges } = await import("./utils/mocks");
+  const { mockSetNodes, mockSetEdges } = await import("../utils/mocks");
   return {
     ...actual,
     useStore: (store: any, selector: any) =>

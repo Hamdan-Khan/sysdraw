@@ -10,7 +10,7 @@ import {
   NODE_WRAPPER_CLASS_ID,
 } from "@sysdraw/common";
 import { describe, expect, it } from "vitest";
-import { EXPORT_CANVAS_GRID_ID } from "../components/export/ExportRenderer";
+import { EXPORT_CANVAS_GRID_ID } from "../../components/export/ExportRenderer";
 
 describe("renderToNativeSvg", () => {
   it("inlines stroke and fill presentation attributes on background grid pattern paths", () => {

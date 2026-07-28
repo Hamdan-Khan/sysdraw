@@ -9,7 +9,7 @@ import { toPng } from "html-to-image";
 import React from "react";
 import { toast } from "sonner";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { makeStore } from "./utils/utils";
+import { makeStore } from "../utils/utils";
 
 vi.mock("html-to-image", () => ({
   toPng: vi.fn(),
