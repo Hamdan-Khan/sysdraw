@@ -26,6 +26,7 @@ export function useShortcuts() {
   const { nodes, edges, setNodes, setEdges, isNodeLocked } = useCanvasStore(useShallow(selector));
 
   const [contextMenu, setContextMenu] = useState<ContextMenuState | null>(null);
+  const [isSaveDialogOpen, setIsSaveDialogOpen] = useState(false);
 
   const closeContextMenu = useCallback(() => setContextMenu(null), []);
 
@@ -91,6 +92,10 @@ export function useShortcuts() {
           e.preventDefault();
           selectAll();
           break;
+        case "s":
+          e.preventDefault();
+          setIsSaveDialogOpen(true);
+          break;
         default:
           break;
       }
@@ -117,5 +122,10 @@ export function useShortcuts() {
     return () => window.removeEventListener("contextmenu", handleContextMenu);
   }, []);
 
-  return { contextMenu, closeContextMenu };
+  return {
+    contextMenu,
+    closeContextMenu,
+    isSaveDialogOpen,
+    setIsSaveDialogOpen,
+  };
 }

@@ -57,7 +57,7 @@ const CanvasElement = () => {
   } = useCanvasHandlers();
 
   // registers keyboard shortcuts and custom context menu
-  const { contextMenu, closeContextMenu } = useShortcuts();
+  const { contextMenu, closeContextMenu, isSaveDialogOpen, setIsSaveDialogOpen } = useShortcuts();
 
   // syncs current canvas to / from localStorage
   useCanvasStorage();
@@ -69,7 +69,10 @@ const CanvasElement = () => {
     <div className="w-screen h-screen bg-bg relative" style={{ width: "100%", height: "100%" }}>
       <DndWrapper wrapperRef={dndWrapperRef} onDrop={onDrop} onDragOver={onDragOver}>
         <Toolbar />
-        <ControlsBar />
+        <ControlsBar
+          isSaveDialogOpen={isSaveDialogOpen}
+          setIsSaveDialogOpen={setIsSaveDialogOpen}
+        />
         <ReactFlow
           nodes={nodes}
           nodeTypes={nodeTypes}

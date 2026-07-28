@@ -22,6 +22,7 @@ import {
 } from "@/hooks/useCanvasExport";
 import { useCanvasStore } from "@/store/CanvasStoreProvider";
 import { CanvasStoreState } from "@/store/store";
+import { FILE_EXTENSIONS } from "@sysdraw/common";
 import { Download, Loader2, Image as LucideImage } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useShallow } from "zustand/shallow";
@@ -41,7 +42,7 @@ export const ExportDialog = ({ open, onOpenChange }: ExportDialogProps) => {
   const { exportOptions, setExportOptions } = useCanvasStore(useShallow(storeSelector));
 
   const [fileName, setFileName] = useState("diagram");
-  const [format, setFormat] = useState<ExportFormat | null>("png");
+  const [format, setFormat] = useState<ExportFormat | null>(FILE_EXTENSIONS.PNG);
   const [dataUrl, setDataUrl] = useState<string | null>(null);
   const [isLoadingPreview, setIsLoadingPreview] = useState(false);
 
@@ -52,7 +53,7 @@ export const ExportDialog = ({ open, onOpenChange }: ExportDialogProps) => {
     }
     setDataUrl(null);
     setIsLoadingPreview(true);
-    captureImage(format ?? "png").then((url) => {
+    captureImage(format ?? FILE_EXTENSIONS.PNG).then((url) => {
       setDataUrl(url);
       setIsLoadingPreview(false);
     });
@@ -73,9 +74,9 @@ export const ExportDialog = ({ open, onOpenChange }: ExportDialogProps) => {
       return;
     }
     const name = fileName.trim();
-    if (format === "png") {
+    if (format === FILE_EXTENSIONS.PNG) {
       exportAsPng(name);
-    } else {
+    } else if (format === FILE_EXTENSIONS.SVG) {
       exportAsSvg(name);
     }
     onOpenChange(false);
@@ -95,6 +96,11 @@ export const ExportDialog = ({ open, onOpenChange }: ExportDialogProps) => {
     { value: 1, label: "1x" },
     { value: 2, label: "2x" },
     { value: 3, label: "3x" },
+  ];
+
+  const formats: { value: ExportFormat; label: string }[] = [
+    { value: FILE_EXTENSIONS.PNG, label: "png" },
+    { value: FILE_EXTENSIONS.SVG, label: "svg" },
   ];
 
   return (
@@ -224,8 +230,11 @@ export const ExportDialog = ({ open, onOpenChange }: ExportDialogProps) => {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="png">png</SelectItem>
-                  <SelectItem value="svg">svg</SelectItem>
+                  {formats.map((f) => (
+                    <SelectItem key={f.value} value={f.value}>
+                      {f.label}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
               <button

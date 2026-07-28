@@ -7,13 +7,15 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 /**
- * downloads an image from a data URL
+ * downloads an image or a file from a data URL
  */
-export const downloadImage = (dataUrl: string, fileName: string, format: ExportFormat) => {
+export const downloadFile = (dataUrl: string, fileName: string, format: ExportFormat) => {
   const a = document.createElement("a");
   a.href = dataUrl;
   a.download = fileName.endsWith(`.${format}`) ? fileName : `${fileName}.${format}`;
   document.body.appendChild(a);
   a.click();
   document.body.removeChild(a);
+
+  URL.revokeObjectURL(dataUrl);
 };

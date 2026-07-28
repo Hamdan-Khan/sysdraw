@@ -1,8 +1,10 @@
 import { ExportReadyPayload, ExportRenderer } from "@/components/export/ExportRenderer";
 import { renderToNativeSvg } from "@/lib/svgExport";
-import { downloadImage } from "@/lib/utils";
+import { downloadFile } from "@/lib/utils";
 import { CanvasStoreContext, useCanvasStore } from "@/store/CanvasStoreProvider";
 import { CanvasStoreState } from "@/store/store";
+import { FILE_EXTENSIONS, PROJECT_VERSION } from "@sysdraw/common";
+import { Edge, Node, useReactFlow, Viewport } from "@xyflow/react";
 import { toPng } from "html-to-image";
 import { useCallback, useContext } from "react";
 import { toast } from "sonner";
@@ -10,7 +12,15 @@ import { useShallow } from "zustand/shallow";
 
 export type ExportBackground = "white" | "transparent";
 export type ExportScale = 1 | 2 | 3;
-export type ExportFormat = "png" | "svg";
+export type ExportFormat = FILE_EXTENSIONS;
+
+/** sysdraw project file schema for export / import */
+export type ProjectFile = {
+  nodes: Node[];
+  edges: Edge[];
+  viewport: Viewport;
+  version: string;
+};
 
 export interface ExportOptions {
   background: ExportBackground;
@@ -46,6 +56,7 @@ const selector = (s: CanvasStoreState) => ({
 export const useCanvasExport = () => {
   const { isExporting } = useCanvasStore(useShallow(selector));
   const storeApi = useContext(CanvasStoreContext)!;
+  const { toObject } = useReactFlow();
 
   /**
    * called by export renderer when it has finished mounting.
@@ -64,7 +75,7 @@ export const useCanvasExport = () => {
    * mounts the renderer, waits for it to signal readiness, then captures and returns a data URL
    */
   const captureImage = useCallback(
-    async (format: ExportFormat = "png"): Promise<string | null> => {
+    async (format: ExportFormat = FILE_EXTENSIONS.PNG): Promise<string | null> => {
       const { setIsExporting, exportOptions: expOptions } = storeApi.getState();
 
       setIsExporting(true);
@@ -85,7 +96,7 @@ export const useCanvasExport = () => {
 
       try {
         let dataUrl: string | null = null;
-        if (format === "png") {
+        if (format === FILE_EXTENSIONS.PNG) {
           dataUrl = await toPng(flowEl, {
             width,
             height,
@@ -96,7 +107,7 @@ export const useCanvasExport = () => {
               height: `${height}px`,
             },
           });
-        } else if (format === "svg") {
+        } else if (format === FILE_EXTENSIONS.SVG) {
           dataUrl = renderToNativeSvg(flowEl, width, height, bgColor);
         }
         return dataUrl;
@@ -114,14 +125,14 @@ export const useCanvasExport = () => {
   /** downloads the diagram as a PNG file */
   const exportAsPng = useCallback(
     async (fileName: string) => {
-      const dataUrl = await captureImage("png");
+      const dataUrl = await captureImage(FILE_EXTENSIONS.PNG);
       if (!dataUrl) {
         toast.error("Failed to export diagram");
         return;
       }
 
       try {
-        downloadImage(dataUrl, fileName, "png");
+        downloadFile(dataUrl, fileName, FILE_EXTENSIONS.PNG);
         toast.success("Diagram exported as png successfully");
       } catch (error) {
         console.error(error);
@@ -134,14 +145,14 @@ export const useCanvasExport = () => {
   /** downloads the diagram as a SVG file */
   const exportAsSvg = useCallback(
     async (fileName: string) => {
-      const dataUrl = await captureImage("svg");
+      const dataUrl = await captureImage(FILE_EXTENSIONS.SVG);
       if (!dataUrl) {
         toast.error("Failed to export diagram");
         return;
       }
 
       try {
-        downloadImage(dataUrl, fileName, "svg");
+        downloadFile(dataUrl, fileName, FILE_EXTENSIONS.SVG);
         toast.success("Diagram exported as svg successfully");
       } catch (error) {
         console.error(error);
@@ -151,10 +162,32 @@ export const useCanvasExport = () => {
     [captureImage],
   );
 
+  const exportAsProject = useCallback(
+    (fileName: string = "diagram") => {
+      try {
+        const flowObj: ProjectFile = {
+          ...toObject(),
+          version: PROJECT_VERSION,
+          // reset viewport
+          viewport: { x: 0, y: 0, zoom: 1 },
+        };
+
+        const blob = new Blob([JSON.stringify(flowObj)], { type: "application/json" });
+        const dataUrl = URL.createObjectURL(blob);
+        downloadFile(dataUrl, fileName, FILE_EXTENSIONS.PROJECT);
+        toast.success("Project saved successfully");
+      } catch (error) {
+        console.error(error);
+        toast.error("Failed to save project");
+      }
+    },
+    [toObject],
+  );
+
   /**
    * mounts the export renderer only while a capture is under way
    */
   const ExportCanvas = isExporting ? <ExportRenderer onReady={onRendererReady} /> : null;
 
-  return { captureImage, exportAsPng, exportAsSvg, ExportCanvas };
+  return { captureImage, exportAsPng, exportAsSvg, exportAsProject, ExportCanvas };
 };

@@ -1,4 +1,5 @@
-import { cn, downloadImage } from "@/lib/utils";
+import { cn, downloadFile } from "@/lib/utils";
+import { FILE_EXTENSIONS } from "@sysdraw/common";
 import { describe, expect, it, vi } from "vitest";
 
 describe("lib/utils", () => {
@@ -10,7 +11,7 @@ describe("lib/utils", () => {
     });
   });
 
-  describe("downloadImage", () => {
+  describe("downloadFile", () => {
     it("creates an anchor element and triggers download", () => {
       const clickSpy = vi.fn();
       const mockAnchor = {
@@ -23,7 +24,7 @@ describe("lib/utils", () => {
       vi.spyOn(document.body, "appendChild").mockImplementation(() => mockAnchor);
       vi.spyOn(document.body, "removeChild").mockImplementation(() => mockAnchor);
 
-      downloadImage("data:image/png;base64,123", "my-canvas", "png");
+      downloadFile("data:image/png;base64,123", "my-canvas", FILE_EXTENSIONS.PNG);
 
       expect(mockAnchor.download).toBe("my-canvas.png");
       expect(clickSpy).toHaveBeenCalled();
@@ -41,7 +42,7 @@ describe("lib/utils", () => {
       vi.spyOn(document.body, "appendChild").mockImplementation(() => mockAnchor);
       vi.spyOn(document.body, "removeChild").mockImplementation(() => mockAnchor);
 
-      downloadImage("data:image/png;base64,123", "my-canvas.png", "png");
+      downloadFile("data:image/png;base64,123", "my-canvas.png", FILE_EXTENSIONS.PNG);
 
       expect(mockAnchor.download).toBe("my-canvas.png");
     });

@@ -1,8 +1,9 @@
 import { ExportReadyPayload } from "@/components/export/ExportRenderer";
 import { DEFAULT_EXPORT_OPTIONS, useCanvasExport } from "@/hooks/useCanvasExport";
 import { renderToNativeSvg } from "@/lib/svgExport";
-import { downloadImage } from "@/lib/utils";
+import { downloadFile } from "@/lib/utils";
 import { CanvasStoreProvider } from "@/store/CanvasStoreProvider";
+import { FILE_EXTENSIONS } from "@sysdraw/common";
 import { renderHook } from "@testing-library/react";
 import { toPng } from "html-to-image";
 import React from "react";
@@ -22,7 +23,7 @@ vi.mock("@/lib/utils", async (importOriginal) => {
   const actual = await importOriginal<typeof import("@/lib/utils")>();
   return {
     ...actual,
-    downloadImage: vi.fn(),
+    downloadFile: vi.fn(),
   };
 });
 
@@ -124,7 +125,7 @@ describe("useCanvasExport", () => {
       const mockDataUrl = "data:image/png;base64,transparentpng";
       vi.mocked(toPng).mockResolvedValue(mockDataUrl);
 
-      const capturePromise = result.current.captureImage("png");
+      const capturePromise = result.current.captureImage(FILE_EXTENSIONS.PNG);
 
       store.setState({ isExporting: true });
       const { result: activeResult } = renderHook(() => useCanvasExport(), {
@@ -162,7 +163,7 @@ describe("useCanvasExport", () => {
       const mockSvgData = "data:image/svg+xml;utf8,<svg></svg>";
       vi.mocked(renderToNativeSvg).mockReturnValue(mockSvgData);
 
-      const capturePromise = result.current.captureImage("svg");
+      const capturePromise = result.current.captureImage(FILE_EXTENSIONS.SVG);
 
       store.setState({ isExporting: true });
       const { result: activeResult } = renderHook(() => useCanvasExport(), {
@@ -191,7 +192,7 @@ describe("useCanvasExport", () => {
       const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
       vi.mocked(toPng).mockRejectedValue(new Error("toPng failure"));
 
-      const capturePromise = result.current.captureImage("png");
+      const capturePromise = result.current.captureImage(FILE_EXTENSIONS.PNG);
 
       store.setState({ isExporting: true });
       const { result: activeResult } = renderHook(() => useCanvasExport(), {
@@ -238,7 +239,7 @@ describe("useCanvasExport", () => {
 
       await exportPromise;
 
-      expect(downloadImage).toHaveBeenCalledWith(mockDataUrl, "architecture.png", "png");
+      expect(downloadFile).toHaveBeenCalledWith(mockDataUrl, "architecture.png", "png");
       expect(toast.success).toHaveBeenCalledWith("Diagram exported as png successfully");
       expect(store.getState().isExporting).toBe(false);
     });
@@ -269,7 +270,7 @@ describe("useCanvasExport", () => {
 
       expect(toast.error).toHaveBeenCalledWith("Failed to capture diagram");
       expect(toast.error).toHaveBeenCalledWith("Failed to export diagram");
-      expect(downloadImage).not.toHaveBeenCalled();
+      expect(downloadFile).not.toHaveBeenCalled();
       consoleSpy.mockRestore();
     });
 
@@ -282,7 +283,7 @@ describe("useCanvasExport", () => {
       const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
       const mockDataUrl = "data:image/png;base64,pngdata";
       vi.mocked(toPng).mockResolvedValue(mockDataUrl);
-      vi.mocked(downloadImage).mockImplementation(() => {
+      vi.mocked(downloadFile).mockImplementation(() => {
         throw new Error("Download error");
       });
 
@@ -331,7 +332,7 @@ describe("useCanvasExport", () => {
 
       await exportPromise;
 
-      expect(downloadImage).toHaveBeenCalledWith(mockSvgData, "architecture.svg", "svg");
+      expect(downloadFile).toHaveBeenCalledWith(mockSvgData, "architecture.svg", "svg");
       expect(toast.success).toHaveBeenCalledWith("Diagram exported as svg successfully");
       expect(store.getState().isExporting).toBe(false);
     });
@@ -345,7 +346,7 @@ describe("useCanvasExport", () => {
       const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
       const mockSvgData = "data:image/svg+xml;utf8,<svg></svg>";
       vi.mocked(renderToNativeSvg).mockReturnValue(mockSvgData);
-      vi.mocked(downloadImage).mockImplementation(() => {
+      vi.mocked(downloadFile).mockImplementation(() => {
         throw new Error("Download error");
       });
 
@@ -366,6 +367,24 @@ describe("useCanvasExport", () => {
 
       expect(toast.error).toHaveBeenCalledWith("Failed to export diagram");
       consoleSpy.mockRestore();
+    });
+  });
+
+  describe("exportAsProject", () => {
+    it("saves project file and displays success toast", () => {
+      const store = makeStore();
+      const { result } = renderHook(() => useCanvasExport(), {
+        wrapper: createWrapper(store),
+      });
+
+      result.current.exportAsProject("my-project");
+
+      expect(downloadFile).toHaveBeenCalledWith(
+        expect.any(String),
+        "my-project",
+        FILE_EXTENSIONS.PROJECT,
+      );
+      expect(toast.success).toHaveBeenCalledWith("Project saved successfully");
     });
   });
 });

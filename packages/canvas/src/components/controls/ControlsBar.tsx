@@ -7,11 +7,21 @@ import { useCanvasStore } from "@/store/CanvasStoreProvider";
 import { CanvasStoreState } from "@/store/store";
 import { RegisteredEdges } from "@sysdraw/models";
 import { useReactFlow } from "@xyflow/react";
-import { ExternalLink, FolderOpen, Lock, Maximize, Redo, Undo, Unlock } from "lucide-react";
+import {
+  Download,
+  ExternalLink,
+  FolderOpen,
+  Lock,
+  Maximize,
+  Redo,
+  Undo,
+  Unlock,
+} from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { useShallow } from "zustand/shallow";
 import { ExportDialog } from "./ExportDialog";
+import { SaveProjectDialog } from "./SaveProjectDialog";
 
 const selector = (s: CanvasStoreState) => ({
   isInteractive: s.isInteractive,
@@ -45,7 +55,15 @@ type DropdownControlItem<T extends string = string> = {
 
 type ControlItem = ButtonControlItem | DropdownControlItem<RegisteredEdges>;
 
-export const ControlsBar = () => {
+interface ControlsBarProps {
+  isSaveDialogOpen?: boolean;
+  setIsSaveDialogOpen?: (open: boolean) => void;
+}
+
+export const ControlsBar = ({
+  isSaveDialogOpen = false,
+  setIsSaveDialogOpen,
+}: ControlsBarProps) => {
   const [isExportDialogOpen, setIsExportDialogOpen] = useState(false);
   const { undo, redo, canUndo, canRedo } = useHistory();
   const { fitView } = useReactFlow();
@@ -64,11 +82,36 @@ export const ControlsBar = () => {
   const items: ControlItem[] = [
     {
       type: "button",
+      id: "controls-open",
+      icon: FolderOpen,
+      label: "Open",
+      action: () => toast("Todo"),
+      disabled: false,
+    },
+    {
+      type: "button",
+      id: "controls-save",
+      icon: Download,
+      label: "Save Project",
+      action: () => setIsSaveDialogOpen?.(true),
+      disabled: false,
+    },
+    {
+      type: "button",
+      id: "controls-export",
+      icon: ExternalLink,
+      label: "Export as Image",
+      action: () => setIsExportDialogOpen(true),
+      disabled: false,
+    },
+    {
+      type: "button",
       id: "controls-toggle-interactivity",
       icon: isInteractive ? Unlock : Lock,
       label: isInteractive ? "Lock Canvas" : "Unlock Canvas",
       action: handleToggleInteractivity,
       disabled: false,
+      dividerBefore: true,
       active: !isInteractive,
     },
     {
@@ -104,23 +147,6 @@ export const ControlsBar = () => {
       action: () => fitView({ padding: 0.1, duration: 300 }),
       disabled: false,
     },
-    {
-      type: "button",
-      id: "controls-export",
-      icon: ExternalLink,
-      label: "Export",
-      action: () => setIsExportDialogOpen(true),
-      disabled: false,
-      dividerBefore: true,
-    },
-    {
-      type: "button",
-      id: "controls-open",
-      icon: FolderOpen,
-      label: "Open",
-      action: () => toast("Todo"),
-      disabled: false,
-    },
   ];
 
   return (
@@ -134,7 +160,7 @@ export const ControlsBar = () => {
 
           return (
             <div key={item.id} className="flex items-center">
-              {isDividerBefore && <div className="w-px h-6 bg-border mx-1" />}
+              {isDividerBefore && <div className="w-0.5 h-8 bg-border mx-1" />}
 
               {item.type === "button" ? (
                 <div className="relative flex items-center justify-center group">
@@ -174,6 +200,10 @@ export const ControlsBar = () => {
         })}
       </div>
       <ExportDialog open={isExportDialogOpen} onOpenChange={setIsExportDialogOpen} />
+      <SaveProjectDialog
+        isSaveDialogOpen={isSaveDialogOpen}
+        setIsSaveDialogOpen={(open) => setIsSaveDialogOpen?.(open)}
+      />
     </>
   );
 };
