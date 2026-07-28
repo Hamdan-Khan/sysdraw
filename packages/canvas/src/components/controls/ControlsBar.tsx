@@ -13,17 +13,19 @@ import {
   Download,
   ExternalLink,
   FolderOpen,
+  Grid2x2,
   Lock,
   Maximize,
   Redo,
+  Trash2,
   Undo,
   Unlock,
 } from "lucide-react";
 import { useRef, useState } from "react";
 import { toast } from "sonner";
 import { useShallow } from "zustand/shallow";
+import { ConfirmDialog } from "./ConfirmDialog";
 import { ExportDialog } from "./ExportDialog";
-import { ImportConfirmDialog } from "./ImportConfirmDialog";
 import { SaveProjectDialog } from "./SaveProjectDialog";
 
 const selector = (s: CanvasStoreState) => ({
@@ -35,6 +37,8 @@ const selector = (s: CanvasStoreState) => ({
   setGlobalEdgeType: s.setGlobalEdgeType,
   setEdges: s.setEdges,
   setNodes: s.setNodes,
+  grid: s.grid,
+  setGrid: s.setGrid,
 });
 
 type ButtonControlItem = {
@@ -71,7 +75,9 @@ export const ControlsBar = ({
 }: ControlsBarProps) => {
   const [isExportDialogOpen, setIsExportDialogOpen] = useState(false);
   const [isImportConfirmOpen, setIsImportConfirmOpen] = useState(false);
-  const { undo, redo, canUndo, canRedo } = useHistory();
+  const [isClearConfirmOpen, setIsClearConfirmOpen] = useState(false);
+
+  const { undo, redo, canUndo, canRedo, commit } = useHistory();
   const { fitView, setViewport } = useReactFlow();
   const {
     nodes,
@@ -82,6 +88,8 @@ export const ControlsBar = ({
     setGlobalEdgeType,
     setNodes,
     setEdges,
+    grid,
+    setGrid,
   } = useCanvasStore(useShallow(selector));
 
   const handleToggleInteractivity = () => {
@@ -109,6 +117,13 @@ export const ControlsBar = ({
     } else {
       openProjectFile();
     }
+  };
+
+  const handleClearCanvas = () => {
+    commit();
+    setNodes([]);
+    setEdges([]);
+    toast.success("Canvas cleared");
   };
 
   const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -151,6 +166,8 @@ export const ControlsBar = ({
     }
   };
 
+  const hasContent = nodes.length > 0 || edges.length > 0;
+
   const items: ControlItem[] = [
     {
       type: "button",
@@ -178,6 +195,14 @@ export const ControlsBar = ({
     },
     {
       type: "button",
+      id: "controls-clear",
+      icon: Trash2,
+      label: "Clear Canvas",
+      action: () => setIsClearConfirmOpen(true),
+      disabled: !hasContent,
+    },
+    {
+      type: "button",
       id: "controls-toggle-interactivity",
       icon: isInteractive ? Unlock : Lock,
       label: isInteractive ? "Lock Canvas" : "Unlock Canvas",
@@ -185,6 +210,15 @@ export const ControlsBar = ({
       disabled: false,
       dividerBefore: true,
       active: !isInteractive,
+    },
+    {
+      type: "button",
+      id: "controls-toggle-grid",
+      icon: Grid2x2,
+      label: grid ? "Hide Grid" : "Show Grid",
+      action: () => setGrid(!grid),
+      disabled: false,
+      active: grid,
     },
     {
       type: "dropdown",
@@ -201,6 +235,7 @@ export const ControlsBar = ({
       label: "Undo",
       action: () => undo(),
       disabled: !canUndo,
+      dividerBefore: true,
     },
     {
       type: "button",
@@ -283,10 +318,24 @@ export const ControlsBar = ({
         isSaveDialogOpen={isSaveDialogOpen}
         setIsSaveDialogOpen={(open) => setIsSaveDialogOpen?.(open)}
       />
-      <ImportConfirmDialog
+      <ConfirmDialog
         isOpen={isImportConfirmOpen}
         onOpenChange={setIsImportConfirmOpen}
         onConfirm={openProjectFile}
+        title="Import Project"
+        description="Importing a project file will replace your current canvas. Any unsaved progress will be lost. Are you sure you want to proceed?"
+        confirmText="Confirm & Open"
+        icon={FolderOpen}
+      />
+      <ConfirmDialog
+        isOpen={isClearConfirmOpen}
+        onOpenChange={setIsClearConfirmOpen}
+        onConfirm={handleClearCanvas}
+        title="Clear Canvas"
+        description="Are you sure you want to clear the canvas?"
+        confirmText="Clear Canvas"
+        icon={Trash2}
+        variant="destructive"
       />
     </>
   );
