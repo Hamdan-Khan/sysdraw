@@ -9,11 +9,23 @@ const ARROW_ROTATION: Record<Position, number> = {
   [Position.Left]: 180,
 };
 
-export const CustomHandle = memo(({ position, ...props }: HandleProps) => {
+/**
+ * for some reason, dots are rendered a bit far from the edge if we center it (50% 50%)
+ * on the handle, so we adjust the position using offsets
+ */
+const DOT_POSITION: Record<Position, { top: string; left: string }> = {
+  [Position.Top]: { top: "30%", left: "50%" },
+  [Position.Right]: { top: "50%", left: "70%" },
+  [Position.Bottom]: { top: "70%", left: "50%" },
+  [Position.Left]: { top: "50%", left: "30%" },
+};
+
+export const CustomHandle = memo(({ position = Position.Top, ...props }: HandleProps) => {
   const { zoom } = useViewport();
   const [isHovered, setIsHovered] = useState(false);
   const connections = useNodeConnections({ handleType: props.type, handleId: props.id! });
   const isConnected = connections.length > 0;
+  const { top, left } = DOT_POSITION[position];
 
   return (
     <Handle
@@ -32,9 +44,9 @@ export const CustomHandle = memo(({ position, ...props }: HandleProps) => {
           viewBox="0 0 6 6"
           style={{
             position: "absolute",
-            top: "50%",
-            left: "50%",
-            transform: `scale(${2 / (zoom + 0.6)}) translate(-50%, -50%)`,
+            top,
+            left,
+            transform: `translate(-50%, -50%) scale(${2 / (zoom + 0.6)})`,
             pointerEvents: "none",
             opacity: isHovered ? 0 : 1,
             transition: "opacity 0.15s ease",
