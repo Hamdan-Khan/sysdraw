@@ -122,6 +122,11 @@ export const CanvasContextMenu = ({ contextMenu, closeContextMenu }: CanvasConte
 
   const { x, y } = contextMenu;
 
+  const getMarkerType = (markerEnd?: Edge["markerEnd"]): string | null => {
+    if (!markerEnd) return null;
+    return typeof markerEnd === "string" ? markerEnd : markerEnd.type;
+  };
+
   const arrowOptions = [
     { label: "None", value: undefined, typeStr: null },
     {
@@ -188,8 +193,8 @@ export const CanvasContextMenu = ({ contextMenu, closeContextMenu }: CanvasConte
       submenu: arrowOptions.map((opt) => {
         const isChecked =
           selectedEdges.length > 0
-            ? selectedEdges.every((e) => e.markerEnd === opt.typeStr)
-            : globalEdgeMarkerEnd === opt.typeStr;
+            ? selectedEdges.every((e) => getMarkerType(e.markerEnd) === opt.typeStr)
+            : getMarkerType(globalEdgeMarkerEnd) === opt.typeStr;
 
         return {
           label: opt.label,

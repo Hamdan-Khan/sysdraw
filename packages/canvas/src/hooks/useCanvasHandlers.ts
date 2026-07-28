@@ -13,7 +13,7 @@ import { SYSDRAW_DRAG_DATA_FORMAT } from "@/components/toolbar/Toolbar";
 import { useCanvasStore } from "@/store/CanvasStoreProvider";
 import { CanvasStoreState } from "@/store/store";
 import { NODE_WRAPPER_CLASS_ID } from "@sysdraw/common";
-import { useLibraryRegistryStore } from "@sysdraw/models";
+import { LibraryNode, useLibraryRegistryStore } from "@sysdraw/models";
 import {
   addEdge,
   Edge,
@@ -25,7 +25,7 @@ import {
   type OnConnect,
 } from "@xyflow/react";
 import { nanoid } from "nanoid";
-import { useCallback } from "react";
+import { useCallback, useRef } from "react";
 import { toast } from "sonner";
 import { useShallow } from "zustand/shallow";
 import { useHistory } from "./useHistory";
@@ -44,6 +44,25 @@ const selector = (state: CanvasStoreState) => ({
 const MIN_OVERLAPPING_AREA = 0.25;
 
 type CandidateGroupNode = { group: Node; groupRect: NodeRect; ratio: number };
+
+/**
+ * creates node data object from library node definition
+ */
+const createNodeData = (kind: "node" | "group", nodeDef: LibraryNode) => {
+  return kind === "node"
+    ? {
+        kind,
+        label: nodeDef.label,
+        description: nodeDef.description,
+        icon: nodeDef.icon,
+        handles: defaultHandles,
+      }
+    : {
+        kind,
+        label: nodeDef.label,
+        description: nodeDef.description,
+      };
+};
 
 /**
  * event handlers for the canvas (drag, drop, re-parenting, etc.)
@@ -75,6 +94,10 @@ export const useCanvasHandlers = () => {
     },
     [commit, setEdges, globalEdgeType, globalEdgeAnimated, globalEdgeMarkerEnd],
   );
+
+  // last added node key and repeat offset count for adding nodes from toolbar via click
+  const lastAddedNodeKeyRef = useRef<string | null>(null);
+  const toolbarAddOffsetRef = useRef(0);
 
   /**
    * drag over (from toolbar)
@@ -112,20 +135,7 @@ export const useCanvasHandlers = () => {
         return;
       }
 
-      const nodeData =
-        kind === "node"
-          ? {
-              kind,
-              label: nodeDef.label,
-              description: nodeDef.description,
-              icon: nodeDef.icon,
-              handles: defaultHandles,
-            }
-          : {
-              kind,
-              label: nodeDef.label,
-              description: nodeDef.description,
-            };
+      const nodeData = createNodeData(kind, nodeDef);
 
       const newNode: Node = {
         id: nanoid(),
@@ -146,6 +156,65 @@ export const useCanvasHandlers = () => {
       });
     },
     [screenToFlowPosition, setNodes, commit, loadedLibs],
+  );
+
+  /**
+   * adds a node or group at the center of the canvas viewport
+   */
+  const addNodeAtCenter = useCallback(
+    (data: DnDTransferData) => {
+      const { kind, id } = data;
+      const currentKey = `${kind}:${id}`;
+
+      if (lastAddedNodeKeyRef.current === currentKey) {
+        toolbarAddOffsetRef.current += 1;
+      } else {
+        lastAddedNodeKeyRef.current = currentKey;
+        toolbarAddOffsetRef.current = 0;
+      }
+
+      const centerScreen = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
+      const flowPos = screenToFlowPosition(centerScreen);
+
+      const defaultWidth = kind === "group" ? 400 : 48;
+      const defaultHeight = kind === "group" ? 300 : 48;
+
+      const offset = toolbarAddOffsetRef.current * 20;
+      const position = {
+        x: flowPos.x - defaultWidth / 2 + offset,
+        y: flowPos.y - defaultHeight / 2 + offset,
+      };
+
+      const allLibNodes = Object.values(loadedLibs || {}).flatMap((lib) => lib.nodes || []);
+      const nodeDef = allLibNodes.find((n) => n.id === id);
+
+      if (!nodeDef) {
+        console.error(`Node definition for "${id}" not found in loaded libraries.`);
+        return;
+      }
+
+      const nodeData = createNodeData(kind, nodeDef);
+
+      const newNode: Node = {
+        id: nanoid(),
+        type: id,
+        position,
+        data: nodeData,
+        className: NODE_WRAPPER_CLASS_ID,
+        selected: true,
+      };
+
+      commit();
+      setNodes((prev) => {
+        const deselected = prev.map((n) => (n.selected ? { ...n, selected: false } : n));
+        if (isGroup(newNode)) {
+          return [newNode, ...deselected];
+        }
+        return [...deselected, newNode];
+      });
+      setEdges((prev) => prev.map((e) => (e.selected ? { ...e, selected: false } : e)));
+    },
+    [screenToFlowPosition, loadedLibs, commit, setNodes, setEdges],
   );
 
   /**
@@ -430,6 +499,7 @@ export const useCanvasHandlers = () => {
   return {
     onDragOver,
     onDrop,
+    addNodeAtCenter,
     onConnect,
     onNodeDragStart,
     onNodeDrag,

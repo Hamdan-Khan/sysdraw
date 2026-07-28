@@ -1,6 +1,7 @@
 import type { DnDTransferData } from "@/components/canvas/types";
 import { Divider } from "@/components/common/Divider";
 import { Tooltip } from "@/components/common/Tooltip";
+import { useCanvasHandlers } from "@/hooks/useCanvasHandlers";
 import { useCanvasStore } from "@/store/CanvasStoreProvider";
 import { CanvasStoreState } from "@/store/store";
 import { useLibraryRegistryStore } from "@sysdraw/models";
@@ -19,6 +20,7 @@ const selector = (state: CanvasStoreState) => ({
 export const Toolbar = () => {
   const { isInteractive } = useCanvasStore(useShallow(selector));
   const { loadedLibs } = useLibraryRegistryStore(useShallow((s) => ({ loadedLibs: s.loadedLibs })));
+  const { addNodeAtCenter } = useCanvasHandlers();
 
   const { nodes, groups } = useMemo(() => {
     const all = Object.values(loadedLibs)
@@ -42,6 +44,17 @@ export const Toolbar = () => {
     event.dataTransfer.effectAllowed = "move";
   }
 
+  /**
+   * Handler for when a node or group is clicked in the toolbar
+   */
+  function handleClick(data: DnDTransferData) {
+    if (!isInteractive) {
+      toast.error("Please unlock the canvas to add nodes and groups.");
+      return;
+    }
+    addNodeAtCenter(data);
+  }
+
   return (
     <div
       data-no-context-menu
@@ -59,6 +72,7 @@ export const Toolbar = () => {
               key={id}
               draggable
               onDragStart={(e) => onDragStart(e, { kind: "node", id })}
+              onClick={() => handleClick({ kind: "node", id })}
               className="group relative px-3 py-2 bg-bg border border-border rounded text-sm cursor-grab active:cursor-grabbing text-text text-center font-extrabold flex items-center justify-center hover:bg-surface/50 transition-colors"
             >
               <LibraryIcon icon={icon} size={24} />
@@ -79,6 +93,7 @@ export const Toolbar = () => {
               key={id}
               draggable
               onDragStart={(e) => onDragStart(e, { kind: "group", id })}
+              onClick={() => handleClick({ kind: "group", id })}
               className="group relative px-3 py-2 bg-bg border border-dashed border-secondary rounded text-sm cursor-grab active:cursor-grabbing text-text text-center font-medium flex items-center justify-center gap-2 hover:bg-surface/50 transition-colors"
             >
               {icon && <LibraryIcon icon={icon} size={20} />}

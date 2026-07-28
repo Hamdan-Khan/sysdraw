@@ -115,6 +115,39 @@ describe("useCanvasHandlers", () => {
     });
   });
 
+  describe("addNodeAtCenter", () => {
+    it("places node at center and increments offset for same node, resetting for different node", () => {
+      const { result } = renderHook(() => useCanvasHandlers(), { wrapper: createWrapper() });
+
+      // first click: database node (offset 0)
+      act(() => result.current.addNodeAtCenter({ kind: "node", id: "database" }));
+      expect(mockSetNodes).toHaveBeenCalledTimes(1);
+      let updated = mockSetNodes.mock.calls[0][0]([]);
+      const firstPos = updated[0].position;
+      expect(updated[0].selected).toBe(true);
+
+      mockSetNodes.mockClear();
+
+      // second click: same database node (offset +20)
+      act(() => result.current.addNodeAtCenter({ kind: "node", id: "database" }));
+      expect(mockSetNodes).toHaveBeenCalledTimes(1);
+      updated = mockSetNodes.mock.calls[0][0]([]);
+      const secondPos = updated[0].position;
+      expect(secondPos.x).toBe(firstPos.x + 20);
+      expect(secondPos.y).toBe(firstPos.y + 20);
+
+      mockSetNodes.mockClear();
+
+      // third click: different node type "availability-zone" (resets offset to 0)
+      act(() => result.current.addNodeAtCenter({ kind: "group", id: "availability-zone" }));
+      expect(mockSetNodes).toHaveBeenCalledTimes(1);
+      updated = mockSetNodes.mock.calls[0][0]([]);
+      const thirdPos = updated[0].position;
+      // third pos for group should use 0 offset step from group center
+      expect(thirdPos.x).not.toBe(secondPos.x + 20);
+    });
+  });
+
   describe("onNodeDragStart", () => {
     it("commites the history", () => {
       const { result } = renderHook(() => useCanvasHandlers(), { wrapper: createWrapper() });
