@@ -1,8 +1,8 @@
+import { EdgePropsType } from "@/components/canvas/types";
+import { DropdownOption } from "@/components/common/Dropdown";
 import { RegisteredEdges } from "@sysdraw/models";
 import { EdgeTypes } from "@xyflow/react";
 import { CornerDownRight, LucideIcon, Route, Slash, Spline } from "lucide-react";
-import { EdgePropsType } from "../canvas";
-import { DropdownOption } from "../common";
 import { EdgeWrapper } from "./EdgeWrapper";
 
 export type EdgeTypeMetadata = {

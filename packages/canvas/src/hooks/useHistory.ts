@@ -1,5 +1,6 @@
+import { useCanvasStore } from "@/store/CanvasStoreProvider";
+import { CanvasStoreState } from "@/store/store";
 import { useShallow } from "zustand/shallow";
-import { CanvasStoreState, useCanvasStore } from "../store";
 
 const selector = (state: CanvasStoreState) => ({
   history: state.history,

@@ -1,12 +1,15 @@
+import { useCanvasStore } from "@/store/CanvasStoreProvider";
+import { CanvasStoreState } from "@/store/store";
 import { Background, BackgroundVariant, useViewport } from "@xyflow/react";
 import { useShallow } from "zustand/shallow";
-import { CanvasStoreState, useCanvasStore } from "../../store";
+
+export const CANVAS_GRID_BG_COLOR = "rgba(150, 150, 150, 0.3)";
 
 const selector = (state: CanvasStoreState) => ({
   grid: state.grid,
 });
 
-export const CanvasGrid = () => {
+export const CanvasGrid = ({ id }: { id: string }) => {
   const { grid } = useCanvasStore(useShallow(selector));
   const { zoom } = useViewport();
 
@@ -18,7 +21,7 @@ export const CanvasGrid = () => {
     <>
       {/* minor lines */}
       <Background
-        id="minor-grid-lines"
+        id={`${id}-minor-grid-lines`}
         gap={10}
         variant={BackgroundVariant.Lines}
         // farthest zoom value is 0.5, and we want to hide the minor grids at that zoom level
@@ -27,10 +30,10 @@ export const CanvasGrid = () => {
       />
       {/* major lines */}
       <Background
-        id="major-grid-lines"
+        id={`${id}-major-grid-lines`}
         gap={50}
         variant={BackgroundVariant.Lines}
-        color="rgba(150, 150, 150, 0.3)"
+        color={CANVAS_GRID_BG_COLOR}
         lineWidth={1}
       />
     </>

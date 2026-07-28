@@ -1,3 +1,4 @@
+import { EDGE_LABEL_CLASS_ID, EDGE_PATH_CLASS_ID } from "@sysdraw/common";
 import { RegisteredEdges } from "@sysdraw/models";
 import {
   BaseEdge,
@@ -86,6 +87,7 @@ export const EdgeWrapper = ({
         markerEnd={markerEnd}
         markerStart={markerStart}
         style={edgeStyle}
+        className={EDGE_PATH_CLASS_ID}
       />
       {label && (
         <EdgeLabelRenderer>
@@ -95,8 +97,9 @@ export const EdgeWrapper = ({
               transform: `translate(-50%, -50%) translate(${labelX}px, ${labelY}px)`,
               transformOrigin: "center center",
               pointerEvents: "all",
+              zIndex: 1001,
             }}
-            className="nodrag nopan px-2 py-0.5 rounded bg-white text-primary text-xs font-medium whitespace-nowrap cursor-pointer select-none"
+            className={`nodrag nopan px-2 py-0.5 rounded bg-white text-primary text-xs font-medium whitespace-nowrap cursor-pointer select-none ${EDGE_LABEL_CLASS_ID}`}
             onClick={handleLabelClick}
           >
             {label}
@@ -155,7 +158,7 @@ const EdgeOptionBarContainer = ({
           // counter-scale by 1/zoom so the bar stays the same visual size at any zoom level
           transform: `translate(-50%, -50%) translate(${labelX}px,${labelY}px) scale(${1 / zoom})`,
           pointerEvents: "all",
-          zIndex: 1000,
+          zIndex: 1002,
         }}
         className="nodrag nopan"
       >

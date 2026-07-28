@@ -1,7 +1,8 @@
+import { ContextMenuState } from "@/components/context-menu/types";
+import { useCanvasStore } from "@/store/CanvasStoreProvider";
+import { CanvasStoreState } from "@/store/store";
 import { useCallback, useEffect, useState } from "react";
-import { ContextMenuState } from "src/components/context-menu/types";
 import { useShallow } from "zustand/shallow";
-import { CanvasStoreState, useCanvasStore } from "../store";
 import { useCopyPaste } from "./useCopyPaste";
 import { useHistory } from "./useHistory";
 
@@ -25,6 +26,7 @@ export function useShortcuts() {
   const { nodes, edges, setNodes, setEdges, isNodeLocked } = useCanvasStore(useShallow(selector));
 
   const [contextMenu, setContextMenu] = useState<ContextMenuState | null>(null);
+  const [isSaveDialogOpen, setIsSaveDialogOpen] = useState(false);
 
   const closeContextMenu = useCallback(() => setContextMenu(null), []);
 
@@ -90,6 +92,10 @@ export function useShortcuts() {
           e.preventDefault();
           selectAll();
           break;
+        case "s":
+          e.preventDefault();
+          setIsSaveDialogOpen(true);
+          break;
         default:
           break;
       }
@@ -102,9 +108,11 @@ export function useShortcuts() {
   // right-click context menu
   useEffect(() => {
     const handleContextMenu = (e: MouseEvent) => {
-      // only open on the canvas pane itself, not on overlaying UI controls
+      // only open on the canvas pane itself, not on overlaying UI controls or non react-flow elements
       const target = e.target as HTMLElement;
-      if (target.closest("[data-no-context-menu]")) return;
+      if (!target.closest(".react-flow") || target.closest("[data-no-context-menu]")) {
+        return;
+      }
 
       e.preventDefault();
       setContextMenu({ x: e.clientX, y: e.clientY });
@@ -114,5 +122,10 @@ export function useShortcuts() {
     return () => window.removeEventListener("contextmenu", handleContextMenu);
   }, []);
 
-  return { contextMenu, closeContextMenu };
+  return {
+    contextMenu,
+    closeContextMenu,
+    isSaveDialogOpen,
+    setIsSaveDialogOpen,
+  };
 }

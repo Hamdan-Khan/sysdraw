@@ -28,9 +28,9 @@ export default App;
 - [ ] dropping a node from sidebar on a group should reparent it
 - [x] add labels on edges
 - [x] fix multi nodes on ctrl+v paste
-- [ ] remove barrel imports for components
+- [x] remove barrel imports for components
 - [ ] add edges arrow head option in the option bar
-- [ ] export as png, svg and .sysdraw
+- [x] export as png, svg and .sysdraw
 - [ ] optimize undo/redo history state
 - [ ] configure rolldown code splitting
 - [ ] add error boundary

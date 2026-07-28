@@ -1,11 +1,12 @@
+import { Dropdown } from "@/components/common/Dropdown";
+import { Tooltip } from "@/components/common/Tooltip";
+import { useHistory } from "@/hooks/useHistory";
 import { RegisteredEdges } from "@sysdraw/models";
 import { Edge, MarkerType, useReactFlow } from "@xyflow/react";
 import debounce from "lodash-es/debounce";
 import { ArrowRight, Trash2, Type, Zap } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
-import { useHistory } from "../../hooks";
-import { Dropdown, Tooltip } from "../common";
 import { edgeTypeOptions } from "./EdgeTypes";
 
 interface EdgeOptionBarProps {

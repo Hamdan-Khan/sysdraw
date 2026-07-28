@@ -1,9 +1,10 @@
+import { useCanvasStore } from "@/store/CanvasStoreProvider";
+import { CanvasStoreState } from "@/store/store";
 import { useLibraryRegistry } from "@sysdraw/models";
 import { Edge, Node, ReactFlowJsonObject, useReactFlow } from "@xyflow/react";
 import { useCallback, useEffect, useRef } from "react";
 import { toast } from "sonner";
 import { useShallow } from "zustand/shallow";
-import { CanvasStoreState, useCanvasStore } from "../store";
 
 const selector = (state: CanvasStoreState) => ({
   nodes: state.nodes,

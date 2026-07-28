@@ -1,4 +1,18 @@
-import { defaultHandles } from "@/components";
+import type { DnDTransferData } from "@/components/canvas/types";
+import {
+  clampPositionInsideGroup,
+  getIntersectingArea,
+  getNodeRect,
+  isChildNode,
+  isGroup,
+  NodeRect,
+  sortNodesAndGroups,
+} from "@/components/canvas/utils";
+import { defaultHandles } from "@/components/nodes/createNodeTypes";
+import { SYSDRAW_DRAG_DATA_FORMAT } from "@/components/toolbar/Toolbar";
+import { useCanvasStore } from "@/store/CanvasStoreProvider";
+import { CanvasStoreState } from "@/store/store";
+import { NODE_WRAPPER_CLASS_ID } from "@sysdraw/common";
 import { useLibraryRegistryStore } from "@sysdraw/models";
 import {
   addEdge,
@@ -14,18 +28,6 @@ import { nanoid } from "nanoid";
 import { useCallback } from "react";
 import { toast } from "sonner";
 import { useShallow } from "zustand/shallow";
-import {
-  clampPositionInsideGroup,
-  DnDTransferData,
-  getIntersectingArea,
-  getNodeRect,
-  isChildNode,
-  isGroup,
-  NodeRect,
-  sortNodesAndGroups,
-} from "../components/canvas";
-import { SYSDRAW_DRAG_DATA_FORMAT } from "../components/toolbar";
-import { CanvasStoreState, useCanvasStore } from "../store";
 import { useHistory } from "./useHistory";
 
 const selector = (state: CanvasStoreState) => ({
@@ -125,7 +127,13 @@ export const useCanvasHandlers = () => {
               description: nodeDef.description,
             };
 
-      const newNode: Node = { id: nanoid(), type: id, position, data: nodeData };
+      const newNode: Node = {
+        id: nanoid(),
+        type: id,
+        position,
+        data: nodeData,
+        className: NODE_WRAPPER_CLASS_ID,
+      };
 
       commit();
       setNodes((prev) => {
@@ -277,11 +285,11 @@ export const useCanvasHandlers = () => {
           if (n.id === best?.group.id) {
             return {
               ...n,
-              className: "ring-2 ring-primary bg-primary/5 rounded-xl transition-all",
+              className: `${NODE_WRAPPER_CLASS_ID} ring-2 ring-primary bg-primary/5 rounded-xl transition-all`,
             };
           }
           if (n.className?.includes("ring-2")) {
-            return { ...n, className: "" };
+            return { ...n, className: NODE_WRAPPER_CLASS_ID };
           }
           return n;
         }),
@@ -316,7 +324,7 @@ export const useCanvasHandlers = () => {
         setNodes((ns) => {
           const updatedNodes = ns.map((n) => {
             // Clear the drop-target highlight ring.
-            if (n.id === dropTarget.id) return { ...n, className: "" };
+            if (n.id === dropTarget.id) return { ...n, className: NODE_WRAPPER_CLASS_ID };
 
             // Only touch nodes that are part of the current drag selection.
             if (!draggedNodeIds.has(n.id)) return n;
@@ -342,7 +350,7 @@ export const useCanvasHandlers = () => {
         // then restore its absolute position and clean up any highlight rings.
         setNodes((ns) =>
           ns.map((n) => {
-            if (n.className?.includes("ring-2")) return { ...n, className: "" };
+            if (n.className?.includes("ring-2")) return { ...n, className: NODE_WRAPPER_CLASS_ID };
 
             if (!draggedNodeIds.has(n.id) || !n.parentId) return n;
 

@@ -1,8 +1,9 @@
+import { NodeComponentType, NodePropsType } from "@/components/canvas/types";
+import { LibraryIcon } from "@/components/toolbar/LibraryIcon";
 import { IconType, LibraryManifest, NodeHandleConfig } from "@sysdraw/models";
 import { Position } from "@xyflow/react";
-import { NodeComponentType, NodePropsType } from "../canvas";
-import { LibraryIcon } from "../toolbar/LibraryIcon";
-import { GenericGroup, GroupWrapper } from "./group";
+import { GenericGroup } from "./group/GenericGroup";
+import { GroupWrapper } from "./group/GroupWrapper";
 import { NodeWrapper } from "./node/NodeWrapper";
 
 type CanvasNodeData = {

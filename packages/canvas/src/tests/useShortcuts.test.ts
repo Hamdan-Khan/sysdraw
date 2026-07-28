@@ -1,8 +1,8 @@
+import { useShortcuts } from "@/hooks/useShortcuts";
+import { CanvasStoreProvider } from "@/store/CanvasStoreProvider";
 import { act, renderHook } from "@testing-library/react";
 import React, { createElement } from "react";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { useShortcuts } from "../hooks";
-import { CanvasStoreProvider } from "../store";
 import { mockSetNodes } from "./utils/mocks";
 import { makeEdge, makeNode, makeStore } from "./utils/utils";
 
@@ -26,15 +26,28 @@ const fireKeyOn = (el: Element, key: string) =>
   });
 
 /** fires a contextmenu event at (x, y), optionally on a specific element */
-const fireContextMenu = (x = 100, y = 200, target: Element = document.body) =>
+const fireContextMenu = (x = 100, y = 200, target?: Element) => {
+  let el = target;
+  let flowContainer: HTMLElement | null = null;
+  if (!el) {
+    flowContainer = document.createElement("div");
+    flowContainer.className = "react-flow";
+    el = document.createElement("div");
+    flowContainer.appendChild(el);
+    document.body.appendChild(flowContainer);
+  }
   act(() => {
-    target.dispatchEvent(new MouseEvent("contextmenu", { bubbles: true, clientX: x, clientY: y }));
+    el!.dispatchEvent(new MouseEvent("contextmenu", { bubbles: true, clientX: x, clientY: y }));
   });
+  if (flowContainer) {
+    flowContainer.remove();
+  }
+};
 
 const mockCopy = vi.fn();
 const mockPaste = vi.fn();
 
-vi.mock("../hooks/useCopyPaste", () => ({
+vi.mock("@/hooks/useCopyPaste", () => ({
   useCopyPaste: () => ({ copy: mockCopy, paste: mockPaste }),
 }));
 
@@ -202,17 +215,21 @@ describe("useShortcuts", () => {
 
     it("does not open when the target has [data-no-context-menu]", () => {
       const { result } = mount();
+      const parent = document.createElement("div");
+      parent.className = "react-flow";
       const el = document.createElement("div");
       el.setAttribute("data-no-context-menu", "");
-      document.body.appendChild(el);
+      parent.appendChild(el);
+      document.body.appendChild(parent);
       fireContextMenu(100, 200, el);
       expect(result.current.contextMenu).toBeNull();
-      el.remove();
+      parent.remove();
     });
 
     it("does not open when the target is a descendant of [data-no-context-menu]", () => {
       const { result } = mount();
       const parent = document.createElement("div");
+      parent.className = "react-flow";
       parent.setAttribute("data-no-context-menu", "");
       const child = document.createElement("span");
       parent.appendChild(child);
@@ -220,6 +237,16 @@ describe("useShortcuts", () => {
       fireContextMenu(100, 200, child);
       expect(result.current.contextMenu).toBeNull();
       parent.remove();
+    });
+
+    it("does not open when the target is outside .react-flow (e.g. ExportDialog, controls, modals)", () => {
+      const { result } = mount();
+      const dialogContent = document.createElement("div");
+      dialogContent.className = "export-dialog-content";
+      document.body.appendChild(dialogContent);
+      fireContextMenu(100, 200, dialogContent);
+      expect(result.current.contextMenu).toBeNull();
+      dialogContent.remove();
     });
   });
 

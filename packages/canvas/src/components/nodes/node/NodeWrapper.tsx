@@ -1,3 +1,4 @@
+import { NODE_CLASS_ID } from "@sysdraw/common";
 import type { NodeHandleConfig } from "@sysdraw/models";
 import { CommonNodeWrapper } from "../CommonNodeWrapper";
 
@@ -15,7 +16,7 @@ export const NodeWrapper = ({ children, handles, selected, width, height }: Node
       type="node"
       handles={handles}
       selected={selected}
-      className="flex flex-col items-center justify-center relative w-full h-full"
+      className={`flex flex-col items-center justify-center relative w-full h-full ${NODE_CLASS_ID}`}
       style={{
         width: width || 48,
         height: height || 48,

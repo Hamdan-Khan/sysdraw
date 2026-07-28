@@ -1,10 +1,10 @@
-import "fake-indexeddb/auto";
+import { CanvasStoreState } from "@/store/store";
 import { RegisteredEdges } from "@sysdraw/models";
 import "@testing-library/jest-dom/vitest";
 import { cleanup } from "@testing-library/react";
+import "fake-indexeddb/auto";
 import { afterEach, vi } from "vitest";
 import { StoreApi } from "zustand";
-import { CanvasStoreState } from "../store";
 
 afterEach(() => {
   cleanup();
@@ -75,6 +75,7 @@ vi.mock("@xyflow/react", async (importOriginal) => {
       setEdges: mockSetEdges,
       setNodes: mockSetNodes,
       setViewport: mockSetViewport,
+      toObject: vi.fn(() => ({ nodes: [], edges: [], viewport: { x: 0, y: 0, zoom: 1 } })),
     }),
   };
 });

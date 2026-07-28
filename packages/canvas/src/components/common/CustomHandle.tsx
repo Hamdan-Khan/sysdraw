@@ -1,3 +1,4 @@
+import { HANDLE_DOT_CLASS_ID } from "@sysdraw/common";
 import { Handle, Position, useNodeConnections, useViewport, type HandleProps } from "@xyflow/react";
 import { memo, useState } from "react";
 
@@ -24,21 +25,23 @@ export const CustomHandle = memo(({ position, ...props }: HandleProps) => {
     >
       {isConnected && (
         // dot to denote a connected edge
-        <div
+        <svg
+          className={HANDLE_DOT_CLASS_ID}
+          width="6"
+          height="6"
+          viewBox="0 0 6 6"
           style={{
             position: "absolute",
             top: "50%",
             left: "50%",
-            width: "6px",
-            height: "6px",
             transform: `scale(${2 / (zoom + 0.6)}) translate(-50%, -50%)`,
-            backgroundColor: "#555",
-            borderRadius: "50%",
             pointerEvents: "none",
             opacity: isHovered ? 0 : 1,
             transition: "opacity 0.15s ease",
           }}
-        />
+        >
+          <circle cx="3" cy="3" r="2.5" fill="#555" />
+        </svg>
       )}
       <svg
         className="custom-handle__arrow"
@@ -50,10 +53,11 @@ export const CustomHandle = memo(({ position, ...props }: HandleProps) => {
       >
         <path
           d="M0 -2.5 H11 L11 -6 L19 0 L11 6 L11 2.5 H0 Z"
-          // fill="none"
+          fill="#555"
           stroke="currentColor"
           strokeWidth={1}
           strokeLinejoin="round"
+          opacity={0.7}
         />
       </svg>
     </Handle>

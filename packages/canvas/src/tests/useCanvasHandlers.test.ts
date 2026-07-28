@@ -1,11 +1,11 @@
+import { SYSDRAW_DRAG_DATA_FORMAT } from "@/components/toolbar/Toolbar";
+import { useCanvasHandlers } from "@/hooks/useCanvasHandlers";
+import { CanvasStoreProvider } from "@/store/CanvasStoreProvider";
 import { LibraryRegistry, LibraryRegistryProvider, RegisteredEdges } from "@sysdraw/models";
 import { act, renderHook } from "@testing-library/react";
 import React, { createElement } from "react";
 import { toast } from "sonner";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { SYSDRAW_DRAG_DATA_FORMAT } from "../components/toolbar";
-import { useCanvasHandlers } from "../hooks/useCanvasHandlers";
-import { CanvasStoreProvider } from "../store";
 import {
   mockGetInternalNode,
   mockGetIntersectingNodes,
@@ -25,7 +25,7 @@ vi.mock("nanoid", () => ({ nanoid: () => "new-id" }));
 
 const mockCommit = vi.fn();
 
-vi.mock("../hooks/useHistory", () => ({
+vi.mock("@/hooks/useHistory", () => ({
   useHistory: () => ({
     commit: mockCommit,
     undo: vi.fn(),
@@ -59,8 +59,8 @@ vi.mock("@sysdraw/models", async (importOriginal) => ({
   defaultGroupsMap: { container: { label: "default group" } },
 }));
 
-vi.mock("../components/canvas", async (importOriginal) => {
-  const actual = await importOriginal<typeof import("../components/canvas")>();
+vi.mock("@/components/canvas/utils", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("@/components/canvas/utils")>();
   return {
     ...actual,
     isGroup: vi.fn((n) => n.type === "container" || n.type === "availability-zone"),
@@ -141,7 +141,7 @@ describe("useCanvasHandlers", () => {
     });
 
     it("rejects the drop and shows an error when the node is too big for the group", async () => {
-      const { getIntersectingArea } = await import("../components/canvas");
+      const { getIntersectingArea } = await import("@/components/canvas/utils");
       // full overlap, ratio 1
       vi.mocked(getIntersectingArea).mockReturnValue(400);
 
@@ -154,7 +154,7 @@ describe("useCanvasHandlers", () => {
     });
 
     it("reparents the node into the group on a valid drop", async () => {
-      const { getIntersectingArea } = await import("../components/canvas");
+      const { getIntersectingArea } = await import("@/components/canvas/utils");
       vi.mocked(getIntersectingArea).mockReturnValue(400);
 
       const { result } = renderHook(() => useCanvasHandlers(), { wrapper: createWrapper() });

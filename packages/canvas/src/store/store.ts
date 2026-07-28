@@ -1,3 +1,4 @@
+import { DEFAULT_EXPORT_OPTIONS, ExportOptions } from "@/hooks/useCanvasExport";
 import { RegisteredEdges } from "@sysdraw/models";
 import {
   applyEdgeChanges,
@@ -42,6 +43,8 @@ interface CanvasStoreState {
   globalEdgeMarkerEnd: Edge["markerEnd"];
   isInteractive: boolean;
   grid: boolean;
+  isExporting: boolean;
+  exportOptions: ExportOptions;
   isNodeLocked: (id?: string | null) => boolean;
   onNodesChange: OnNodesChange<Node>;
   onEdgesChange: OnEdgesChange;
@@ -55,6 +58,8 @@ interface CanvasStoreState {
   setGlobalEdgeAnimated: (animated: boolean) => void;
   setGlobalEdgeMarkerEnd: (markerEnd?: Edge["markerEnd"]) => void;
   setGrid: (value: boolean) => void;
+  setIsExporting: (value: boolean) => void;
+  setExportOptions: (opts: Partial<ExportOptions>) => void;
 }
 
 /**
@@ -74,6 +79,8 @@ const createCanvasStore = (storeState: InitialCanvasStoreState) => {
     globalEdgeAnimated: false,
     globalEdgeMarkerEnd: undefined,
     grid: true,
+    isExporting: false,
+    exportOptions: DEFAULT_EXPORT_OPTIONS,
     isNodeLocked: (id) => {
       if (!id) return false;
       // using draggable as the locking indicator, though there a bunch of other
@@ -142,6 +149,8 @@ const createCanvasStore = (storeState: InitialCanvasStoreState) => {
     setGlobalEdgeAnimated: (animated) => set({ globalEdgeAnimated: animated }),
     setGlobalEdgeMarkerEnd: (markerEnd) => set({ globalEdgeMarkerEnd: markerEnd }),
     setGrid: (value) => set({ grid: value }),
+    setIsExporting: (value) => set({ isExporting: value }),
+    setExportOptions: (opts) => set((s) => ({ exportOptions: { ...s.exportOptions, ...opts } })),
   }));
 };
 

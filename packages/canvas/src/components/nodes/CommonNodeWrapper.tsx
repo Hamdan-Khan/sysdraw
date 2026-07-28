@@ -1,8 +1,8 @@
+import { CustomHandle } from "@/components/common/CustomHandle";
+import { OptionBar } from "@/components/common/OptionBar";
+import { useCanvasStore } from "@/store/CanvasStoreProvider";
 import type { NodeHandleConfig } from "@sysdraw/models";
 import { NodeResizer, NodeToolbar, Position, useNodeId, useViewport } from "@xyflow/react";
-import { useCanvasStore } from "../../store";
-import { OptionBar } from "../common";
-import { CustomHandle } from "../common/CustomHandle";
 
 export interface CommonNodeWrapperProps {
   children: React.ReactNode;

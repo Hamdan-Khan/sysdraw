@@ -27,7 +27,9 @@ describe("EdgeWrapper", () => {
 
   it("renders edge label when label prop is provided", () => {
     renderComponent(<EdgeWrapper {...defaultProps} label="Test Connection" />);
-    expect(screen.getByText("Test Connection")).toBeInTheDocument();
+    const labelElement = screen.getByText("Test Connection");
+    expect(labelElement).toBeInTheDocument();
+    expect(labelElement).toHaveStyle({ zIndex: 1001 });
   });
 
   it("selects edge when label is clicked", () => {
