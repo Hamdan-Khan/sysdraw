@@ -168,7 +168,40 @@ describe("useCopyPaste", () => {
 
     expect(mockScreenToFlowPosition).toHaveBeenCalledWith({ x: 500, y: 500 });
     const newNodes = mockSetNodes.mock.calls[0][0](mockNodes);
-    expect(newNodes[2].position.x).toBeCloseTo(560); // 500 + 100 * 1 * 0.6
+    expect(newNodes[2].position.x).toBe(500);
+    expect(newNodes[2].position.y).toBe(500);
+  });
+
+  it("calculates bounding box from top-level nodes only when child nodes are included", () => {
+    const parentNode: Node = {
+      id: "p1",
+      position: { x: 200, y: 200 },
+      data: {},
+      selected: true,
+    };
+    const childNode: Node = {
+      id: "c1",
+      parentId: "p1",
+      position: { x: 10, y: 10 },
+      data: {},
+      selected: true,
+    };
+    mockGetNodes.mockReturnValue([parentNode, childNode]);
+    mockGetEdges.mockReturnValue([]);
+
+    const { result } = renderHook(() => useCopyPaste(), { wrapper: createWrapper() });
+    act(() => result.current.copy());
+    act(() => result.current.paste({ x: 400, y: 400 }));
+
+    const setNodesFn = mockSetNodes.mock.calls[0][0];
+    const newNodes = setNodesFn([parentNode, childNode]);
+    const pastedParent = newNodes.find((n: Node) => n.id === "mock-id-1");
+    const pastedChild = newNodes.find((n: Node) => n.id === "mock-id-2");
+
+    expect(pastedParent?.position.x).toBe(400);
+    expect(pastedParent?.position.y).toBe(400);
+    expect(pastedChild?.position.x).toBe(10);
+    expect(pastedChild?.position.y).toBe(10);
   });
 
   describe("isClipboardEmpty util", () => {

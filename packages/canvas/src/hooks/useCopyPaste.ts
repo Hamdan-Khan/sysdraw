@@ -28,13 +28,12 @@ export function useCopyPaste() {
   const nodesMap = useCanvasStore((s) => s.nodesMap);
   const isNodeLocked = useCanvasStore((s) => s.isNodeLocked);
   const { getNodes, getEdges, setNodes, setEdges, screenToFlowPosition } = useReactFlow();
-  const lastMousePosition = useRef<{ x: number; y: number } | null>(null);
+
   /** to add offset to pasted elements */
   const pasteCount = useRef(0);
 
   useEffect(() => {
-    const handleClick = (e: MouseEvent) => {
-      lastMousePosition.current = { x: e.clientX, y: e.clientY };
+    const handleClick = (_e: MouseEvent) => {
       // clears offset
       pasteCount.current = 0;
     };
@@ -74,7 +73,6 @@ export function useCopyPaste() {
 
       // clear previous copy's references
       pasteCount.current = 0;
-      lastMousePosition.current = null;
     },
     [getNodes, getEdges, nodesMap, isNodeLocked],
   );
@@ -86,45 +84,58 @@ export function useCopyPaste() {
   const paste = useCallback(
     (screenPosition?: { x: number; y: number }) => {
       const clipboard = clipboardRef.current;
-      if (!clipboard || clipboard.nodes.length === 0) return;
+      if (!clipboard || clipboard.nodes.length === 0) {
+        return;
+      }
 
       pasteCount.current += 1;
 
-      // calculate of multi node selection's dimensions
-      const minX = Math.min(...clipboard.nodes.map((n) => n.position.x));
-      const minY = Math.min(...clipboard.nodes.map((n) => n.position.y));
-      const maxX = Math.max(...clipboard.nodes.map((n) => n.position.x + (n.measured?.width ?? 0)));
-      const maxY = Math.max(
-        ...clipboard.nodes.map((n) => n.position.y + (n.measured?.height ?? 0)),
-      );
-      const width = maxX - minX;
-      const height = maxY - minY;
+      const idSet = new Set(clipboard.nodes.map((n) => n.id));
+      /** nodes without parents or parent nodes that are not in the clipboard */
+      const topLevelNodes = clipboard.nodes.filter((n) => {
+        return !n.parentId || !idSet.has(n.parentId);
+      });
+      const nodesForBounds = topLevelNodes.length > 0 ? topLevelNodes : clipboard.nodes;
 
-      const anchor = screenPosition ?? lastMousePosition.current;
+      // calculate top level selection's bounding rectangle
+      const minX = Math.min(...nodesForBounds.map((n) => n.position.x));
+      const minY = Math.min(...nodesForBounds.map((n) => n.position.y));
 
       let targetX: number;
       let targetY: number;
 
-      if (anchor) {
-        const flowPos = screenToFlowPosition(anchor);
-        targetX = flowPos.x + width * pasteCount.current * 0.6;
-        targetY = flowPos.y + height * pasteCount.current * 0.1;
+      if (screenPosition) {
+        const flowPos = screenToFlowPosition(screenPosition);
+        const repeatOffset = pasteCount.current * 20;
+        targetX = flowPos.x + repeatOffset;
+        targetY = flowPos.y + repeatOffset;
       } else {
-        // if no known cursor position, offset by the selection's own size
-        targetX = minX + width * pasteCount.current * 0.6;
-        targetY = minY + height * pasteCount.current * 0.1;
+        // if no known cursor position, offset by 20px step from original selection position
+        const offset = pasteCount.current * 20;
+        targetX = minX + offset;
+        targetY = minY + offset;
       }
 
       const dx = targetX - minX;
       const dy = targetY - minY;
 
       const idMap = new Map<string, string>();
-      const newNodes = structuredClone(clipboard.nodes).map((n) => {
+      // in first pass, assign new ids to all nodes to populate idMap
+      const clonedNodes = structuredClone(clipboard.nodes).map((n) => {
         const newId = nanoid();
         idMap.set(n.id, newId);
         n.id = newId;
-        n.position.x += dx;
-        n.position.y += dy;
+        return n;
+      });
+      // in second pass, remap parentId and apply position offset
+      const newNodes = clonedNodes.map((n) => {
+        if (n.parentId && idMap.has(n.parentId)) {
+          n.parentId = idMap.get(n.parentId)!;
+        } else {
+          // child nodes are positioned relative to their parents, so only add offset to parent nodes
+          n.position.x += dx;
+          n.position.y += dy;
+        }
         n.selected = true;
         return n;
       });

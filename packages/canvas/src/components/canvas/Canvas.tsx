@@ -93,9 +93,9 @@ const CanvasElement = () => {
           fitView
           className="bg-transparent"
           proOptions={{ hideAttribution: true }}
+          minZoom={0.2}
           // snapToGrid={false}
           // snapGrid={[-5, -5]}
-          // nodeDragThreshold={5}
         >
           <CanvasGrid id="canvas" />
         </ReactFlow>
