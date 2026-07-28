@@ -106,7 +106,7 @@ export function useCopyPaste() {
 
       if (screenPosition) {
         const flowPos = screenToFlowPosition(screenPosition);
-        const repeatOffset = pasteCount.current * 20;
+        const repeatOffset = (pasteCount.current - 1) * 20;
         targetX = flowPos.x + repeatOffset;
         targetY = flowPos.y + repeatOffset;
       } else {
