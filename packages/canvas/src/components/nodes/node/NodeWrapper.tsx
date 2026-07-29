@@ -33,7 +33,6 @@ export const NodeWrapper = ({
 
   const [isEditing, setIsEditing] = useState(false);
   const [inputValue, setInputValue] = useState(title ?? "");
-  const inputRef = useRef<HTMLInputElement>(null);
   const isCancelingRef = useRef(false);
   // tracks un-edited base height when adding a label for the first time
   const initialHeightRef = useRef<number | null>(null);
@@ -60,18 +59,10 @@ export const NodeWrapper = ({
     return { width: baseW, height: baseH };
   }, [width, height, isFirstTimeEditing]);
 
-  useEffect(() => {
-    if (!isEditing) {
-      setInputValue(title ?? "");
-    }
-  }, [title, isEditing]);
-
-  useEffect(() => {
-    if (isEditing) {
-      inputRef.current?.focus();
-      inputRef.current?.select();
-    }
-  }, [isEditing]);
+  const startEditing = useCallback(() => {
+    setInputValue(title ?? "");
+    setIsEditing(true);
+  }, [title]);
 
   const handleSave = useCallback(() => {
     if (isCancelingRef.current) {
@@ -143,9 +134,7 @@ export const NodeWrapper = ({
       type="node"
       handles={handles}
       selected={selected}
-      onAddLabel={() => {
-        setIsEditing(true);
-      }}
+      onAddLabel={startEditing}
       className={`flex flex-col items-center justify-center gap-1 relative w-full h-full p-1 ${NODE_CLASS_ID}`}
       style={{
         width: nodeWidth,
@@ -163,7 +152,8 @@ export const NodeWrapper = ({
           <div className="shrink-0 z-10 flex items-center justify-center">
             {isEditing ? (
               <input
-                ref={inputRef}
+                autoFocus
+                onFocus={(e) => e.currentTarget.select()}
                 type="text"
                 value={inputValue}
                 onChange={(e) => setInputValue(e.target.value)}
@@ -179,7 +169,7 @@ export const NodeWrapper = ({
               <span
                 onClick={(e) => {
                   e.stopPropagation();
-                  setIsEditing(true);
+                  startEditing();
                 }}
                 className="block text-xs text-primary text-center px-1.5 py-0.5 cursor-pointer hover:bg-dim/60 rounded transition-colors select-none whitespace-nowrap"
                 title={title}

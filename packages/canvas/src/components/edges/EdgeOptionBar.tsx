@@ -29,7 +29,6 @@ export const EdgeOptionBar = ({ edgeId }: EdgeOptionBarProps) => {
   const [labelInput, setLabelInput] = useState<string>((edge?.label as string) ?? "");
   const hasCommittedRef = useRef(false);
   const popoverRef = useRef<HTMLDivElement>(null);
-  const inputRef = useRef<HTMLInputElement>(null);
 
   const updateEdge = useCallback(
     (updater: (edge: Partial<Edge>) => Partial<Edge>) => {
@@ -53,13 +52,6 @@ export const EdgeOptionBar = ({ edgeId }: EdgeOptionBarProps) => {
     };
   }, [debouncedUpdateLabel]);
 
-  // keep local input in sync with edge's label when popover is closed
-  useEffect(() => {
-    if (!isLabelOpen) {
-      setLabelInput((edge?.label as string) ?? "");
-    }
-  }, [edge?.label, isLabelOpen]);
-
   // handle click outside to close label popover & flush state
   useEffect(() => {
     if (!isLabelOpen) return;
@@ -77,14 +69,6 @@ export const EdgeOptionBar = ({ edgeId }: EdgeOptionBarProps) => {
       document.removeEventListener("pointerdown", handleClickOutside);
     };
   }, [isLabelOpen, debouncedUpdateLabel]);
-
-  // focus and select text when popover opens
-  useEffect(() => {
-    if (isLabelOpen) {
-      inputRef.current?.focus();
-      inputRef.current?.select();
-    }
-  }, [isLabelOpen]);
 
   if (!edge) {
     return null;
@@ -129,6 +113,7 @@ export const EdgeOptionBar = ({ edgeId }: EdgeOptionBarProps) => {
       hasCommittedRef.current = false;
       setIsLabelOpen(false);
     } else {
+      setLabelInput((edge?.label as string) ?? "");
       setIsLabelOpen(true);
     }
   };
@@ -201,7 +186,8 @@ export const EdgeOptionBar = ({ edgeId }: EdgeOptionBarProps) => {
         {isLabelOpen && (
           <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2.5 z-50 flex items-center gap-1 bg-surface p-1.5 rounded-lg border border-border shadow-lg min-w-45">
             <input
-              ref={inputRef}
+              autoFocus
+              onFocus={(e) => e.currentTarget.select()}
               type="text"
               value={labelInput}
               onChange={handleLabelInputChange}

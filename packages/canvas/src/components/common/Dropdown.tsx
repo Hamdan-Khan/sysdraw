@@ -47,7 +47,8 @@ export const Dropdown = <T extends string>({
 
     // vertical: open down unless there is not enough space, then flip up
     const spaceBelow = vh - rect.bottom;
-    const openDown = preferredDirection === "down" ? spaceBelow > 160 : spaceBelow > 160;
+    const spaceAbove = rect.top;
+    const openDown = preferredDirection === "down" ? spaceBelow > 160 : spaceAbove < 160;
     const top = openDown ? rect.bottom + 4 : rect.top - 4;
     const transform = openDown ? "none" : "translateY(-100%)";
 
