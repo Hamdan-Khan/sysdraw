@@ -10,12 +10,16 @@ export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
       {
-        title: "SysDraw - System Architecture & Diagramming",
+        title: "SysDraw | System Design Canvas",
+      },
+      {
+        name: "title",
+        content: "Sysdraw | A high level system design tool | Free to use",
       },
       {
         name: "description",
         content:
-          "Interactive canvas for system architecture design and diagramming.",
+          "Sysdraw is a free, high level system design diagramming tool that lets you easily create software architecture diagrams.",
       },
     ],
   }),

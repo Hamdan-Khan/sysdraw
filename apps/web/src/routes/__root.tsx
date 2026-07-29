@@ -15,10 +15,32 @@ export const Route = createRootRoute({
       },
       {
         name: "viewport",
-        content: "width=device-width, initial-scale=1",
+        content:
+          "width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover, shrink-to-fit=no",
       },
       {
-        title: "SysDraw",
+        name: "referrer",
+        content: "origin",
+      },
+      {
+        name: "mobile-web-app-capable",
+        content: "yes",
+      },
+      {
+        name: "apple-mobile-web-app-title",
+        content: "Sysdraw",
+      },
+      {
+        title: "SysDraw | System Design Canvas",
+      },
+      {
+        name: "title",
+        content: "Sysdraw | A high level system design tool | Free to use",
+      },
+      {
+        name: "description",
+        content:
+          "Sysdraw is a free, high level system design diagramming tool that lets you easily create software architecture diagrams.",
       },
     ],
     links: [
@@ -51,6 +73,10 @@ function RootDocument({ children }: Readonly<{ children: ReactNode }>) {
         <HeadContent />
       </head>
       <body>
+        <noscript>You need to enable JavaScript to run this app.</noscript>
+        <header>
+          <h1 className="sr-only">SysDraw</h1>
+        </header>
         {children}
         <Scripts />
       </body>
