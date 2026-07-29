@@ -12,7 +12,6 @@ import { CanvasStoreProvider, useCanvasStore } from "@/store/CanvasStoreProvider
 import { CanvasStoreState } from "@/store/store";
 import { LibraryRegistry, LibraryRegistryProvider, useLibraryRegistryStore } from "@sysdraw/models";
 import { ReactFlow, ReactFlowProvider } from "@xyflow/react";
-import "@xyflow/react/dist/style.css";
 import { createRef, useMemo } from "react";
 import { Toaster } from "sonner";
 import { StoreApi } from "zustand";

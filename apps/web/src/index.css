@@ -1,3 +1,4 @@
+@import "@xyflow/react/dist/style.css" layer(base);
 @import "tailwindcss";
 @import "@sysdraw/common/theme.css";
 
