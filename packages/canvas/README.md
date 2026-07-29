@@ -29,9 +29,11 @@ export default App;
 - [x] fix multi nodes on ctrl+v paste
 - [x] remove barrel imports for components
 - [x] export as png, svg and .sysdraw
+- [x] add labels to standard nodes
 - [ ] optimize undo/redo history state
 - [ ] configure rolldown code splitting
 - [ ] add error boundary
+- [ ] fix svg export renderer
 
 ### UX (later)
 - [ ] improve node dragging semantics i.e. nodes should appear as a canvas element while dragged from the toolbar, instead of being like a picture of the node element.

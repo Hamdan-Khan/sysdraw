@@ -8,6 +8,7 @@ import { NodeWrapper } from "./node/NodeWrapper";
 
 type CanvasNodeData = {
   label?: string;
+  title?: string;
   color?: string;
   handles?: NodeHandleConfig[];
   icon?: IconType;
@@ -54,6 +55,7 @@ export const createNodeTypes = (
             handles={handles}
             width={props.width}
             height={props.height}
+            title={props.data?.title}
           >
             <LibraryIcon icon={icon} className="w-full h-full text-text drop-shadow-sm" />
           </NodeWrapper>

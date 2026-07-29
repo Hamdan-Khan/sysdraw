@@ -15,6 +15,7 @@ export interface CommonNodeWrapperProps {
   minHeight?: number;
   keepAspectRatio?: boolean;
   resizerBorderWidth?: number;
+  onAddLabel?: () => void;
 }
 
 const defaultHandles: NodeHandleConfig[] = [];
@@ -30,6 +31,7 @@ export const CommonNodeWrapper = ({
   minHeight,
   keepAspectRatio,
   resizerBorderWidth = 1,
+  onAddLabel,
 }: CommonNodeWrapperProps) => {
   const nodeId = useNodeId();
   const isNodeLocked = useCanvasStore((s) => s.isNodeLocked(nodeId));
@@ -45,7 +47,7 @@ export const CommonNodeWrapper = ({
         lineStyle={{ borderWidth: resizerBorderWidth / zoom }}
       />
       <NodeToolbar className="flex gap-2">
-        <OptionBar type={type} />
+        <OptionBar type={type} onAddLabel={onAddLabel} />
       </NodeToolbar>
       {handles.map((handle) => {
         return (

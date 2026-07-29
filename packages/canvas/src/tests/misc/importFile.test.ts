@@ -58,6 +58,7 @@ describe("importFile schema validation", () => {
       const data = {
         kind: "node" as const,
         label: "Database",
+        title: "My Database Node",
         description: "Primary PostgreSQL DB",
         color: "#ff0000",
         icon: { kind: "url", value: "https://example.com/icon.png" },

@@ -16,6 +16,7 @@ export const IconTypeSchema = z.object({
 export const NodeDataSchema = z.looseObject({
   kind: z.enum(["node", "group"]).optional(),
   label: z.string().optional(),
+  title: z.string().optional(),
   description: z.string().optional(),
   color: z.string().optional(),
   icon: IconTypeSchema.optional(),
