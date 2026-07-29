@@ -1,6 +1,13 @@
-import { GROUP_CONTAINER_CLASS_ID, GROUP_LABEL_CLASS_ID } from "@sysdraw/common";
+import {
+  GROUP_CONTAINER_CLASS_ID,
+  GROUP_LABEL_CLASS_ID,
+} from "@sysdraw/common";
 
-export const GenericGroup = ({ data }: { data: { label: string; color?: string } }) => {
+export const GenericGroup = ({
+  data,
+}: {
+  data: { label: string; color?: string };
+}) => {
   return (
     <div
       className={`w-full h-full border border-dashed border-dim-border rounded-xl p-2.5 relative bg-dim ${GROUP_CONTAINER_CLASS_ID}`}

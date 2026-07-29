@@ -41,7 +41,10 @@ export const createNodeTypes = (
             height={props.height}
           >
             <GenericGroup
-              data={{ label: props.data?.label || libNode.label, color: props.data?.color }}
+              data={{
+                label: props.data?.label || libNode.label,
+                color: props.data?.color,
+              }}
             />
           </GroupWrapper>
         );
@@ -57,7 +60,10 @@ export const createNodeTypes = (
             height={props.height}
             title={props.data?.title}
           >
-            <LibraryIcon icon={icon} className="w-full h-full text-text drop-shadow-sm" />
+            <LibraryIcon
+              icon={icon}
+              className="w-full h-full text-text drop-shadow-sm"
+            />
           </NodeWrapper>
         );
       }

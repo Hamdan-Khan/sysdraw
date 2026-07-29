@@ -100,7 +100,8 @@ const createCanvasStore = (storeState: InitialCanvasStoreState) => {
       });
     },
     setNodes: (nodes) => {
-      const nextNodes = typeof nodes === "function" ? nodes(get().nodes) : nodes;
+      const nextNodes =
+        typeof nodes === "function" ? nodes(get().nodes) : nodes;
       set({
         nodes: nextNodes,
         nodesMap: createNodesMap(nextNodes),
@@ -113,7 +114,10 @@ const createCanvasStore = (storeState: InitialCanvasStoreState) => {
       const { history, nodes, edges } = get();
       set({
         // clear future list on change
-        history: { future: [], past: [...history.past, { nodes, edges }].slice(-HISTORY_LIMIT) },
+        history: {
+          future: [],
+          past: [...history.past, { nodes, edges }].slice(-HISTORY_LIMIT),
+        },
       });
     },
     undo: () => {
@@ -127,7 +131,10 @@ const createCanvasStore = (storeState: InitialCanvasStoreState) => {
         nodes: previous.nodes,
         nodesMap: createNodesMap(previous.nodes),
         edges: previous.edges,
-        history: { past: past.slice(0, past.length - 1), future: [{ nodes, edges }, ...future] },
+        history: {
+          past: past.slice(0, past.length - 1),
+          future: [{ nodes, edges }, ...future],
+        },
       });
     },
     redo: () => {
@@ -147,11 +154,17 @@ const createCanvasStore = (storeState: InitialCanvasStoreState) => {
     setIsInteractive: (value) => set({ isInteractive: value }),
     setGlobalEdgeType: (type) => set({ globalEdgeType: type }),
     setGlobalEdgeAnimated: (animated) => set({ globalEdgeAnimated: animated }),
-    setGlobalEdgeMarkerEnd: (markerEnd) => set({ globalEdgeMarkerEnd: markerEnd }),
+    setGlobalEdgeMarkerEnd: (markerEnd) =>
+      set({ globalEdgeMarkerEnd: markerEnd }),
     setGrid: (value) => set({ grid: value }),
     setIsExporting: (value) => set({ isExporting: value }),
-    setExportOptions: (opts) => set((s) => ({ exportOptions: { ...s.exportOptions, ...opts } })),
+    setExportOptions: (opts) =>
+      set((s) => ({ exportOptions: { ...s.exportOptions, ...opts } })),
   }));
 };
 
-export { createCanvasStore, type CanvasStoreState, type InitialCanvasStoreState };
+export {
+  createCanvasStore,
+  type CanvasStoreState,
+  type InitialCanvasStoreState,
+};

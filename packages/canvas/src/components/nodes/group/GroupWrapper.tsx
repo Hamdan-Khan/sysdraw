@@ -9,7 +9,13 @@ export interface GroupWrapperProps {
   height?: number;
 }
 
-export const GroupWrapper = ({ children, handles, selected, width, height }: GroupWrapperProps) => {
+export const GroupWrapper = ({
+  children,
+  handles,
+  selected,
+  width,
+  height,
+}: GroupWrapperProps) => {
   return (
     <CommonNodeWrapper
       type="group"

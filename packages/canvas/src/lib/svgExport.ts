@@ -54,7 +54,9 @@ function isVisibleColor(color: string | undefined | null): boolean {
 function extractTranslate(el: HTMLElement): { x: number; y: number } {
   const transformStyle = el.style.transform;
   if (!transformStyle) return { x: 0, y: 0 };
-  const match = transformStyle.match(/translate(?:3d)?\(([-+\d.]+)(?:px)?,\s*([-+\d.]+)/);
+  const match = transformStyle.match(
+    /translate(?:3d)?\(([-+\d.]+)(?:px)?,\s*([-+\d.]+)/,
+  );
   if (match) {
     return {
       x: parseFloat(match[1]) || 0,
@@ -77,9 +79,17 @@ interface BakeStyleOptions {
  * reads computed css styles (stroke, fill, etc.) of original DOM shape elements and
  * applies matching svg attributes directly onto corresponding cloned svg elements
  */
-function bakeComputedStyles(original: Element, cloned: Element, opts?: BakeStyleOptions): void {
-  const origShapes = opts?.isEdge ? [original] : original.querySelectorAll(SVG_SHAPE_SELECTOR);
-  const clonedShapes = opts?.isEdge ? [cloned] : cloned.querySelectorAll(SVG_SHAPE_SELECTOR);
+function bakeComputedStyles(
+  original: Element,
+  cloned: Element,
+  opts?: BakeStyleOptions,
+): void {
+  const origShapes = opts?.isEdge
+    ? [original]
+    : original.querySelectorAll(SVG_SHAPE_SELECTOR);
+  const clonedShapes = opts?.isEdge
+    ? [cloned]
+    : cloned.querySelectorAll(SVG_SHAPE_SELECTOR);
 
   origShapes.forEach((origShape, idx) => {
     const clonedShape = clonedShapes[idx];
@@ -132,9 +142,13 @@ function extractNodeLabel(_htmlNode: HTMLElement): string | null {
 }
 
 function renderGroupNode(groupContainer: HTMLElement): string {
-  const wrapperEl = groupContainer.closest<HTMLElement>(`.${NODE_WRAPPER_CLASS_ID}`);
+  const wrapperEl = groupContainer.closest<HTMLElement>(
+    `.${NODE_WRAPPER_CLASS_ID}`,
+  );
   if (!wrapperEl) {
-    throw new Error(`Group node wrapper not found for group container ${groupContainer}`);
+    throw new Error(
+      `Group node wrapper not found for group container ${groupContainer}`,
+    );
   }
   const { x: nx, y: ny } = extractTranslate(wrapperEl);
   const nw = wrapperEl.offsetWidth;
@@ -173,7 +187,9 @@ function renderGroupNode(groupContainer: HTMLElement): string {
       const labelBorderColor = isVisibleColor(labelStyle.borderColor)
         ? labelStyle.borderColor
         : groupBorderColor;
-      const labelTextColor = isVisibleColor(labelStyle.color) ? labelStyle.color : "";
+      const labelTextColor = isVisibleColor(labelStyle.color)
+        ? labelStyle.color
+        : "";
       const labelRx = parseFloat(labelStyle.borderRadius);
 
       nodeSvg += `<g class="group-label">\n`;
@@ -199,7 +215,9 @@ function renderStandardNode(htmlNode: HTMLElement): string {
   let nodeSvg = `<g transform="translate(${nx}, ${ny})">\n`;
 
   // render main node icon if present
-  const iconSvg = htmlNode.querySelector<SVGElement>(`.${NODE_ICON_CLASS_ID} svg`);
+  const iconSvg = htmlNode.querySelector<SVGElement>(
+    `.${NODE_ICON_CLASS_ID} svg`,
+  );
   if (iconSvg) {
     const iconClone = iconSvg.cloneNode(true) as SVGElement;
     iconClone.setAttribute("width", String(nw));
@@ -211,7 +229,9 @@ function renderStandardNode(htmlNode: HTMLElement): string {
   }
 
   // render handler dots
-  const dotSvgs = htmlNode.querySelectorAll<SVGElement>(`.${HANDLE_DOT_CLASS_ID}`);
+  const dotSvgs = htmlNode.querySelectorAll<SVGElement>(
+    `.${HANDLE_DOT_CLASS_ID}`,
+  );
   dotSvgs.forEach((dotSvg) => {
     const dotClone = dotSvg.cloneNode(true) as SVGElement;
     bakeComputedStyles(dotSvg, dotClone);
@@ -227,7 +247,9 @@ function renderStandardNode(htmlNode: HTMLElement): string {
   return nodeSvg;
 }
 
-function collectDefsAndMarkers(elements: NodeListOf<SVGDefsElement | SVGMarkerElement>): string {
+function collectDefsAndMarkers(
+  elements: NodeListOf<SVGDefsElement | SVGMarkerElement>,
+): string {
   let content = "";
   elements.forEach((def) => {
     const clonedDef = def.cloneNode(true) as SVGElement;
@@ -242,7 +264,9 @@ function renderBackgroundGrid(flowEl: HTMLElement): string {
   const minorGridId = `${EXPORT_CANVAS_GRID_ID}-minor-grid-lines`;
   const majorGridId = `${EXPORT_CANVAS_GRID_ID}-major-grid-lines`;
 
-  const bgElements = flowEl.querySelectorAll(`[id*="${minorGridId}"], [id*="${majorGridId}"]`);
+  const bgElements = flowEl.querySelectorAll(
+    `[id*="${minorGridId}"], [id*="${majorGridId}"]`,
+  );
   if (bgElements.length === 0) return "";
 
   let gridSvg = "";
@@ -273,7 +297,9 @@ function renderGroupNodesLayer(groupNodesEls: HTMLElement[]): string {
 }
 
 function renderEdgesLayer(flowEl: HTMLElement): string {
-  const edgePaths = flowEl.querySelectorAll<SVGPathElement>(`.${EDGE_PATH_CLASS_ID}`);
+  const edgePaths = flowEl.querySelectorAll<SVGPathElement>(
+    `.${EDGE_PATH_CLASS_ID}`,
+  );
   if (edgePaths.length === 0) return "";
 
   let layerSvg = `  <!-- Edges Layer -->\n  <g class="edges-layer">\n`;
@@ -299,7 +325,10 @@ function renderStandardNodesLayer(standardNodesEls: HTMLElement[]): string {
   return layerSvg;
 }
 
-function renderEdgeLabelsLayer(flowEl: HTMLElement, viewportEl: HTMLElement | null): string {
+function renderEdgeLabelsLayer(
+  flowEl: HTMLElement,
+  viewportEl: HTMLElement | null,
+): string {
   const edgeLabelElements: HTMLElement[] = Array.from(
     flowEl.querySelectorAll<HTMLElement>(`.${EDGE_LABEL_CLASS_ID}`),
   );
@@ -317,12 +346,16 @@ function renderEdgeLabelsLayer(flowEl: HTMLElement, viewportEl: HTMLElement | nu
     }
 
     const labelBbox = labelEl.getBoundingClientRect();
-    const viewportBbox = viewportEl ? viewportEl.getBoundingClientRect() : { left: 0, top: 0 };
+    const viewportBbox = viewportEl
+      ? viewportEl.getBoundingClientRect()
+      : { left: 0, top: 0 };
     const lx = labelBbox.left - viewportBbox.left + labelBbox.width / 2;
     const ly = labelBbox.top - viewportBbox.top + labelBbox.height / 2;
 
     const style = window.getComputedStyle(labelEl);
-    const bg = isVisibleColor(style.backgroundColor) ? style.backgroundColor : "#ffffff";
+    const bg = isVisibleColor(style.backgroundColor)
+      ? style.backgroundColor
+      : "#ffffff";
     const color = isVisibleColor(style.color) ? style.color : "#0f172a";
 
     const lw = Math.max(16, labelBbox.width);
@@ -360,8 +393,12 @@ export function renderToNativeSvg(
   height: number,
   bgColor?: string,
 ): string {
-  const viewportEl = flowEl.querySelector(".react-flow__viewport") as HTMLElement | null;
-  const { x: tx, y: ty } = viewportEl ? extractTranslate(viewportEl) : { x: 0, y: 0 };
+  const viewportEl = flowEl.querySelector(
+    ".react-flow__viewport",
+  ) as HTMLElement | null;
+  const { x: tx, y: ty } = viewportEl
+    ? extractTranslate(viewportEl)
+    : { x: 0, y: 0 };
 
   let svgContent = "";
 
@@ -390,7 +427,9 @@ export function renderToNativeSvg(
   const groupNodesEls = Array.from(
     flowEl.querySelectorAll<HTMLElement>(`.${GROUP_CONTAINER_CLASS_ID}`),
   );
-  const standardNodesEls = Array.from(flowEl.querySelectorAll<HTMLElement>(`.${NODE_CLASS_ID}`));
+  const standardNodesEls = Array.from(
+    flowEl.querySelectorAll<HTMLElement>(`.${NODE_CLASS_ID}`),
+  );
 
   // group nodes layer (rendered before edges layer so group backgrounds stay behind edges)
   svgContent += renderGroupNodesLayer(groupNodesEls);

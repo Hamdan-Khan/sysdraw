@@ -44,7 +44,9 @@ describe("importFile schema validation", () => {
     });
 
     it("rejects invalid handle type", () => {
-      expect(() => NodeHandleConfigSchema.parse({ id: "h1", type: "invalid" })).toThrow();
+      expect(() =>
+        NodeHandleConfigSchema.parse({ id: "h1", type: "invalid" }),
+      ).toThrow();
     });
 
     it("validates icon type configuration", () => {
@@ -62,7 +64,9 @@ describe("importFile schema validation", () => {
         description: "Primary PostgreSQL DB",
         color: "#ff0000",
         icon: { kind: "url", value: "https://example.com/icon.png" },
-        handles: [{ id: "h1", type: "source" as const, position: "bottom" as const }],
+        handles: [
+          { id: "h1", type: "source" as const, position: "bottom" as const },
+        ],
         customExtraField: 1234,
       };
 
@@ -210,7 +214,13 @@ describe("importFile schema validation", () => {
               label: "Web Server",
               description: "Nginx reverse proxy",
               icon: { kind: "svg", value: "<path />" },
-              handles: [{ id: "out-1", type: "source" as const, position: "right" as const }],
+              handles: [
+                {
+                  id: "out-1",
+                  type: "source" as const,
+                  position: "right" as const,
+                },
+              ],
             },
           },
         ],

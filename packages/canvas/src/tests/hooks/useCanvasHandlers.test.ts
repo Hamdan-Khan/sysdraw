@@ -1,7 +1,11 @@
 import { SYSDRAW_DRAG_DATA_FORMAT } from "@/components/toolbar/Toolbar";
 import { useCanvasHandlers } from "@/hooks/useCanvasHandlers";
 import { CanvasStoreProvider } from "@/store/CanvasStoreProvider";
-import { LibraryRegistry, LibraryRegistryProvider, RegisteredEdges } from "@sysdraw/models";
+import {
+  LibraryRegistry,
+  LibraryRegistryProvider,
+  RegisteredEdges,
+} from "@sysdraw/models";
 import { act, renderHook } from "@testing-library/react";
 import React, { createElement } from "react";
 import { toast } from "sonner";
@@ -60,10 +64,13 @@ vi.mock("@sysdraw/models", async (importOriginal) => ({
 }));
 
 vi.mock("@/components/canvas/utils", async (importOriginal) => {
-  const actual = await importOriginal<typeof import("@/components/canvas/utils")>();
+  const actual =
+    await importOriginal<typeof import("@/components/canvas/utils")>();
   return {
     ...actual,
-    isGroup: vi.fn((n) => n.type === "container" || n.type === "availability-zone"),
+    isGroup: vi.fn(
+      (n) => n.type === "container" || n.type === "availability-zone",
+    ),
     isChildNode: vi.fn(() => false),
     getNodeRect: vi.fn((internal) => internal.rect),
     getIntersectingArea: vi.fn(),
@@ -95,14 +102,25 @@ describe("useCanvasHandlers", () => {
 
   describe("onDrop", () => {
     it("does nothing if no drag data is present", () => {
-      const { result } = renderHook(() => useCanvasHandlers(), { wrapper: createWrapper() });
+      const { result } = renderHook(() => useCanvasHandlers(), {
+        wrapper: createWrapper(),
+      });
       act(() => result.current.onDrop(makeDragEvent()));
       expect(mockSetNodes).not.toHaveBeenCalled();
     });
 
     it("prepends a dropped group, appends a dropped node", () => {
-      const { result } = renderHook(() => useCanvasHandlers(), { wrapper: createWrapper() });
-      const existing = [{ id: "existing", type: "database", position: { x: 0, y: 0 }, data: {} }];
+      const { result } = renderHook(() => useCanvasHandlers(), {
+        wrapper: createWrapper(),
+      });
+      const existing = [
+        {
+          id: "existing",
+          type: "database",
+          position: { x: 0, y: 0 },
+          data: {},
+        },
+      ];
 
       act(() => result.current.onDrop(makeEvent("node", "database")));
       let updated = mockSetNodes.mock.calls[0][0](existing);
@@ -117,10 +135,14 @@ describe("useCanvasHandlers", () => {
 
   describe("addNodeAtCenter", () => {
     it("places node at center and increments offset for same node, resetting for different node", () => {
-      const { result } = renderHook(() => useCanvasHandlers(), { wrapper: createWrapper() });
+      const { result } = renderHook(() => useCanvasHandlers(), {
+        wrapper: createWrapper(),
+      });
 
       // first click: database node (offset 0)
-      act(() => result.current.addNodeAtCenter({ kind: "node", id: "database" }));
+      act(() =>
+        result.current.addNodeAtCenter({ kind: "node", id: "database" }),
+      );
       expect(mockSetNodes).toHaveBeenCalledTimes(1);
       let updated = mockSetNodes.mock.calls[0][0]([]);
       const firstPos = updated[0].position;
@@ -129,7 +151,9 @@ describe("useCanvasHandlers", () => {
       mockSetNodes.mockClear();
 
       // second click: same database node (offset +20)
-      act(() => result.current.addNodeAtCenter({ kind: "node", id: "database" }));
+      act(() =>
+        result.current.addNodeAtCenter({ kind: "node", id: "database" }),
+      );
       expect(mockSetNodes).toHaveBeenCalledTimes(1);
       updated = mockSetNodes.mock.calls[0][0]([]);
       const secondPos = updated[0].position;
@@ -139,7 +163,12 @@ describe("useCanvasHandlers", () => {
       mockSetNodes.mockClear();
 
       // third click: different node type "availability-zone" (resets offset to 0)
-      act(() => result.current.addNodeAtCenter({ kind: "group", id: "availability-zone" }));
+      act(() =>
+        result.current.addNodeAtCenter({
+          kind: "group",
+          id: "availability-zone",
+        }),
+      );
       expect(mockSetNodes).toHaveBeenCalledTimes(1);
       updated = mockSetNodes.mock.calls[0][0]([]);
       const thirdPos = updated[0].position;
@@ -150,8 +179,16 @@ describe("useCanvasHandlers", () => {
 
   describe("onNodeDragStart", () => {
     it("commites the history", () => {
-      const { result } = renderHook(() => useCanvasHandlers(), { wrapper: createWrapper() });
-      act(() => result.current.onNodeDragStart(makeNativeMouseEvent(), makeNode("n1"), []));
+      const { result } = renderHook(() => useCanvasHandlers(), {
+        wrapper: createWrapper(),
+      });
+      act(() =>
+        result.current.onNodeDragStart(
+          makeNativeMouseEvent(),
+          makeNode("n1"),
+          [],
+        ),
+      );
       expect(mockCommit).toHaveBeenCalledTimes(1);
     });
   });
@@ -178,11 +215,19 @@ describe("useCanvasHandlers", () => {
       // full overlap, ratio 1
       vi.mocked(getIntersectingArea).mockReturnValue(400);
 
-      const { result } = renderHook(() => useCanvasHandlers(), { wrapper: createWrapper() });
+      const { result } = renderHook(() => useCanvasHandlers(), {
+        wrapper: createWrapper(),
+      });
       const bigNode = { ...draggedNode, measured: { width: 150, height: 150 } };
-      act(() => result.current.onNodeDragStop(makeNativeMouseEvent(), bigNode, [bigNode]));
+      act(() =>
+        result.current.onNodeDragStop(makeNativeMouseEvent(), bigNode, [
+          bigNode,
+        ]),
+      );
 
-      expect(toast.error).toHaveBeenCalledWith("Group is too small to contain the node");
+      expect(toast.error).toHaveBeenCalledWith(
+        "Group is too small to contain the node",
+      );
       expect(mockSetNodes).not.toHaveBeenCalled();
     });
 
@@ -190,8 +235,14 @@ describe("useCanvasHandlers", () => {
       const { getIntersectingArea } = await import("@/components/canvas/utils");
       vi.mocked(getIntersectingArea).mockReturnValue(400);
 
-      const { result } = renderHook(() => useCanvasHandlers(), { wrapper: createWrapper() });
-      act(() => result.current.onNodeDragStop(makeNativeMouseEvent(), draggedNode, [draggedNode]));
+      const { result } = renderHook(() => useCanvasHandlers(), {
+        wrapper: createWrapper(),
+      });
+      act(() =>
+        result.current.onNodeDragStop(makeNativeMouseEvent(), draggedNode, [
+          draggedNode,
+        ]),
+      );
 
       expect(mockSetNodes).toHaveBeenCalledTimes(1);
       const updated = mockSetNodes.mock.calls[0][0]([draggedNode, group]);
@@ -204,8 +255,14 @@ describe("useCanvasHandlers", () => {
       mockGetIntersectingNodes.mockReturnValue([]);
       const parented = { ...draggedNode, parentId: "old-group" };
 
-      const { result } = renderHook(() => useCanvasHandlers(), { wrapper: createWrapper() });
-      act(() => result.current.onNodeDragStop(makeNativeMouseEvent(), parented, [parented]));
+      const { result } = renderHook(() => useCanvasHandlers(), {
+        wrapper: createWrapper(),
+      });
+      act(() =>
+        result.current.onNodeDragStop(makeNativeMouseEvent(), parented, [
+          parented,
+        ]),
+      );
 
       const updated = mockSetNodes.mock.calls[0][0]([parented]);
       expect(updated[0].parentId).toBeUndefined();
@@ -254,7 +311,9 @@ describe("useCanvasHandlers", () => {
 
   describe("onNodeContextMenu", () => {
     it("selects unselected node and deselects other nodes and edges", () => {
-      const { result } = renderHook(() => useCanvasHandlers(), { wrapper: createWrapper() });
+      const { result } = renderHook(() => useCanvasHandlers(), {
+        wrapper: createWrapper(),
+      });
 
       const node1 = makeNode("n1", { selected: false });
       const node2 = makeNode("n2", { selected: true });
@@ -278,7 +337,9 @@ describe("useCanvasHandlers", () => {
     });
 
     it("does nothing to selection if node is already selected", () => {
-      const { result } = renderHook(() => useCanvasHandlers(), { wrapper: createWrapper() });
+      const { result } = renderHook(() => useCanvasHandlers(), {
+        wrapper: createWrapper(),
+      });
 
       const node1 = makeNode("n1", { selected: true });
 
@@ -293,7 +354,9 @@ describe("useCanvasHandlers", () => {
 
   describe("onEdgeContextMenu", () => {
     it("selects unselected edge and deselects nodes", () => {
-      const { result } = renderHook(() => useCanvasHandlers(), { wrapper: createWrapper() });
+      const { result } = renderHook(() => useCanvasHandlers(), {
+        wrapper: createWrapper(),
+      });
 
       const node1 = makeNode("n1", { selected: true });
       const edge1 = makeEdge("e1", "s", "t", { selected: false });
@@ -317,7 +380,9 @@ describe("useCanvasHandlers", () => {
 
   describe("onPaneContextMenu", () => {
     it("deselects all nodes and edges when right clicking pane background", () => {
-      const { result } = renderHook(() => useCanvasHandlers(), { wrapper: createWrapper() });
+      const { result } = renderHook(() => useCanvasHandlers(), {
+        wrapper: createWrapper(),
+      });
 
       const node1 = makeNode("n1", { selected: true });
       const edge1 = makeEdge("e1", "s", "t", { selected: true });

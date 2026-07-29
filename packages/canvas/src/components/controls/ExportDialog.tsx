@@ -45,12 +45,20 @@ export const ExportDialog = ({ open, onOpenChange }: ExportDialogProps) => {
   );
 };
 
-const ExportDialogInner = ({ onOpenChange }: { onOpenChange: (open: boolean) => void }) => {
+const ExportDialogInner = ({
+  onOpenChange,
+}: {
+  onOpenChange: (open: boolean) => void;
+}) => {
   const { captureImage, exportAsPng, exportAsSvg } = useCanvasExport();
-  const { exportOptions, setExportOptions } = useCanvasStore(useShallow(storeSelector));
+  const { exportOptions, setExportOptions } = useCanvasStore(
+    useShallow(storeSelector),
+  );
 
   const [fileName, setFileName] = useState("diagram");
-  const [format, setFormat] = useState<ExportFormat | null>(FILE_EXTENSIONS.PNG);
+  const [format, setFormat] = useState<ExportFormat | null>(
+    FILE_EXTENSIONS.PNG,
+  );
   const [dataUrl, setDataUrl] = useState<string | null>(null);
   const [isLoadingPreview, setIsLoadingPreview] = useState(false);
 
@@ -116,7 +124,9 @@ const ExportDialogInner = ({ onOpenChange }: { onOpenChange: (open: boolean) => 
     <DialogContent className="sm:max-w-sm">
       <DialogHeader>
         <DialogTitle>Export Diagram</DialogTitle>
-        <DialogDescription>Export your diagram in your preferred format.</DialogDescription>
+        <DialogDescription>
+          Export your diagram in your preferred format.
+        </DialogDescription>
       </DialogHeader>
 
       {/* export preview container */}
@@ -124,15 +134,23 @@ const ExportDialogInner = ({ onOpenChange }: { onOpenChange: (open: boolean) => 
         {isLoadingPreview ? (
           <div className="flex flex-col items-center gap-2">
             <Loader2 className="size-5 text-secondary animate-spin" />
-            <span className="text-xs font-medium text-secondary">Generating preview…</span>
+            <span className="text-xs font-medium text-secondary">
+              Generating preview…
+            </span>
           </div>
         ) : dataUrl ? (
-          <img src={dataUrl} alt="Export preview" className="w-full h-full object-contain p-2" />
+          <img
+            src={dataUrl}
+            alt="Export preview"
+            className="w-full h-full object-contain p-2"
+          />
         ) : (
           // last fallback
           <div className="flex flex-col items-center gap-2">
             <LucideImage className="size-7 text-secondary/50" />
-            <span className="text-xs font-medium text-secondary">Export Preview</span>
+            <span className="text-xs font-medium text-secondary">
+              Export Preview
+            </span>
           </div>
         )}
       </div>
@@ -150,10 +168,14 @@ const ExportDialogInner = ({ onOpenChange }: { onOpenChange: (open: boolean) => 
 
         {/* background */}
         <div className="flex items-center justify-between gap-3">
-          <span className="text-xs font-bold text-primary shrink-0">Background</span>
+          <span className="text-xs font-bold text-primary shrink-0">
+            Background
+          </span>
           <RadioGroup
             value={exportOptions.background}
-            onValueChange={(v) => setExportOptions({ background: v as ExportBackground })}
+            onValueChange={(v) =>
+              setExportOptions({ background: v as ExportBackground })
+            }
             className="flex flex-row gap-1 w-auto"
           >
             {backgrounds.map(({ value, label }) => (
@@ -193,7 +215,9 @@ const ExportDialogInner = ({ onOpenChange }: { onOpenChange: (open: boolean) => 
           <span className="text-xs font-bold text-primary shrink-0">Scale</span>
           <RadioGroup
             value={String(exportOptions.scale)}
-            onValueChange={(v) => setExportOptions({ scale: Number(v) as ExportScale })}
+            onValueChange={(v) =>
+              setExportOptions({ scale: Number(v) as ExportScale })
+            }
             className="flex flex-row gap-1 w-auto"
           >
             {scales.map(({ value, label }) => (
@@ -210,7 +234,9 @@ const ExportDialogInner = ({ onOpenChange }: { onOpenChange: (open: boolean) => 
 
         {/* padding */}
         <div className="flex items-center justify-between gap-3">
-          <span className="text-xs font-bold text-primary shrink-0">Padding</span>
+          <span className="text-xs font-bold text-primary shrink-0">
+            Padding
+          </span>
           <div className="flex items-center gap-1.5">
             <Input
               id="export-padding"
@@ -231,7 +257,9 @@ const ExportDialogInner = ({ onOpenChange }: { onOpenChange: (open: boolean) => 
 
         {/* export action */}
         <div className="flex items-center justify-between gap-3 pt-1">
-          <span className="text-xs font-bold text-primary shrink-0">Export as</span>
+          <span className="text-xs font-bold text-primary shrink-0">
+            Export as
+          </span>
           <div className="flex items-center gap-2">
             <Select value={format} onValueChange={(v) => setFormat(v)}>
               <SelectTrigger className="h-8 text-xs">

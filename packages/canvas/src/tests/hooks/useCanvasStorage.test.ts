@@ -1,4 +1,7 @@
-import { CANVAS_LOCALSTORAGE_KEY, useCanvasStorage } from "@/hooks/useCanvasStorage";
+import {
+  CANVAS_LOCALSTORAGE_KEY,
+  useCanvasStorage,
+} from "@/hooks/useCanvasStorage";
 import { CanvasStoreProvider } from "@/store/CanvasStoreProvider";
 import { CanvasStoreState } from "@/store/store";
 import { LibraryRegistry, LibraryRegistryProvider } from "@sysdraw/models";
@@ -11,7 +14,10 @@ import { makeEdge, makeNode, makeStore } from "../utils/utils";
 
 vi.unmock("zustand");
 
-const createWrapper = (store: StoreApi<CanvasStoreState>, registry?: LibraryRegistry) => {
+const createWrapper = (
+  store: StoreApi<CanvasStoreState>,
+  registry?: LibraryRegistry,
+) => {
   const libRegistry = registry || new LibraryRegistry();
   return ({ children }: { children: React.ReactNode }) =>
     createElement(CanvasStoreProvider, {
@@ -31,7 +37,9 @@ describe("useCanvasStorage", () => {
 
   it("saves the flow snapshot when onSave is called directly", () => {
     const store = makeStore([makeNode("1")], []);
-    const { result } = renderHook(() => useCanvasStorage(), { wrapper: createWrapper(store) });
+    const { result } = renderHook(() => useCanvasStorage(), {
+      wrapper: createWrapper(store),
+    });
 
     act(() => result.current.onSave());
 
@@ -41,7 +49,9 @@ describe("useCanvasStorage", () => {
       viewport: { x: 0, y: 0, zoom: 1 },
     };
 
-    expect(JSON.parse(localStorage.getItem(CANVAS_LOCALSTORAGE_KEY)!)).toEqual(expectedObject);
+    expect(JSON.parse(localStorage.getItem(CANVAS_LOCALSTORAGE_KEY)!)).toEqual(
+      expectedObject,
+    );
   });
 
   it("auto-restores nodes, edges, and viewport from localStorage on mount", async () => {
@@ -54,7 +64,9 @@ describe("useCanvasStorage", () => {
 
     const store = makeStore();
     const libRegistry = new LibraryRegistry();
-    renderHook(() => useCanvasStorage(), { wrapper: createWrapper(store, libRegistry) });
+    renderHook(() => useCanvasStorage(), {
+      wrapper: createWrapper(store, libRegistry),
+    });
 
     await act(async () => {
       await libRegistry.whenReady();
@@ -71,7 +83,9 @@ describe("useCanvasStorage", () => {
   it("auto-saves when nodes or edges change after mount (debounced)", async () => {
     const store = makeStore();
     const libRegistry = new LibraryRegistry();
-    renderHook(() => useCanvasStorage(), { wrapper: createWrapper(store, libRegistry) });
+    renderHook(() => useCanvasStorage(), {
+      wrapper: createWrapper(store, libRegistry),
+    });
 
     await act(async () => {
       await libRegistry.whenReady();

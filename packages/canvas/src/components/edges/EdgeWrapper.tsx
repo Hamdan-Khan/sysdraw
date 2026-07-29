@@ -55,7 +55,10 @@ export const EdgeWrapper = ({
       [edgePath, labelX, labelY] = getStraightPath(pathParams);
       break;
     case RegisteredEdges.STEP:
-      [edgePath, labelX, labelY] = getSmoothStepPath({ ...pathParams, borderRadius: 0 });
+      [edgePath, labelX, labelY] = getSmoothStepPath({
+        ...pathParams,
+        borderRadius: 0,
+      });
       break;
     case RegisteredEdges.SMOOTHSTEP:
     default:
@@ -69,7 +72,9 @@ export const EdgeWrapper = ({
   const handleLabelClick = (e: React.MouseEvent) => {
     e.stopPropagation();
     setNodes((nodes) =>
-      nodes.some((n) => n.selected) ? nodes.map((n) => ({ ...n, selected: false })) : nodes,
+      nodes.some((n) => n.selected)
+        ? nodes.map((n) => ({ ...n, selected: false }))
+        : nodes,
     );
     setEdges((edges) =>
       edges.map((edge) => ({
@@ -107,7 +112,12 @@ export const EdgeWrapper = ({
         </EdgeLabelRenderer>
       )}
       {selected && (
-        <EdgeOptionBarContainer edgeId={id} labelX={labelX} labelY={labelY} zoom={zoom} />
+        <EdgeOptionBarContainer
+          edgeId={id}
+          labelX={labelX}
+          labelY={labelY}
+          zoom={zoom}
+        />
       )}
     </>
   );

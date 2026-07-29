@@ -26,13 +26,17 @@ export const EdgeOptionBar = ({ edgeId }: EdgeOptionBarProps) => {
   const { commit } = useHistory();
 
   const [isLabelOpen, setIsLabelOpen] = useState(false);
-  const [labelInput, setLabelInput] = useState<string>((edge?.label as string) ?? "");
+  const [labelInput, setLabelInput] = useState<string>(
+    (edge?.label as string) ?? "",
+  );
   const hasCommittedRef = useRef(false);
   const popoverRef = useRef<HTMLDivElement>(null);
 
   const updateEdge = useCallback(
     (updater: (edge: Partial<Edge>) => Partial<Edge>) => {
-      setEdges((edges) => edges.map((e) => (e.id === edgeId ? { ...e, ...updater(e) } : e)));
+      setEdges((edges) =>
+        edges.map((e) => (e.id === edgeId ? { ...e, ...updater(e) } : e)),
+      );
     },
     [edgeId, setEdges],
   );
@@ -57,7 +61,10 @@ export const EdgeOptionBar = ({ edgeId }: EdgeOptionBarProps) => {
     if (!isLabelOpen) return;
 
     const handleClickOutside = (event: MouseEvent) => {
-      if (popoverRef.current && !popoverRef.current.contains(event.target as Node)) {
+      if (
+        popoverRef.current &&
+        !popoverRef.current.contains(event.target as Node)
+      ) {
         debouncedUpdateLabel.flush();
         hasCommittedRef.current = false;
         setIsLabelOpen(false);
@@ -74,7 +81,8 @@ export const EdgeOptionBar = ({ edgeId }: EdgeOptionBarProps) => {
     return null;
   }
 
-  const currentType = (edge.type ?? RegisteredEdges.STRAIGHT) as RegisteredEdges;
+  const currentType = (edge.type ??
+    RegisteredEdges.STRAIGHT) as RegisteredEdges;
   const isAnimated = edge.animated;
   const currentMarker = edge.markerEnd;
   const currentLabel = edge.label as string;
@@ -94,7 +102,10 @@ export const EdgeOptionBar = ({ edgeId }: EdgeOptionBarProps) => {
       let nextMarker;
       if (!e.markerEnd) {
         nextMarker = { type: MarkerType.ArrowClosed };
-      } else if (typeof e.markerEnd === "object" && e.markerEnd.type === MarkerType.ArrowClosed) {
+      } else if (
+        typeof e.markerEnd === "object" &&
+        e.markerEnd.type === MarkerType.ArrowClosed
+      ) {
         nextMarker = { type: MarkerType.Arrow };
       } else {
         nextMarker = undefined;
@@ -130,7 +141,9 @@ export const EdgeOptionBar = ({ edgeId }: EdgeOptionBarProps) => {
     debouncedUpdateLabel(newValue);
   };
 
-  const handleLabelInputKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+  const handleLabelInputKeyDown = (
+    e: React.KeyboardEvent<HTMLInputElement>,
+  ) => {
     if (e.key === "Enter") {
       e.preventDefault();
       debouncedUpdateLabel.flush();
@@ -146,7 +159,12 @@ export const EdgeOptionBar = ({ edgeId }: EdgeOptionBarProps) => {
   };
 
   const buttons: OptionBarButton[] = [
-    { icon: <Zap size={16} />, onClick: handleToggleAnimate, label: "Animate", active: isAnimated },
+    {
+      icon: <Zap size={16} />,
+      onClick: handleToggleAnimate,
+      label: "Animate",
+      active: isAnimated,
+    },
     {
       icon: <ArrowRight size={16} />,
       onClick: cycleMarker,
@@ -169,7 +187,10 @@ export const EdgeOptionBar = ({ edgeId }: EdgeOptionBarProps) => {
       </div>
 
       {/* label option */}
-      <div className="relative flex items-center justify-center group" ref={popoverRef}>
+      <div
+        className="relative flex items-center justify-center group"
+        ref={popoverRef}
+      >
         <button
           onClick={handleToggleLabelPopover}
           className={`p-1.5 rounded-md transition-all flex items-center justify-center cursor-pointer outline-none ${
@@ -203,7 +224,10 @@ export const EdgeOptionBar = ({ edgeId }: EdgeOptionBarProps) => {
       </div>
 
       {buttons.map(({ icon, onClick, label, active }) => (
-        <div key={label} className="relative flex items-center justify-center group">
+        <div
+          key={label}
+          className="relative flex items-center justify-center group"
+        >
           <button
             onClick={onClick}
             className={`p-1.5 rounded-md transition-all flex items-center justify-center cursor-pointer outline-none ${

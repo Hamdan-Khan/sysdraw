@@ -2,7 +2,9 @@ import { createContext, ReactNode, useContext } from "react";
 import { StoreApi, useStore } from "zustand";
 import { CanvasStoreState } from "./store";
 
-const CanvasStoreContext = createContext<StoreApi<CanvasStoreState> | null>(null);
+const CanvasStoreContext = createContext<StoreApi<CanvasStoreState> | null>(
+  null,
+);
 
 export interface CanvasStoreProviderProps {
   store: StoreApi<CanvasStoreState>;
@@ -10,10 +12,16 @@ export interface CanvasStoreProviderProps {
 }
 
 function CanvasStoreProvider({ store, children }: CanvasStoreProviderProps) {
-  return <CanvasStoreContext.Provider value={store}>{children}</CanvasStoreContext.Provider>;
+  return (
+    <CanvasStoreContext.Provider value={store}>
+      {children}
+    </CanvasStoreContext.Provider>
+  );
 }
 
-function useCanvasStore<T = CanvasStoreState>(selector: (state: CanvasStoreState) => T): T {
+function useCanvasStore<T = CanvasStoreState>(
+  selector: (state: CanvasStoreState) => T,
+): T {
   const store = useContext(CanvasStoreContext);
   if (!store) {
     throw new Error("useCanvasStore must be used within a CanvasStoreProvider");

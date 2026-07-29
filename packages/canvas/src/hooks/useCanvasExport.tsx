@@ -1,7 +1,13 @@
-import { ExportReadyPayload, ExportRenderer } from "@/components/export/ExportRenderer";
+import {
+  ExportReadyPayload,
+  ExportRenderer,
+} from "@/components/export/ExportRenderer";
 import { renderToNativeSvg } from "@/lib/svgExport";
 import { downloadFile } from "@/lib/utils";
-import { CanvasStoreContext, useCanvasStore } from "@/store/CanvasStoreProvider";
+import {
+  CanvasStoreContext,
+  useCanvasStore,
+} from "@/store/CanvasStoreProvider";
 import { CanvasStoreState } from "@/store/store";
 import { FILE_EXTENSIONS, PROJECT_VERSION } from "@sysdraw/common";
 import { Edge, Node, useReactFlow, Viewport } from "@xyflow/react";
@@ -75,14 +81,17 @@ export const useCanvasExport = () => {
    * mounts the renderer, waits for it to signal readiness, then captures and returns a data URL
    */
   const captureImage = useCallback(
-    async (format: ExportFormat = FILE_EXTENSIONS.PNG): Promise<string | null> => {
+    async (
+      format: ExportFormat = FILE_EXTENSIONS.PNG,
+    ): Promise<string | null> => {
       const { setIsExporting, exportOptions: expOptions } = storeApi.getState();
 
       setIsExporting(true);
 
       let payload: ExportReadyPayload;
       try {
-        const { promise, resolve } = Promise.withResolvers<ExportReadyPayload>();
+        const { promise, resolve } =
+          Promise.withResolvers<ExportReadyPayload>();
         pendingResolve = resolve;
         payload = await promise;
       } catch {
@@ -172,7 +181,9 @@ export const useCanvasExport = () => {
           viewport: { x: 0, y: 0, zoom: 1 },
         };
 
-        const blob = new Blob([JSON.stringify(flowObj)], { type: "application/json" });
+        const blob = new Blob([JSON.stringify(flowObj)], {
+          type: "application/json",
+        });
         const dataUrl = URL.createObjectURL(blob);
         downloadFile(dataUrl, fileName, FILE_EXTENSIONS.PROJECT);
         toast.success("Project saved successfully");
@@ -187,7 +198,15 @@ export const useCanvasExport = () => {
   /**
    * mounts the export renderer only while a capture is under way
    */
-  const ExportCanvas = isExporting ? <ExportRenderer onReady={onRendererReady} /> : null;
+  const ExportCanvas = isExporting ? (
+    <ExportRenderer onReady={onRendererReady} />
+  ) : null;
 
-  return { captureImage, exportAsPng, exportAsSvg, exportAsProject, ExportCanvas };
+  return {
+    captureImage,
+    exportAsPng,
+    exportAsSvg,
+    exportAsProject,
+    ExportCanvas,
+  };
 };

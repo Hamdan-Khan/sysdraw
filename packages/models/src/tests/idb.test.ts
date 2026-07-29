@@ -1,4 +1,8 @@
-import { IDB_CONFIG_KEY, IDB_DATABASE_NAME, IDB_DATABASE_VERSION } from "@sysdraw/common";
+import {
+  IDB_CONFIG_KEY,
+  IDB_DATABASE_NAME,
+  IDB_DATABASE_VERSION,
+} from "@sysdraw/common";
 import "fake-indexeddb/auto";
 import { openDB } from "idb";
 import { afterEach, describe, expect, it } from "vitest";
@@ -25,7 +29,9 @@ describe("LibraryRegistry IndexedDB Integration", () => {
     await registry.whenReady();
 
     // Verify Zustand state auto-loaded default library on first init
-    expect(registry.getSnapshot().loadedLibs[defaultLibrary.id]).toEqual(defaultLibrary);
+    expect(registry.getSnapshot().loadedLibs[defaultLibrary.id]).toEqual(
+      defaultLibrary,
+    );
 
     // Verify raw IndexedDB contents
     const db = await openDB(IDB_DATABASE_NAME, IDB_DATABASE_VERSION);
@@ -55,7 +61,9 @@ describe("LibraryRegistry IndexedDB Integration", () => {
 
     await registry.removeLibrary(defaultLibrary.id);
 
-    expect(registry.getSnapshot().loadedLibs[defaultLibrary.id]).toBeUndefined();
+    expect(
+      registry.getSnapshot().loadedLibs[defaultLibrary.id],
+    ).toBeUndefined();
 
     const db = await openDB(IDB_DATABASE_NAME, IDB_DATABASE_VERSION);
     const config = await db.get("config", IDB_CONFIG_KEY);
@@ -74,6 +82,8 @@ describe("LibraryRegistry IndexedDB Integration", () => {
     const registry2 = createRegistry();
     await registry2.whenReady();
 
-    expect(registry2.getSnapshot().loadedLibs[defaultLibrary.id]).toEqual(defaultLibrary);
+    expect(registry2.getSnapshot().loadedLibs[defaultLibrary.id]).toEqual(
+      defaultLibrary,
+    );
   });
 });

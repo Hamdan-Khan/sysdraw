@@ -1,4 +1,7 @@
-import { edgeTypeMetadata, edgeTypeOptions } from "@/components/edges/EdgeTypes";
+import {
+  edgeTypeMetadata,
+  edgeTypeOptions,
+} from "@/components/edges/EdgeTypes";
 import { useCopyPaste } from "@/hooks/useCopyPaste";
 import { useHistory } from "@/hooks/useHistory";
 import { useCanvasStore } from "@/store/CanvasStoreProvider";
@@ -35,7 +38,10 @@ const storeSelector = (state: CanvasStoreState) => ({
 /**
  * context menu for the canvas
  */
-export const CanvasContextMenu = ({ contextMenu, closeContextMenu }: CanvasContextMenuProps) => {
+export const CanvasContextMenu = ({
+  contextMenu,
+  closeContextMenu,
+}: CanvasContextMenuProps) => {
   const menuRef = useRef<HTMLDivElement>(null);
   const { copy, paste, isClipboardEmpty } = useCopyPaste();
   const { commit } = useHistory();
@@ -86,7 +92,9 @@ export const CanvasContextMenu = ({ contextMenu, closeContextMenu }: CanvasConte
     if (selectedEdges.length > 0) {
       commit();
       const selectedEdgeIds = new Set(selectedEdges.map((e) => e.id));
-      setEdges((prev) => prev.map((e) => (selectedEdgeIds.has(e.id) ? { ...e, type } : e)));
+      setEdges((prev) =>
+        prev.map((e) => (selectedEdgeIds.has(e.id) ? { ...e, type } : e)),
+      );
     } else {
       setGlobalEdgeType(type);
     }
@@ -95,11 +103,15 @@ export const CanvasContextMenu = ({ contextMenu, closeContextMenu }: CanvasConte
   const updateEdgeAnimated = () => {
     if (selectedEdges.length > 0) {
       commit();
-      const isCurrentlyAnimated = selectedEdges.every((e) => Boolean(e.animated));
+      const isCurrentlyAnimated = selectedEdges.every((e) =>
+        Boolean(e.animated),
+      );
       const nextState = !isCurrentlyAnimated;
       const selectedEdgeIds = new Set(selectedEdges.map((e) => e.id));
       setEdges((prev) =>
-        prev.map((e) => (selectedEdgeIds.has(e.id) ? { ...e, animated: nextState } : e)),
+        prev.map((e) =>
+          selectedEdgeIds.has(e.id) ? { ...e, animated: nextState } : e,
+        ),
       );
     } else {
       setGlobalEdgeAnimated(!globalEdgeAnimated);
@@ -110,7 +122,9 @@ export const CanvasContextMenu = ({ contextMenu, closeContextMenu }: CanvasConte
     if (selectedEdges.length > 0) {
       commit();
       const selectedEdgeIds = new Set(selectedEdges.map((e) => e.id));
-      setEdges((prev) => prev.map((e) => (selectedEdgeIds.has(e.id) ? { ...e, markerEnd } : e)));
+      setEdges((prev) =>
+        prev.map((e) => (selectedEdgeIds.has(e.id) ? { ...e, markerEnd } : e)),
+      );
     } else {
       setGlobalEdgeMarkerEnd(markerEnd);
     }
@@ -134,7 +148,11 @@ export const CanvasContextMenu = ({ contextMenu, closeContextMenu }: CanvasConte
       value: { type: MarkerType.ArrowClosed },
       typeStr: MarkerType.ArrowClosed,
     },
-    { label: "Open Arrow", value: { type: MarkerType.Arrow }, typeStr: MarkerType.Arrow },
+    {
+      label: "Open Arrow",
+      value: { type: MarkerType.Arrow },
+      typeStr: MarkerType.Arrow,
+    },
   ];
 
   const items: ContextMenuItem[] = [
@@ -193,7 +211,9 @@ export const CanvasContextMenu = ({ contextMenu, closeContextMenu }: CanvasConte
       submenu: arrowOptions.map((opt) => {
         const isChecked =
           selectedEdges.length > 0
-            ? selectedEdges.every((e) => getMarkerType(e.markerEnd) === opt.typeStr)
+            ? selectedEdges.every(
+                (e) => getMarkerType(e.markerEnd) === opt.typeStr,
+              )
             : getMarkerType(globalEdgeMarkerEnd) === opt.typeStr;
 
         return {

@@ -86,7 +86,10 @@ describe("onNodesChange", () => {
 
 describe("isNodeLocked", () => {
   it("returns false for undefined, missing, or unlocked nodes", () => {
-    const store = makeStore([makeNode("n1", { draggable: true }), makeNode("n2")]);
+    const store = makeStore([
+      makeNode("n1", { draggable: true }),
+      makeNode("n2"),
+    ]);
     const { isNodeLocked } = store.getState();
 
     expect(isNodeLocked()).toBe(false);
@@ -115,7 +118,10 @@ describe("onEdgesChange", () => {
   });
 
   it("removes an edge via a 'remove' change", () => {
-    const store = makeStore([], [makeEdge("e1", "a", "b"), makeEdge("e2", "b", "c")]);
+    const store = makeStore(
+      [],
+      [makeEdge("e1", "a", "b"), makeEdge("e2", "b", "c")],
+    );
     const { onEdgesChange } = store.getState();
 
     onEdgesChange([{ type: "remove", id: "e1" }]);
@@ -280,13 +286,20 @@ describe("commit / undo / redo", () => {
     redo();
     expect(store.getState().nodes.map((n) => n.id)).toEqual(["a"]);
     expect(store.getState().history.past).toHaveLength(1);
-    expect(store.getState().history.past[0].nodes.map((n) => n.id)).toEqual(["initial"]);
-    expect(store.getState().history.future.map((f) => f.nodes[0].id)).toEqual(["b"]);
+    expect(store.getState().history.past[0].nodes.map((n) => n.id)).toEqual([
+      "initial",
+    ]);
+    expect(store.getState().history.future.map((f) => f.nodes[0].id)).toEqual([
+      "b",
+    ]);
 
     // second redo restores "b"
     redo();
     expect(store.getState().nodes.map((n) => n.id)).toEqual(["b"]);
-    expect(store.getState().history.past.map((p) => p.nodes[0].id)).toEqual(["initial", "a"]);
+    expect(store.getState().history.past.map((p) => p.nodes[0].id)).toEqual([
+      "initial",
+      "a",
+    ]);
     expect(store.getState().history.future).toHaveLength(0);
 
     // single undo from "b" should go straight back to "a"

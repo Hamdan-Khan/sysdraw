@@ -9,7 +9,10 @@ interface LibraryRegistryProviderProps {
   children: ReactNode;
 }
 
-function LibraryRegistryProvider({ registry, children }: LibraryRegistryProviderProps) {
+function LibraryRegistryProvider({
+  registry,
+  children,
+}: LibraryRegistryProviderProps) {
   const registryInstance = useMemo(() => registry, [registry]);
 
   return (
@@ -29,7 +32,9 @@ function useLibraryRegistryStore<T = LibraryRegistryState>(
 ): T {
   const registry = useContext(LibraryRegistryContext);
   if (!registry) {
-    throw new Error("useLibraryRegistryStore must be used within a LibraryRegistryProvider");
+    throw new Error(
+      "useLibraryRegistryStore must be used within a LibraryRegistryProvider",
+    );
   }
   return useStore(registry.getStore(), selector);
 }
@@ -41,7 +46,9 @@ function useLibraryRegistryStore<T = LibraryRegistryState>(
 function useLibraryRegistry(): LibraryRegistry {
   const registry = useContext(LibraryRegistryContext);
   if (!registry) {
-    throw new Error("useLibraryRegistry must be used within a LibraryRegistryProvider");
+    throw new Error(
+      "useLibraryRegistry must be used within a LibraryRegistryProvider",
+    );
   }
   return registry;
 }

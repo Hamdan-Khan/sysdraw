@@ -27,7 +27,9 @@ describe("getIntersectingArea", () => {
   });
 
   it("returns 0 when one rect is missing", () => {
-    expect(getIntersectingArea({ x: 0, y: 0, width: 100, height: 100 }, undefined)).toBe(0);
+    expect(
+      getIntersectingArea({ x: 0, y: 0, width: 100, height: 100 }, undefined),
+    ).toBe(0);
   });
 
   it("returns 0 when a rect has zero width or height", () => {
@@ -61,21 +63,29 @@ describe("getIntersectingArea", () => {
 
 describe("clampPositionInsideGroup", () => {
   it("returns position unchanged when already inside bounds", () => {
-    expect(clampPositionInsideGroup({ x: 10, y: 20 }, 30, 30, 200, 200)).toEqual({ x: 10, y: 20 });
+    expect(
+      clampPositionInsideGroup({ x: 10, y: 20 }, 30, 30, 200, 200),
+    ).toEqual({ x: 10, y: 20 });
   });
 
   it("clamps negative x and y to 0", () => {
-    expect(clampPositionInsideGroup({ x: -10, y: -5 }, 30, 30, 200, 200)).toEqual({ x: 0, y: 0 });
+    expect(
+      clampPositionInsideGroup({ x: -10, y: -5 }, 30, 30, 200, 200),
+    ).toEqual({ x: 0, y: 0 });
   });
 
   it("clamps x that would push node outside the right edge", () => {
     // nodeW=50, groupW=100, max x = 50
     // position.x = 80 which is > 50, so clamped to 50
-    expect(clampPositionInsideGroup({ x: 80, y: 0 }, 50, 30, 100, 200)).toEqual({ x: 50, y: 0 });
+    expect(clampPositionInsideGroup({ x: 80, y: 0 }, 50, 30, 100, 200)).toEqual(
+      { x: 50, y: 0 },
+    );
   });
 
   it("clamps y that would push node outside the bottom edge", () => {
-    expect(clampPositionInsideGroup({ x: 0, y: 90 }, 30, 50, 200, 100)).toEqual({ x: 0, y: 50 });
+    expect(clampPositionInsideGroup({ x: 0, y: 90 }, 30, 50, 200, 100)).toEqual(
+      { x: 0, y: 50 },
+    );
   });
 });
 
@@ -99,7 +109,11 @@ describe("sortNodesAndGroups", () => {
   const getMap = (nodes: Node[]) => new Map(nodes.map((n) => [n.id, n]));
 
   it("places group nodes before regular nodes", () => {
-    const nodes = [makeRegularNode("r1"), makeGroupNode("g1"), makeRegularNode("r2")];
+    const nodes = [
+      makeRegularNode("r1"),
+      makeGroupNode("g1"),
+      makeRegularNode("r2"),
+    ];
     const sorted = sortNodesAndGroups(nodes, getMap(nodes));
 
     const types = sorted.map((n) => (n.type === "group-a" ? "group" : "node"));
@@ -113,9 +127,13 @@ describe("sortNodesAndGroups", () => {
     const nodes = [gChild, gParent, makeRegularNode("r1")];
 
     const sorted = sortNodesAndGroups(nodes, getMap(nodes));
-    const groupIds = sorted.filter((n) => n.type === "group-a").map((n) => n.id);
+    const groupIds = sorted
+      .filter((n) => n.type === "group-a")
+      .map((n) => n.id);
 
-    expect(groupIds.indexOf("g-parent")).toBeLessThan(groupIds.indexOf("g-child"));
+    expect(groupIds.indexOf("g-parent")).toBeLessThan(
+      groupIds.indexOf("g-child"),
+    );
   });
 
   it("handles deeply nested groups in correct depth order", () => {
@@ -145,13 +163,21 @@ describe("isChildNode", () => {
   it("returns false when node1 has no parentId", () => {
     const n1 = makeRegularNode("n1");
     const n2 = makeGroupNode("n2");
-    expect(isChildNode(n1, n2, new Map([n1, n2].map((n) => [n.id, n])))).toBe(false);
+    expect(isChildNode(n1, n2, new Map([n1, n2].map((n) => [n.id, n])))).toBe(
+      false,
+    );
   });
 
   it("returns true when node1 is a direct child of node2", () => {
     const parent = makeGroupNode("parent");
     const child = makeRegularNode("child", "parent");
-    expect(isChildNode(child, parent, new Map([parent, child].map((n) => [n.id, n])))).toBe(true);
+    expect(
+      isChildNode(
+        child,
+        parent,
+        new Map([parent, child].map((n) => [n.id, n])),
+      ),
+    ).toBe(true);
   });
 
   it("returns true when node1 is a grandchild of node2", () => {
@@ -159,7 +185,11 @@ describe("isChildNode", () => {
     const parent = makeGroupNode("parent", "grandparent");
     const child = makeRegularNode("child", "parent");
     expect(
-      isChildNode(child, grandparent, new Map([grandparent, parent, child].map((n) => [n.id, n]))),
+      isChildNode(
+        child,
+        grandparent,
+        new Map([grandparent, parent, child].map((n) => [n.id, n])),
+      ),
     ).toBe(true);
   });
 
@@ -167,6 +197,8 @@ describe("isChildNode", () => {
     const a = makeGroupNode("a");
     const b = makeGroupNode("b");
     const c = makeRegularNode("c", "b");
-    expect(isChildNode(c, a, new Map([a, b, c].map((n) => [n.id, n])))).toBe(false);
+    expect(isChildNode(c, a, new Map([a, b, c].map((n) => [n.id, n])))).toBe(
+      false,
+    );
   });
 });

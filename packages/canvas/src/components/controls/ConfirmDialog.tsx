@@ -44,7 +44,10 @@ export const ConfirmDialog = ({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Icon
-              className={cn("size-4", variant === "destructive" ? "text-red-500" : "text-primary")}
+              className={cn(
+                "size-4",
+                variant === "destructive" ? "text-red-500" : "text-primary",
+              )}
             />
             {title}
           </DialogTitle>

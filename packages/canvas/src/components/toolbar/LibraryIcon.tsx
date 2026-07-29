@@ -12,7 +12,12 @@ export interface LibraryIconProps {
  * Component to render a node icon from a LibraryNode definition.
  * Supports both raw SVG string and image URLs.
  */
-export const LibraryIcon = ({ icon, size, className = "", style }: LibraryIconProps) => {
+export const LibraryIcon = ({
+  icon,
+  size,
+  className = "",
+  style,
+}: LibraryIconProps) => {
   if (!icon || !icon.value) return null;
 
   const sizeStyle = size ? { width: size, height: size } : {};

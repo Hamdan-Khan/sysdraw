@@ -21,10 +21,18 @@ describe("lib/utils", () => {
       } as unknown as HTMLAnchorElement;
 
       vi.spyOn(document, "createElement").mockReturnValue(mockAnchor);
-      vi.spyOn(document.body, "appendChild").mockImplementation(() => mockAnchor);
-      vi.spyOn(document.body, "removeChild").mockImplementation(() => mockAnchor);
+      vi.spyOn(document.body, "appendChild").mockImplementation(
+        () => mockAnchor,
+      );
+      vi.spyOn(document.body, "removeChild").mockImplementation(
+        () => mockAnchor,
+      );
 
-      downloadFile("data:image/png;base64,123", "my-canvas", FILE_EXTENSIONS.PNG);
+      downloadFile(
+        "data:image/png;base64,123",
+        "my-canvas",
+        FILE_EXTENSIONS.PNG,
+      );
 
       expect(mockAnchor.download).toBe("my-canvas.png");
       expect(clickSpy).toHaveBeenCalled();
@@ -39,10 +47,18 @@ describe("lib/utils", () => {
       } as unknown as HTMLAnchorElement;
 
       vi.spyOn(document, "createElement").mockReturnValue(mockAnchor);
-      vi.spyOn(document.body, "appendChild").mockImplementation(() => mockAnchor);
-      vi.spyOn(document.body, "removeChild").mockImplementation(() => mockAnchor);
+      vi.spyOn(document.body, "appendChild").mockImplementation(
+        () => mockAnchor,
+      );
+      vi.spyOn(document.body, "removeChild").mockImplementation(
+        () => mockAnchor,
+      );
 
-      downloadFile("data:image/png;base64,123", "my-canvas.png", FILE_EXTENSIONS.PNG);
+      downloadFile(
+        "data:image/png;base64,123",
+        "my-canvas.png",
+        FILE_EXTENSIONS.PNG,
+      );
 
       expect(mockAnchor.download).toBe("my-canvas.png");
     });

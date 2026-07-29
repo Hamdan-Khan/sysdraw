@@ -34,15 +34,26 @@ export function ExportRenderer({ onReady }: ExportRendererProps) {
   const { nodes, edges, exportOptions } = useCanvasStore(useShallow(selector));
   const { getNodesBounds } = useReactFlow();
 
-  const { loadedLibs } = useLibraryRegistryStore(useShallow((s) => ({ loadedLibs: s.loadedLibs })));
+  const { loadedLibs } = useLibraryRegistryStore(
+    useShallow((s) => ({ loadedLibs: s.loadedLibs })),
+  );
   const nodeTypes = useMemo(() => createNodeTypes(loadedLibs), [loadedLibs]);
 
   // remove selected states
-  const cleanNodes = useMemo(() => nodes.map((n) => ({ ...n, selected: false })), [nodes]);
-  const cleanEdges = useMemo(() => edges.map((e) => ({ ...e, selected: false })), [edges]);
+  const cleanNodes = useMemo(
+    () => nodes.map((n) => ({ ...n, selected: false })),
+    [nodes],
+  );
+  const cleanEdges = useMemo(
+    () => edges.map((e) => ({ ...e, selected: false })),
+    [edges],
+  );
 
   /** diagram's bounding rect for getting its position and width/height on the canvas */
-  const bounds = useMemo(() => getNodesBounds(cleanNodes), [cleanNodes, getNodesBounds]);
+  const bounds = useMemo(
+    () => getNodesBounds(cleanNodes),
+    [cleanNodes, getNodesBounds],
+  );
   const { padding, showGrid, background } = exportOptions;
 
   // add padding to the diagram's bounding rect to calculate total width
@@ -61,7 +72,9 @@ export function ExportRenderer({ onReady }: ExportRendererProps) {
 
     // .react-flow contains both the background grid & viewport
     const flowEl = container.querySelector(".react-flow") as HTMLElement | null;
-    const viewportEl = container.querySelector(".react-flow__viewport") as HTMLElement | null;
+    const viewportEl = container.querySelector(
+      ".react-flow__viewport",
+    ) as HTMLElement | null;
     if (!flowEl || !viewportEl) {
       return;
     }
@@ -127,7 +140,11 @@ export function ExportRenderer({ onReady }: ExportRendererProps) {
           zoomOnDoubleClick={false}
           preventScrolling={false}
           proOptions={{ hideAttribution: true }}
-          style={{ width: canvasWidth, height: canvasHeight, backgroundColor: bgColor }}
+          style={{
+            width: canvasWidth,
+            height: canvasHeight,
+            backgroundColor: bgColor,
+          }}
         >
           {showGrid && <CanvasGrid id={EXPORT_CANVAS_GRID_ID} />}
         </ReactFlow>

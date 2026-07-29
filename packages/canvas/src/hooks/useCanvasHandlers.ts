@@ -68,12 +68,24 @@ const createNodeData = (kind: "node" | "group", nodeDef: LibraryNode) => {
  * event handlers for the canvas (drag, drop, re-parenting, etc.)
  */
 export const useCanvasHandlers = () => {
-  const { nodesMap, setNodes, setEdges, globalEdgeType, globalEdgeAnimated, globalEdgeMarkerEnd } =
-    useCanvasStore(useShallow(selector));
-  const { loadedLibs } = useLibraryRegistryStore(useShallow((s) => ({ loadedLibs: s.loadedLibs })));
+  const {
+    nodesMap,
+    setNodes,
+    setEdges,
+    globalEdgeType,
+    globalEdgeAnimated,
+    globalEdgeMarkerEnd,
+  } = useCanvasStore(useShallow(selector));
+  const { loadedLibs } = useLibraryRegistryStore(
+    useShallow((s) => ({ loadedLibs: s.loadedLibs })),
+  );
 
-  const { screenToFlowPosition, getIntersectingNodes, getInternalNode, getNodesBounds } =
-    useReactFlow();
+  const {
+    screenToFlowPosition,
+    getIntersectingNodes,
+    getInternalNode,
+    getNodesBounds,
+  } = useReactFlow();
 
   const { commit } = useHistory();
 
@@ -125,13 +137,20 @@ export const useCanvasHandlers = () => {
 
       // screenToFlowPosition converts client (screen) coords straight to
       // flow coords, accounting for pan/zoom
-      const position = screenToFlowPosition({ x: event.clientX, y: event.clientY });
+      const position = screenToFlowPosition({
+        x: event.clientX,
+        y: event.clientY,
+      });
 
-      const allLibNodes = Object.values(loadedLibs || {}).flatMap((lib) => lib.nodes || []);
+      const allLibNodes = Object.values(loadedLibs || {}).flatMap(
+        (lib) => lib.nodes || [],
+      );
       const nodeDef = allLibNodes.find((n) => n.id === id);
 
       if (!nodeDef) {
-        console.error(`Node definition for "${id}" not found in loaded libraries.`);
+        console.error(
+          `Node definition for "${id}" not found in loaded libraries.`,
+        );
         return;
       }
 
@@ -173,7 +192,10 @@ export const useCanvasHandlers = () => {
         toolbarAddOffsetRef.current = 0;
       }
 
-      const centerScreen = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
+      const centerScreen = {
+        x: window.innerWidth / 2,
+        y: window.innerHeight / 2,
+      };
       const flowPos = screenToFlowPosition(centerScreen);
 
       const defaultWidth = kind === "group" ? 400 : 48;
@@ -185,11 +207,15 @@ export const useCanvasHandlers = () => {
         y: flowPos.y - defaultHeight / 2 + offset,
       };
 
-      const allLibNodes = Object.values(loadedLibs || {}).flatMap((lib) => lib.nodes || []);
+      const allLibNodes = Object.values(loadedLibs || {}).flatMap(
+        (lib) => lib.nodes || [],
+      );
       const nodeDef = allLibNodes.find((n) => n.id === id);
 
       if (!nodeDef) {
-        console.error(`Node definition for "${id}" not found in loaded libraries.`);
+        console.error(
+          `Node definition for "${id}" not found in loaded libraries.`,
+        );
         return;
       }
 
@@ -206,13 +232,17 @@ export const useCanvasHandlers = () => {
 
       commit();
       setNodes((prev) => {
-        const deselected = prev.map((n) => (n.selected ? { ...n, selected: false } : n));
+        const deselected = prev.map((n) =>
+          n.selected ? { ...n, selected: false } : n,
+        );
         if (isGroup(newNode)) {
           return [newNode, ...deselected];
         }
         return [...deselected, newNode];
       });
-      setEdges((prev) => prev.map((e) => (e.selected ? { ...e, selected: false } : e)));
+      setEdges((prev) =>
+        prev.map((e) => (e.selected ? { ...e, selected: false } : e)),
+      );
     },
     [screenToFlowPosition, loadedLibs, commit, setNodes, setEdges],
   );
@@ -237,7 +267,8 @@ export const useCanvasHandlers = () => {
   const getBestDropGroup = useCallback(
     (nodes: Node[]): { group: Node; groupRect: NodeRect } | null => {
       /** bounding rect for the whole selection */
-      const multiSelectDragBounds = nodes.length > 1 ? getNodesBounds(nodes) : null;
+      const multiSelectDragBounds =
+        nodes.length > 1 ? getNodesBounds(nodes) : null;
 
       const seen = new Set<string>();
       const candidateGroups: Node[] = [];
@@ -273,7 +304,8 @@ export const useCanvasHandlers = () => {
 
         if (multiSelectDragBounds) {
           overlapArea = getIntersectingArea(multiSelectDragBounds, groupRect);
-          selectionArea = multiSelectDragBounds.width * multiSelectDragBounds.height;
+          selectionArea =
+            multiSelectDragBounds.width * multiSelectDragBounds.height;
         } else {
           // resolve precise rect from internals (in case of a single node)
           const nodeInternal = getInternalNode(nodes[0].id);
@@ -300,7 +332,9 @@ export const useCanvasHandlers = () => {
       // by discarding any candidate that is an ancestor of another valid candidate
       const deepestCandidates = validCandidates.filter((c1) => {
         const hasValidDescendant = validCandidates.some(
-          (c2) => c1.group.id !== c2.group.id && isChildNode(c2.group, c1.group, nodesMap),
+          (c2) =>
+            c1.group.id !== c2.group.id &&
+            isChildNode(c2.group, c1.group, nodesMap),
         );
         return !hasValidDescendant;
       });
@@ -340,8 +374,10 @@ export const useCanvasHandlers = () => {
       const best = getBestDropGroup(nodes);
 
       if (nodes.length == 1) {
-        const nodeArea = (node.measured?.height ?? 0) * (node.measured?.width ?? 0);
-        const targetArea = (best?.groupRect.height ?? 0) * (best?.groupRect.width ?? 0);
+        const nodeArea =
+          (node.measured?.height ?? 0) * (node.measured?.width ?? 0);
+        const targetArea =
+          (best?.groupRect.height ?? 0) * (best?.groupRect.width ?? 0);
 
         if (nodeArea > 0 && targetArea > 0 && nodeArea >= targetArea) {
           return;
@@ -375,8 +411,10 @@ export const useCanvasHandlers = () => {
       const best = getBestDropGroup(nodes);
 
       if (nodes.length == 1) {
-        const nodeArea = (node.measured?.height ?? 0) * (node.measured?.width ?? 0);
-        const targetArea = (best?.groupRect.height ?? 0) * (best?.groupRect.width ?? 0);
+        const nodeArea =
+          (node.measured?.height ?? 0) * (node.measured?.width ?? 0);
+        const targetArea =
+          (best?.groupRect.height ?? 0) * (best?.groupRect.width ?? 0);
 
         if (nodeArea > 0 && targetArea > 0 && nodeArea >= targetArea) {
           toast.error("Group is too small to contain the node");
@@ -393,7 +431,8 @@ export const useCanvasHandlers = () => {
         setNodes((ns) => {
           const updatedNodes = ns.map((n) => {
             // Clear the drop-target highlight ring.
-            if (n.id === dropTarget.id) return { ...n, className: NODE_WRAPPER_CLASS_ID };
+            if (n.id === dropTarget.id)
+              return { ...n, className: NODE_WRAPPER_CLASS_ID };
 
             // Only touch nodes that are part of the current drag selection.
             if (!draggedNodeIds.has(n.id)) return n;
@@ -402,7 +441,10 @@ export const useCanvasHandlers = () => {
             if (!nodeInternal) return n;
 
             const nodeRect = getNodeRect(nodeInternal);
-            const rawRelPos = { x: nodeRect.x - groupRect.x, y: nodeRect.y - groupRect.y };
+            const rawRelPos = {
+              x: nodeRect.x - groupRect.x,
+              y: nodeRect.y - groupRect.y,
+            };
             const position = clampPositionInsideGroup(
               rawRelPos,
               nodeRect.width,
@@ -419,7 +461,8 @@ export const useCanvasHandlers = () => {
         // then restore its absolute position and clean up any highlight rings.
         setNodes((ns) =>
           ns.map((n) => {
-            if (n.className?.includes("ring-2")) return { ...n, className: NODE_WRAPPER_CLASS_ID };
+            if (n.className?.includes("ring-2"))
+              return { ...n, className: NODE_WRAPPER_CLASS_ID };
 
             if (!draggedNodeIds.has(n.id) || !n.parentId) return n;
 
@@ -468,7 +511,9 @@ export const useCanvasHandlers = () => {
     (_event: React.MouseEvent, edge: Edge) => {
       if (!edge.selected) {
         setNodes((nodes) =>
-          nodes.some((n) => n.selected) ? nodes.map((n) => ({ ...n, selected: false })) : nodes,
+          nodes.some((n) => n.selected)
+            ? nodes.map((n) => ({ ...n, selected: false }))
+            : nodes,
         );
         setEdges((edges) =>
           edges.map((e) => ({
@@ -487,10 +532,14 @@ export const useCanvasHandlers = () => {
   const onPaneContextMenu: ReactFlowProps["onPaneContextMenu"] = useCallback(
     (_event: MouseEvent | React.MouseEvent) => {
       setNodes((nodes) =>
-        nodes.some((n) => n.selected) ? nodes.map((n) => ({ ...n, selected: false })) : nodes,
+        nodes.some((n) => n.selected)
+          ? nodes.map((n) => ({ ...n, selected: false }))
+          : nodes,
       );
       setEdges((edges) =>
-        edges.some((e) => e.selected) ? edges.map((e) => ({ ...e, selected: false })) : edges,
+        edges.some((e) => e.selected)
+          ? edges.map((e) => ({ ...e, selected: false }))
+          : edges,
       );
     },
     [setNodes, setEdges],

@@ -22,7 +22,9 @@ const fireKey = (key: string, modifier: "ctrlKey" | "metaKey" = "ctrlKey") =>
 /** fires a keydown directly on a DOM element (so e.target === el) */
 const fireKeyOn = (el: Element, key: string) =>
   act(() => {
-    el.dispatchEvent(new KeyboardEvent("keydown", { key, ctrlKey: true, bubbles: true }));
+    el.dispatchEvent(
+      new KeyboardEvent("keydown", { key, ctrlKey: true, bubbles: true }),
+    );
   });
 
 /** fires a contextmenu event at (x, y), optionally on a specific element */
@@ -37,7 +39,9 @@ const fireContextMenu = (x = 100, y = 200, target?: Element) => {
     document.body.appendChild(flowContainer);
   }
   act(() => {
-    el!.dispatchEvent(new MouseEvent("contextmenu", { bubbles: true, clientX: x, clientY: y }));
+    el!.dispatchEvent(
+      new MouseEvent("contextmenu", { bubbles: true, clientX: x, clientY: y }),
+    );
   });
   if (flowContainer) {
     flowContainer.remove();
@@ -88,7 +92,10 @@ describe("useShortcuts", () => {
     });
 
     it("selects all nodes and edges on Ctrl+A", () => {
-      const store = makeStore([makeNode("a"), makeNode("b")], [makeEdge("e1", "a", "b")]);
+      const store = makeStore(
+        [makeNode("a"), makeNode("b")],
+        [makeEdge("e1", "a", "b")],
+      );
       mount(store);
 
       fireKey("a");
@@ -105,7 +112,9 @@ describe("useShortcuts", () => {
       mount(store);
 
       act(() => {
-        window.dispatchEvent(new KeyboardEvent("keydown", { key: "Delete", bubbles: true }));
+        window.dispatchEvent(
+          new KeyboardEvent("keydown", { key: "Delete", bubbles: true }),
+        );
       });
 
       // Selected nodeA deleted, and connected edgeAB also deleted
@@ -120,7 +129,9 @@ describe("useShortcuts", () => {
       mount(store);
 
       act(() => {
-        window.dispatchEvent(new KeyboardEvent("keydown", { key: "Backspace", bubbles: true }));
+        window.dispatchEvent(
+          new KeyboardEvent("keydown", { key: "Backspace", bubbles: true }),
+        );
       });
 
       expect(store.getState().nodes).toHaveLength(0);
@@ -128,12 +139,17 @@ describe("useShortcuts", () => {
 
     it("preserves locked nodes during deletion when multi-selected", () => {
       const unlockedNode = { ...makeNode("unlocked"), selected: true };
-      const lockedNode = { ...makeNode("locked", { draggable: false }), selected: true };
+      const lockedNode = {
+        ...makeNode("locked", { draggable: false }),
+        selected: true,
+      };
       const store = makeStore([unlockedNode, lockedNode]);
       mount(store);
 
       act(() => {
-        window.dispatchEvent(new KeyboardEvent("keydown", { key: "Delete", bubbles: true }));
+        window.dispatchEvent(
+          new KeyboardEvent("keydown", { key: "Delete", bubbles: true }),
+        );
       });
 
       // unlockedNode is deleted, lockedNode is preserved
@@ -152,7 +168,11 @@ describe("useShortcuts", () => {
 
     it("does nothing when no modifier key is held", () => {
       mount();
-      act(() => window.dispatchEvent(new KeyboardEvent("keydown", { key: "c", bubbles: true })));
+      act(() =>
+        window.dispatchEvent(
+          new KeyboardEvent("keydown", { key: "c", bubbles: true }),
+        ),
+      );
       expect(mockCopy).not.toHaveBeenCalled();
     });
   });
@@ -180,7 +200,10 @@ describe("useShortcuts", () => {
       mount();
       const el = document.createElement("div");
       document.body.appendChild(el);
-      Object.defineProperty(el, "isContentEditable", { value: true, configurable: true });
+      Object.defineProperty(el, "isContentEditable", {
+        value: true,
+        configurable: true,
+      });
       fireKeyOn(el, "c");
       expect(mockCopy).not.toHaveBeenCalled();
       el.remove();

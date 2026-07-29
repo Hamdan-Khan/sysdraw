@@ -9,9 +9,11 @@ export type DnDTransferData = {
   id: string;
 };
 
-export type NodePropsType<TData extends Record<string, unknown> = Record<string, unknown>> =
-  NodeProps<Node<TData>>;
-export type NodeComponentType<TData extends Record<string, unknown> = Record<string, unknown>> =
-  React.ComponentType<NodePropsType<TData>>;
+export type NodePropsType<
+  TData extends Record<string, unknown> = Record<string, unknown>,
+> = NodeProps<Node<TData>>;
+export type NodeComponentType<
+  TData extends Record<string, unknown> = Record<string, unknown>,
+> = React.ComponentType<NodePropsType<TData>>;
 
 export type EdgePropsType = EdgeProps<Edge>;

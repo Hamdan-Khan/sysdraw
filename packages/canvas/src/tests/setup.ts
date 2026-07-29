@@ -63,7 +63,8 @@ vi.mock("@xyflow/react", async (importOriginal) => {
 
   return {
     ...actual,
-    EdgeLabelRenderer: ({ children }: { children: React.ReactNode }) => children,
+    EdgeLabelRenderer: ({ children }: { children: React.ReactNode }) =>
+      children,
     useReactFlow: () => ({
       getEdge: mockGetEdge,
       getEdges: mockGetEdges,
@@ -75,7 +76,11 @@ vi.mock("@xyflow/react", async (importOriginal) => {
       setEdges: mockSetEdges,
       setNodes: mockSetNodes,
       setViewport: mockSetViewport,
-      toObject: vi.fn(() => ({ nodes: [], edges: [], viewport: { x: 0, y: 0, zoom: 1 } })),
+      toObject: vi.fn(() => ({
+        nodes: [],
+        edges: [],
+        viewport: { x: 0, y: 0, zoom: 1 },
+      })),
     }),
   };
 });

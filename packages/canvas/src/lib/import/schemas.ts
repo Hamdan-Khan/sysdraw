@@ -51,7 +51,10 @@ export const NodeSchema = z.object({
   extent: z
     .union([
       z.literal("parent"),
-      z.tuple([z.tuple([z.number(), z.number()]), z.tuple([z.number(), z.number()])]),
+      z.tuple([
+        z.tuple([z.number(), z.number()]),
+        z.tuple([z.number(), z.number()]),
+      ]),
     ])
     .nullable()
     .optional(),
@@ -96,8 +99,12 @@ export const EdgeSchema = z.object({
   className: z.string().optional(),
   zIndex: z.number().optional(),
   ariaLabel: z.string().optional(),
-  markerStart: z.union([z.string(), z.record(z.string(), z.unknown())]).optional(),
-  markerEnd: z.union([z.string(), z.record(z.string(), z.unknown())]).optional(),
+  markerStart: z
+    .union([z.string(), z.record(z.string(), z.unknown())])
+    .optional(),
+  markerEnd: z
+    .union([z.string(), z.record(z.string(), z.unknown())])
+    .optional(),
   data: EdgeDataSchema.optional(),
 });
 

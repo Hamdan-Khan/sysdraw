@@ -7,7 +7,11 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { LibraryMetadata, useLibraryRegistry, useLibraryRegistryStore } from "@sysdraw/models";
+import {
+  LibraryMetadata,
+  useLibraryRegistry,
+  useLibraryRegistryStore,
+} from "@sysdraw/models";
 import { ChevronRight, Image } from "lucide-react";
 
 export const LibraryDropdown = () => {
@@ -47,7 +51,12 @@ export const LibraryDropdown = () => {
             className="text-secondary transition-transform duration-150 group-data-popup-open:rotate-90 group-data-open:rotate-90"
           />
         </DropdownMenuTrigger>
-        <DropdownMenuContent side="right" align="start" sideOffset={8} className="w-52">
+        <DropdownMenuContent
+          side="right"
+          align="start"
+          sideOffset={8}
+          className="w-52"
+        >
           <DropdownMenuGroup>
             <DropdownMenuLabel>
               Libraries ({selectedCount}/{libraries.length})

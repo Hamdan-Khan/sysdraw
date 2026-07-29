@@ -23,7 +23,9 @@ export function useShortcuts() {
   const { copy, paste } = useCopyPaste();
   const { undo, redo, commit } = useHistory();
 
-  const { nodes, edges, setNodes, setEdges, isNodeLocked } = useCanvasStore(useShallow(selector));
+  const { nodes, edges, setNodes, setEdges, isNodeLocked } = useCanvasStore(
+    useShallow(selector),
+  );
 
   const [contextMenu, setContextMenu] = useState<ContextMenuState | null>(null);
   const [isSaveDialogOpen, setIsSaveDialogOpen] = useState(false);
@@ -36,7 +38,9 @@ export function useShortcuts() {
   }, [setEdges, setNodes]);
 
   const deleteSelected = useCallback(() => {
-    const selectedNodes = nodes.filter((n) => n.selected && !isNodeLocked(n.id));
+    const selectedNodes = nodes.filter(
+      (n) => n.selected && !isNodeLocked(n.id),
+    );
     const selectedEdges = edges.filter((e) => e.selected);
 
     if (selectedNodes.length === 0 && selectedEdges.length === 0) {
@@ -50,7 +54,10 @@ export function useShortcuts() {
     setNodes((prev) => prev.filter((n) => !deleteNodeIds.has(n.id)));
     setEdges((prev) =>
       prev.filter(
-        (e) => !e.selected && !deleteNodeIds.has(e.source) && !deleteNodeIds.has(e.target),
+        (e) =>
+          !e.selected &&
+          !deleteNodeIds.has(e.source) &&
+          !deleteNodeIds.has(e.target),
       ),
     );
   }, [nodes, edges, commit, setNodes, setEdges, isNodeLocked]);
@@ -60,7 +67,11 @@ export function useShortcuts() {
     const handleKeyDown = (e: KeyboardEvent) => {
       const target = e.target as HTMLElement;
       // shoudn't trigger on editable elements
-      if (target.tagName === "INPUT" || target.tagName === "TEXTAREA" || target.isContentEditable) {
+      if (
+        target.tagName === "INPUT" ||
+        target.tagName === "TEXTAREA" ||
+        target.isContentEditable
+      ) {
         return;
       }
 
@@ -110,7 +121,10 @@ export function useShortcuts() {
     const handleContextMenu = (e: MouseEvent) => {
       // only open on the canvas pane itself, not on overlaying UI controls or non react-flow elements
       const target = e.target as HTMLElement;
-      if (!target.closest(".react-flow") || target.closest("[data-no-context-menu]")) {
+      if (
+        !target.closest(".react-flow") ||
+        target.closest("[data-no-context-menu]")
+      ) {
         return;
       }
 

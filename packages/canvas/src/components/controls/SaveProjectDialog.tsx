@@ -40,12 +40,17 @@ export const SaveProjectDialog = ({
       <DialogContent className="sm:max-w-sm">
         <DialogHeader>
           <DialogTitle>Save Project</DialogTitle>
-          <DialogDescription>Save your diagram as a .sysdraw project file.</DialogDescription>
+          <DialogDescription>
+            Save your diagram as a .sysdraw project file.
+          </DialogDescription>
         </DialogHeader>
 
         <form onSubmit={handleSave} className="flex flex-col gap-4 py-2">
           <div className="flex flex-col gap-1.5">
-            <label htmlFor="save-file-name" className="text-xs font-bold text-primary">
+            <label
+              htmlFor="save-file-name"
+              className="text-xs font-bold text-primary"
+            >
               File Name
             </label>
             <div className="flex items-center gap-2">

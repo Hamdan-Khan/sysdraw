@@ -11,7 +11,9 @@ interface SubMenuItemProps {
 
 /** a single row that may open a submenu on hover */
 export const SubMenuItem = ({ item, onClose }: SubMenuItemProps) => {
-  const [submenuStyle, setSubmenuStyle] = useState<React.CSSProperties | null>(null);
+  const [submenuStyle, setSubmenuStyle] = useState<React.CSSProperties | null>(
+    null,
+  );
   const rowRef = useRef<HTMLDivElement>(null);
 
   const openSubmenu = () => {
@@ -26,7 +28,8 @@ export const SubMenuItem = ({ item, onClose }: SubMenuItemProps) => {
 
     // vertical: clamp so submenu doesn't fall off the bottom of the viewport
     const submenuHeight = (item.submenu?.length ?? 0) * 36 + 8;
-    const topOffset = rect.bottom + submenuHeight > vh ? -(submenuHeight - rect.height) : 0;
+    const topOffset =
+      rect.bottom + submenuHeight > vh ? -(submenuHeight - rect.height) : 0;
 
     setSubmenuStyle({
       position: "absolute",
@@ -44,7 +47,12 @@ export const SubMenuItem = ({ item, onClose }: SubMenuItemProps) => {
   const Icon = item.icon;
 
   return (
-    <div ref={rowRef} className="relative" onMouseEnter={openSubmenu} onMouseLeave={closeSubmenu}>
+    <div
+      ref={rowRef}
+      className="relative"
+      onMouseEnter={openSubmenu}
+      onMouseLeave={closeSubmenu}
+    >
       <button
         role="menuitem"
         disabled={item.disabled}
@@ -61,7 +69,9 @@ export const SubMenuItem = ({ item, onClose }: SubMenuItemProps) => {
       >
         <span className="flex items-center gap-2">
           {item.checked !== undefined && (
-            <span className="w-4 flex justify-center text-primary">{item.checked ? "✓" : ""}</span>
+            <span className="w-4 flex justify-center text-primary">
+              {item.checked ? "✓" : ""}
+            </span>
           )}
           {Icon && (
             <span className="text-secondary flex items-center">
@@ -71,7 +81,11 @@ export const SubMenuItem = ({ item, onClose }: SubMenuItemProps) => {
           {item.label}
         </span>
         <span className="flex items-center gap-1">
-          {item.shortcut && <kbd className="text-xs text-secondary font-mono">{item.shortcut}</kbd>}
+          {item.shortcut && (
+            <kbd className="text-xs text-secondary font-mono">
+              {item.shortcut}
+            </kbd>
+          )}
           {hasSubmenu && <ChevronRight size={12} className="text-secondary" />}
         </span>
       </button>

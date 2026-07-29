@@ -71,11 +71,21 @@ export const OptionBar = ({ type, onAddLabel }: OptionBarProps) => {
       },
       // todo: add individual element comments/descriptions later with a comment box
       // { icon: MessageSquare, label: "Comment", action: () => {} },
-      { icon: Trash2, label: "Delete", action: handleDelete, disabled: isNodeLocked },
+      {
+        icon: Trash2,
+        label: "Delete",
+        action: handleDelete,
+        disabled: isNodeLocked,
+      },
     ];
 
     if (type === "node" && onAddLabel) {
-      opts.unshift({ icon: Type, label: "Label", action: onAddLabel, disabled: isNodeLocked });
+      opts.unshift({
+        icon: Type,
+        label: "Label",
+        action: onAddLabel,
+        disabled: isNodeLocked,
+      });
     }
 
     return opts;
@@ -86,7 +96,10 @@ export const OptionBar = ({ type, onAddLabel }: OptionBarProps) => {
       {options.map((opt) => {
         const Icon = opt.icon;
         return (
-          <div key={opt.label} className="relative flex items-center justify-center group">
+          <div
+            key={opt.label}
+            className="relative flex items-center justify-center group"
+          >
             <button
               onClick={opt.action}
               disabled={opt.disabled}

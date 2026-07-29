@@ -1,4 +1,8 @@
-import { IDB_CONFIG_KEY, IDB_DATABASE_NAME, IDB_DATABASE_VERSION } from "@sysdraw/common";
+import {
+  IDB_CONFIG_KEY,
+  IDB_DATABASE_NAME,
+  IDB_DATABASE_VERSION,
+} from "@sysdraw/common";
 import { DBSchema, IDBPDatabase, openDB } from "idb";
 import { StoreApi, createStore } from "zustand/vanilla";
 import { AppConfig } from "../config";
@@ -68,14 +72,18 @@ class LibraryRegistry {
    */
   private async initIDB() {
     try {
-      this.idb = await openDB<SysdrawDB>(IDB_DATABASE_NAME, IDB_DATABASE_VERSION, {
-        upgrade(db) {
-          db.createObjectStore("config");
-          db.createObjectStore("libraries", {
-            keyPath: "id",
-          });
+      this.idb = await openDB<SysdrawDB>(
+        IDB_DATABASE_NAME,
+        IDB_DATABASE_VERSION,
+        {
+          upgrade(db) {
+            db.createObjectStore("config");
+            db.createObjectStore("libraries", {
+              keyPath: "id",
+            });
+          },
         },
-      });
+      );
 
       // seed the database with the default library if it's not already there
       const defaultLib = await this.idb.get("libraries", defaultLibrary.id);
@@ -88,12 +96,18 @@ class LibraryRegistry {
       let appConfig = await this.idb.get("config", IDB_CONFIG_KEY);
 
       // if no libraries are selected, select the default one and update the config
-      if (!appConfig || !appConfig.selectedLibs || appConfig.selectedLibs.length === 0) {
+      if (
+        !appConfig ||
+        !appConfig.selectedLibs ||
+        appConfig.selectedLibs.length === 0
+      ) {
         appConfig = { selectedLibs: [defaultLibrary.id] };
         await this.idb.put("config", appConfig, IDB_CONFIG_KEY);
       }
 
-      const promises = appConfig.selectedLibs.map((libId) => this.loadLibraryFromIDB(libId));
+      const promises = appConfig.selectedLibs.map((libId) =>
+        this.loadLibraryFromIDB(libId),
+      );
 
       if (promises) {
         await Promise.all(promises);
@@ -129,7 +143,10 @@ class LibraryRegistry {
           await this.idb!.put("config", appConfig, IDB_CONFIG_KEY);
         }
       } catch (e) {
-        console.error(`Failed to update config in IndexedDB for library ${id}`, e);
+        console.error(
+          `Failed to update config in IndexedDB for library ${id}`,
+          e,
+        );
       }
     }
   };
@@ -154,11 +171,16 @@ class LibraryRegistry {
       try {
         let appConfig = await this.idb!.get("config", IDB_CONFIG_KEY);
         if (appConfig?.selectedLibs) {
-          appConfig.selectedLibs = appConfig.selectedLibs.filter((libId) => libId !== id);
+          appConfig.selectedLibs = appConfig.selectedLibs.filter(
+            (libId) => libId !== id,
+          );
           await this.idb!.put("config", appConfig, IDB_CONFIG_KEY);
         }
       } catch (e) {
-        console.error(`Failed to update config in IndexedDB when removing library ${id}`, e);
+        console.error(
+          `Failed to update config in IndexedDB when removing library ${id}`,
+          e,
+        );
       }
     }
   };

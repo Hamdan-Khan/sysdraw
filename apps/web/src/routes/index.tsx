@@ -14,7 +14,8 @@ export const Route = createFileRoute("/")({
       },
       {
         name: "description",
-        content: "Interactive canvas for system architecture design and diagramming.",
+        content:
+          "Interactive canvas for system architecture design and diagramming.",
       },
     ],
   }),
@@ -35,7 +36,10 @@ function LoadingScreen() {
 }
 
 function HomeComponent() {
-  const canvasState = useMemo(() => createCanvasStore({ nodes: [], edges: [] }), []);
+  const canvasState = useMemo(
+    () => createCanvasStore({ nodes: [], edges: [] }),
+    [],
+  );
   const libraryRegistry = useMemo(() => new LibraryRegistry(), []);
 
   return <Canvas libraryRegistry={libraryRegistry} canvasState={canvasState} />;

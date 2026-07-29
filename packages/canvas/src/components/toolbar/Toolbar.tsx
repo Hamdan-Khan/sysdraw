@@ -19,7 +19,9 @@ const selector = (state: CanvasStoreState) => ({
 
 export const Toolbar = () => {
   const { isInteractive } = useCanvasStore(useShallow(selector));
-  const { loadedLibs } = useLibraryRegistryStore(useShallow((s) => ({ loadedLibs: s.loadedLibs })));
+  const { loadedLibs } = useLibraryRegistryStore(
+    useShallow((s) => ({ loadedLibs: s.loadedLibs })),
+  );
   const { addNodeAtCenter } = useCanvasHandlers();
 
   const { nodes, groups } = useMemo(() => {
@@ -35,7 +37,10 @@ export const Toolbar = () => {
   /**
    * Handler for when a node or group is dragged from the toolbar
    */
-  function onDragStart(event: React.DragEvent<HTMLDivElement>, data: DnDTransferData) {
+  function onDragStart(
+    event: React.DragEvent<HTMLDivElement>,
+    data: DnDTransferData,
+  ) {
     if (!isInteractive) {
       toast.error("Please unlock the canvas to add nodes and groups.");
       return;

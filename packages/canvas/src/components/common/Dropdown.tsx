@@ -48,11 +48,19 @@ export const Dropdown = <T extends string>({
     // vertical: open down unless there is not enough space, then flip up
     const spaceBelow = vh - rect.bottom;
     const spaceAbove = rect.top;
-    const openDown = preferredDirection === "down" ? spaceBelow > 160 : spaceAbove < 160;
+    const openDown =
+      preferredDirection === "down" ? spaceBelow > 160 : spaceAbove < 160;
     const top = openDown ? rect.bottom + 4 : rect.top - 4;
     const transform = openDown ? "none" : "translateY(-100%)";
 
-    setPanelStyle({ position: "fixed", top, left, width: PANEL_WIDTH, transform, zIndex: 9999 });
+    setPanelStyle({
+      position: "fixed",
+      top,
+      left,
+      width: PANEL_WIDTH,
+      transform,
+      zIndex: 9999,
+    });
   };
 
   const toggleOpen = () => {
@@ -128,7 +136,9 @@ export const Dropdown = <T extends string>({
         aria-haspopup="listbox"
         aria-expanded={open}
         className={`flex items-center gap-1 p-2 rounded-md transition-all cursor-pointer outline-none ${
-          open ? "text-primary bg-dim" : "text-secondary hover:text-primary hover:bg-dim"
+          open
+            ? "text-primary bg-dim"
+            : "text-secondary hover:text-primary hover:bg-dim"
         }`}
       >
         {SelectedIcon && <SelectedIcon size={16} />}

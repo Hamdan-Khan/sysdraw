@@ -54,7 +54,8 @@ export const NodeWrapper = ({
     const baseW = width || DEFAULT_NODE_SIZE;
     const effectiveHeight = initialHeightRef.current ?? height;
     const baseH =
-      (effectiveHeight || DEFAULT_NODE_SIZE) + (isFirstTimeEditing ? LABEL_EXTRA_HEIGHT : 0);
+      (effectiveHeight || DEFAULT_NODE_SIZE) +
+      (isFirstTimeEditing ? LABEL_EXTRA_HEIGHT : 0);
 
     return { width: baseW, height: baseH };
   }, [width, height, isFirstTimeEditing]);
@@ -84,12 +85,18 @@ export const NodeWrapper = ({
 
           let updatedHeight = n.height;
           if (!hadLabel && hasNewLabel) {
-            const baseUnedited = initialHeightRef.current ?? n.height ?? DEFAULT_NODE_SIZE;
+            const baseUnedited =
+              initialHeightRef.current ?? n.height ?? DEFAULT_NODE_SIZE;
             updatedHeight = baseUnedited + LABEL_EXTRA_HEIGHT;
           } else if (hadLabel && !hasNewLabel) {
             const currentH =
-              n.height ?? n.measured?.height ?? DEFAULT_NODE_SIZE + LABEL_EXTRA_HEIGHT;
-            updatedHeight = Math.max(DEFAULT_NODE_SIZE, currentH - LABEL_EXTRA_HEIGHT);
+              n.height ??
+              n.measured?.height ??
+              DEFAULT_NODE_SIZE + LABEL_EXTRA_HEIGHT;
+            updatedHeight = Math.max(
+              DEFAULT_NODE_SIZE,
+              currentH - LABEL_EXTRA_HEIGHT,
+            );
           }
 
           return {
@@ -146,7 +153,9 @@ export const NodeWrapper = ({
       resizerBorderWidth={1}
     >
       <div className="my-auto flex flex-col items-center justify-center gap-1 w-full max-h-full">
-        <div className="flex-1 flex items-center justify-center w-full min-h-0">{children}</div>
+        <div className="flex-1 flex items-center justify-center w-full min-h-0">
+          {children}
+        </div>
 
         {hasLabel && (
           <div className="shrink-0 z-10 flex items-center justify-center">

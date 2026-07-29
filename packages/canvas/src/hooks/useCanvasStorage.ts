@@ -16,7 +16,9 @@ const selector = (state: CanvasStoreState) => ({
 export const CANVAS_LOCALSTORAGE_KEY = "sysdraw-canvas-snapshot";
 
 export const useCanvasStorage = () => {
-  const { nodes, edges, setEdges, setNodes } = useCanvasStore(useShallow(selector));
+  const { nodes, edges, setEdges, setNodes } = useCanvasStore(
+    useShallow(selector),
+  );
   const reactFlowInstance = useReactFlow();
   const libraryRegistry = useLibraryRegistry();
 

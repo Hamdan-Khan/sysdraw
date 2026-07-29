@@ -126,7 +126,9 @@ export const ControlsBar = ({
     toast.success("Canvas cleared");
   };
 
-  const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = async (
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) => {
     const file = event.target.files?.[0];
     if (!file) {
       return;
@@ -313,7 +315,10 @@ export const ControlsBar = ({
         onChange={handleFileChange}
         className="hidden"
       />
-      <ExportDialog open={isExportDialogOpen} onOpenChange={setIsExportDialogOpen} />
+      <ExportDialog
+        open={isExportDialogOpen}
+        onOpenChange={setIsExportDialogOpen}
+      />
       <SaveProjectDialog
         isSaveDialogOpen={isSaveDialogOpen}
         setIsSaveDialogOpen={(open) => setIsSaveDialogOpen?.(open)}

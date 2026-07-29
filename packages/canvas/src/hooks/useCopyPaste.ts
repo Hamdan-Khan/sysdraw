@@ -36,7 +36,8 @@ export function clearClipboard(): void {
 export function useCopyPaste() {
   const nodesMap = useCanvasStore((s) => s.nodesMap);
   const isNodeLocked = useCanvasStore((s) => s.isNodeLocked);
-  const { getNodes, getEdges, setNodes, setEdges, screenToFlowPosition } = useReactFlow();
+  const { getNodes, getEdges, setNodes, setEdges, screenToFlowPosition } =
+    useReactFlow();
 
   /** to add offset to pasted elements */
   const pasteCount = useRef(0);
@@ -62,7 +63,9 @@ export function useCopyPaste() {
           return;
         }
         const node = nodesMap.get(explicitNodeId);
-        nodesToCopy = node ? [node] : allNodes.filter((n) => n.id === explicitNodeId);
+        nodesToCopy = node
+          ? [node]
+          : allNodes.filter((n) => n.id === explicitNodeId);
       } else {
         nodesToCopy = allNodes.filter((n) => n.selected && !isNodeLocked(n.id));
       }
@@ -72,7 +75,9 @@ export function useCopyPaste() {
       }
 
       const idSet = new Set(nodesToCopy.map((n) => n.id));
-      const edgesToCopy = allEdges.filter((e) => idSet.has(e.source) && idSet.has(e.target));
+      const edgesToCopy = allEdges.filter(
+        (e) => idSet.has(e.source) && idSet.has(e.target),
+      );
 
       // deep clone to avoid references to copied element's data
       setClipboardData({
@@ -104,7 +109,8 @@ export function useCopyPaste() {
       const topLevelNodes = clipboard.nodes.filter((n) => {
         return !n.parentId || !idSet.has(n.parentId);
       });
-      const nodesForBounds = topLevelNodes.length > 0 ? topLevelNodes : clipboard.nodes;
+      const nodesForBounds =
+        topLevelNodes.length > 0 ? topLevelNodes : clipboard.nodes;
 
       // calculate top level selection's bounding rectangle
       const minX = Math.min(...nodesForBounds.map((n) => n.position.x));
@@ -157,10 +163,14 @@ export function useCopyPaste() {
       });
 
       setNodes((nds) =>
-        nds.map((n) => (n.selected ? { ...n, selected: false } : n)).concat(newNodes),
+        nds
+          .map((n) => (n.selected ? { ...n, selected: false } : n))
+          .concat(newNodes),
       );
       setEdges((eds) =>
-        eds.map((e) => (e.selected ? { ...e, selected: false } : e)).concat(newEdges),
+        eds
+          .map((e) => (e.selected ? { ...e, selected: false } : e))
+          .concat(newEdges),
       );
     },
     [screenToFlowPosition, setNodes, setEdges],

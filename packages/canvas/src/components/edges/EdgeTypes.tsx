@@ -2,7 +2,13 @@ import { EdgePropsType } from "@/components/canvas/types";
 import { DropdownOption } from "@/components/common/Dropdown";
 import { RegisteredEdges } from "@sysdraw/models";
 import { EdgeTypes } from "@xyflow/react";
-import { CornerDownRight, LucideIcon, Route, Slash, Spline } from "lucide-react";
+import {
+  CornerDownRight,
+  LucideIcon,
+  Route,
+  Slash,
+  Spline,
+} from "lucide-react";
 import { EdgeWrapper } from "./EdgeWrapper";
 
 export type EdgeTypeMetadata = {
@@ -17,18 +23,20 @@ export const edgeTypeMetadata: Record<RegisteredEdges, EdgeTypeMetadata> = {
   [RegisteredEdges.BEZIER]: { label: "Bezier", icon: Spline },
 };
 
-export const edgeTypeOptions: DropdownOption<RegisteredEdges>[] = Object.entries(
-  edgeTypeMetadata,
-).map(([value, metadata]) => ({
-  value: value as RegisteredEdges,
-  label: metadata.label,
-  icon: metadata.icon,
-}));
+export const edgeTypeOptions: DropdownOption<RegisteredEdges>[] =
+  Object.entries(edgeTypeMetadata).map(([value, metadata]) => ({
+    value: value as RegisteredEdges,
+    label: metadata.label,
+    icon: metadata.icon,
+  }));
 
 /**
  * map of all registered edge type components
  */
-export const edgeTypes: EdgeTypes = Object.values(RegisteredEdges).reduce((acc, edgeType) => {
-  acc[edgeType] = (props: EdgePropsType) => <EdgeWrapper {...props} />;
-  return acc;
-}, {} as EdgeTypes);
+export const edgeTypes: EdgeTypes = Object.values(RegisteredEdges).reduce(
+  (acc, edgeType) => {
+    acc[edgeType] = (props: EdgePropsType) => <EdgeWrapper {...props} />;
+    return acc;
+  },
+  {} as EdgeTypes,
+);

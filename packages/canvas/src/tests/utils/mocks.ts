@@ -16,7 +16,10 @@ export const mockSetViewport: Mock = vi.fn();
 export const mockOnConnect: Mock = vi.fn();
 
 // sonner mocks
-export const mockToast: Mock & { error: Mock; success: Mock } = Object.assign(vi.fn(), {
-  error: vi.fn(),
-  success: vi.fn(),
-});
+export const mockToast: Mock & { error: Mock; success: Mock } = Object.assign(
+  vi.fn(),
+  {
+    error: vi.fn(),
+    success: vi.fn(),
+  },
+);

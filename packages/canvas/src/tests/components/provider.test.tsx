@@ -1,4 +1,7 @@
-import { CanvasStoreProvider, useCanvasStore } from "@/store/CanvasStoreProvider";
+import {
+  CanvasStoreProvider,
+  useCanvasStore,
+} from "@/store/CanvasStoreProvider";
 import { createCanvasStore } from "@/store/store";
 import { act, renderHook } from "@testing-library/react";
 import React from "react";
@@ -9,7 +12,9 @@ vi.unmock("zustand");
 describe("CanvasStoreProvider & useCanvasStore", () => {
   it("throws an error when useCanvasStore is used outside CanvasStoreProvider", () => {
     // suppress console.error for expected error thrown in render
-    const consoleError = vi.spyOn(console, "error").mockImplementation(() => {});
+    const consoleError = vi
+      .spyOn(console, "error")
+      .mockImplementation(() => {});
     expect(() => renderHook(() => useCanvasStore((s) => s))).toThrow(
       "useCanvasStore must be used within a CanvasStoreProvider",
     );
@@ -34,7 +39,10 @@ describe("CanvasStoreProvider & useCanvasStore", () => {
       <CanvasStoreProvider store={store}>{children}</CanvasStoreProvider>
     );
 
-    const { result } = renderHook(() => useCanvasStore((s) => s.isInteractive), { wrapper });
+    const { result } = renderHook(
+      () => useCanvasStore((s) => s.isInteractive),
+      { wrapper },
+    );
     expect(result.current).toBe(true);
 
     act(() => {

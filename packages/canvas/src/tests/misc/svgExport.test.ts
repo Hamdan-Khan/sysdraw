@@ -19,11 +19,17 @@ describe("renderToNativeSvg", () => {
 
     const bgSvg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
     bgSvg.setAttribute("class", "react-flow__background");
-    bgSvg.setAttribute("style", "--xy-background-pattern-color-props: rgba(150, 150, 150, 0.3);");
+    bgSvg.setAttribute(
+      "style",
+      "--xy-background-pattern-color-props: rgba(150, 150, 150, 0.3);",
+    );
 
     const gridId = `${EXPORT_CANVAS_GRID_ID}-minor-grid-lines`;
 
-    const pattern = document.createElementNS("http://www.w3.org/2000/svg", "pattern");
+    const pattern = document.createElementNS(
+      "http://www.w3.org/2000/svg",
+      "pattern",
+    );
     pattern.setAttribute("id", gridId);
     pattern.setAttribute("width", "20");
     pattern.setAttribute("height", "20");
@@ -68,8 +74,14 @@ describe("renderToNativeSvg", () => {
     const nodeEl = document.createElement("div");
     nodeEl.className = `react-flow__node ${NODE_WRAPPER_CLASS_ID} ${NODE_CLASS_ID}`;
     nodeEl.style.transform = "translate(100px, 100px)";
-    Object.defineProperty(nodeEl, "offsetWidth", { value: 48, configurable: true });
-    Object.defineProperty(nodeEl, "offsetHeight", { value: 48, configurable: true });
+    Object.defineProperty(nodeEl, "offsetWidth", {
+      value: 48,
+      configurable: true,
+    });
+    Object.defineProperty(nodeEl, "offsetHeight", {
+      value: 48,
+      configurable: true,
+    });
     nodeEl.getBoundingClientRect = () => ({
       left: 100,
       top: 100,
@@ -96,9 +108,15 @@ describe("renderToNativeSvg", () => {
       toJSON: () => {},
     });
 
-    const dotSvg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    const dotSvg = document.createElementNS(
+      "http://www.w3.org/2000/svg",
+      "svg",
+    );
     dotSvg.setAttribute("class", HANDLE_DOT_CLASS_ID);
-    const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+    const circle = document.createElementNS(
+      "http://www.w3.org/2000/svg",
+      "circle",
+    );
     circle.setAttribute("cx", "3");
     circle.setAttribute("cy", "3");
     circle.setAttribute("r", "2.5");
@@ -192,8 +210,14 @@ describe("renderToNativeSvg", () => {
     const nodeEl = document.createElement("div");
     nodeEl.className = `react-flow__node ${NODE_WRAPPER_CLASS_ID} parent`;
     nodeEl.style.transform = "translate(100px, 100px)";
-    Object.defineProperty(nodeEl, "offsetWidth", { value: 668, configurable: true });
-    Object.defineProperty(nodeEl, "offsetHeight", { value: 481, configurable: true });
+    Object.defineProperty(nodeEl, "offsetWidth", {
+      value: 668,
+      configurable: true,
+    });
+    Object.defineProperty(nodeEl, "offsetHeight", {
+      value: 481,
+      configurable: true,
+    });
     nodeEl.getBoundingClientRect = () => ({
       left: 100,
       top: 100,
@@ -259,8 +283,14 @@ describe("renderToNativeSvg", () => {
     const groupNode = document.createElement("div");
     groupNode.className = `react-flow__node ${NODE_WRAPPER_CLASS_ID}`;
     groupNode.style.transform = "translate(50px, 50px)";
-    Object.defineProperty(groupNode, "offsetWidth", { value: 300, configurable: true });
-    Object.defineProperty(groupNode, "offsetHeight", { value: 200, configurable: true });
+    Object.defineProperty(groupNode, "offsetWidth", {
+      value: 300,
+      configurable: true,
+    });
+    Object.defineProperty(groupNode, "offsetHeight", {
+      value: 200,
+      configurable: true,
+    });
 
     const groupContainer = document.createElement("div");
     groupContainer.className = `border border-dashed ${GROUP_CONTAINER_CLASS_ID}`;
@@ -292,8 +322,14 @@ describe("renderToNativeSvg", () => {
     const stdNode = document.createElement("div");
     stdNode.className = `react-flow__node ${NODE_WRAPPER_CLASS_ID} ${NODE_CLASS_ID}`;
     stdNode.style.transform = "translate(100px, 100px)";
-    Object.defineProperty(stdNode, "offsetWidth", { value: 48, configurable: true });
-    Object.defineProperty(stdNode, "offsetHeight", { value: 48, configurable: true });
+    Object.defineProperty(stdNode, "offsetWidth", {
+      value: 48,
+      configurable: true,
+    });
+    Object.defineProperty(stdNode, "offsetHeight", {
+      value: 48,
+      configurable: true,
+    });
 
     viewportEl.appendChild(stdNode);
     flowEl.appendChild(viewportEl);
@@ -322,8 +358,14 @@ describe("renderToNativeSvg", () => {
     const nodeWrapper = document.createElement("div");
     nodeWrapper.className = `react-flow__node ${NODE_WRAPPER_CLASS_ID}`;
     nodeWrapper.style.transform = "translate(200px, 150px)";
-    Object.defineProperty(nodeWrapper, "offsetWidth", { value: 64, configurable: true });
-    Object.defineProperty(nodeWrapper, "offsetHeight", { value: 64, configurable: true });
+    Object.defineProperty(nodeWrapper, "offsetWidth", {
+      value: 64,
+      configurable: true,
+    });
+    Object.defineProperty(nodeWrapper, "offsetHeight", {
+      value: 64,
+      configurable: true,
+    });
 
     const nodeEl = document.createElement("div");
     nodeEl.className = NODE_CLASS_ID;
@@ -331,7 +373,10 @@ describe("renderToNativeSvg", () => {
     const iconContainer = document.createElement("div");
     iconContainer.className = NODE_ICON_CLASS_ID;
 
-    const iconSvg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    const iconSvg = document.createElementNS(
+      "http://www.w3.org/2000/svg",
+      "svg",
+    );
     iconSvg.setAttribute("viewBox", "0 0 24 24");
 
     const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
@@ -362,11 +407,20 @@ describe("renderToNativeSvg", () => {
     const flowEl = document.createElement("div");
     flowEl.className = "react-flow";
 
-    const svgLayer = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    const svgLayer = document.createElementNS(
+      "http://www.w3.org/2000/svg",
+      "svg",
+    );
     svgLayer.setAttribute("class", "react-flow__edges");
 
-    const edgePath = document.createElementNS("http://www.w3.org/2000/svg", "path");
-    edgePath.setAttribute("class", `react-flow__edge-path ${EDGE_PATH_CLASS_ID}`);
+    const edgePath = document.createElementNS(
+      "http://www.w3.org/2000/svg",
+      "path",
+    );
+    edgePath.setAttribute(
+      "class",
+      `react-flow__edge-path ${EDGE_PATH_CLASS_ID}`,
+    );
     edgePath.setAttribute("d", "M 10 10 L 100 100");
     edgePath.style.stroke = "rgb(59, 130, 246)";
     edgePath.style.strokeWidth = "2px";
@@ -396,8 +450,14 @@ describe("renderToNativeSvg", () => {
 
     const groupNode = document.createElement("div");
     groupNode.className = `react-flow__node ${NODE_WRAPPER_CLASS_ID}`;
-    Object.defineProperty(groupNode, "offsetWidth", { value: 200, configurable: true });
-    Object.defineProperty(groupNode, "offsetHeight", { value: 100, configurable: true });
+    Object.defineProperty(groupNode, "offsetWidth", {
+      value: 200,
+      configurable: true,
+    });
+    Object.defineProperty(groupNode, "offsetHeight", {
+      value: 100,
+      configurable: true,
+    });
 
     const groupContainer = document.createElement("div");
     groupContainer.className = GROUP_CONTAINER_CLASS_ID;
@@ -428,7 +488,9 @@ describe("renderToNativeSvg", () => {
       dataUrl.replace(/^data:image\/svg\+xml;charset=utf-8,/, ""),
     );
 
-    expect(decodedSvg).toContain("Label &lt;With&gt; &amp; &apos;Unsafe&apos; &quot;Chars&quot;");
+    expect(decodedSvg).toContain(
+      "Label &lt;With&gt; &amp; &apos;Unsafe&apos; &quot;Chars&quot;",
+    );
 
     document.body.removeChild(flowEl);
   });

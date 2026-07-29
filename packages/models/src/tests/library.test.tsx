@@ -65,12 +65,16 @@ describe("LibraryRegistry Instance", () => {
     expect(registry.getSnapshot().loadedLibs[defaultLibrary.id]).toBeDefined();
 
     await registry.removeLibrary(defaultLibrary.id);
-    expect(registry.getSnapshot().loadedLibs[defaultLibrary.id]).toBeUndefined();
+    expect(
+      registry.getSnapshot().loadedLibs[defaultLibrary.id],
+    ).toBeUndefined();
     expect(registry.getSnapshot().loadedLibs).toEqual({});
   });
 
   it("logs an error and preserves state when removing a non-existent library", async () => {
-    const consoleError = vi.spyOn(console, "error").mockImplementation(() => {});
+    const consoleError = vi
+      .spyOn(console, "error")
+      .mockImplementation(() => {});
 
     await registry.addLibrary(defaultLibrary.id);
     const stateBefore = registry.getSnapshot().loadedLibs;
@@ -93,7 +97,9 @@ describe("LibraryRegistry Instance", () => {
       await registry.addLibrary(defaultLibrary.id);
     });
 
-    expect(store.getState().loadedLibs[defaultLibrary.id]).toEqual(defaultLibrary);
+    expect(store.getState().loadedLibs[defaultLibrary.id]).toEqual(
+      defaultLibrary,
+    );
   });
 });
 
@@ -109,7 +115,9 @@ describe("LibraryRegistryProvider & Hooks", () => {
   });
 
   it("throws an error when useLibraryRegistry is used outside LibraryRegistryProvider", () => {
-    const consoleError = vi.spyOn(console, "error").mockImplementation(() => {});
+    const consoleError = vi
+      .spyOn(console, "error")
+      .mockImplementation(() => {});
 
     expect(() => renderHook(() => useLibraryRegistry())).toThrow(
       "useLibraryRegistry must be used within a LibraryRegistryProvider",
@@ -119,7 +127,9 @@ describe("LibraryRegistryProvider & Hooks", () => {
   });
 
   it("throws an error when useLibraryRegistryStore is used outside LibraryRegistryProvider", () => {
-    const consoleError = vi.spyOn(console, "error").mockImplementation(() => {});
+    const consoleError = vi
+      .spyOn(console, "error")
+      .mockImplementation(() => {});
 
     expect(() => renderHook(() => useLibraryRegistryStore((s) => s))).toThrow(
       "useLibraryRegistryStore must be used within a LibraryRegistryProvider",
@@ -130,7 +140,9 @@ describe("LibraryRegistryProvider & Hooks", () => {
 
   it("provides access to the LibraryRegistry instance via useLibraryRegistry", () => {
     const wrapper = ({ children }: { children: React.ReactNode }) => (
-      <LibraryRegistryProvider registry={registry}>{children}</LibraryRegistryProvider>
+      <LibraryRegistryProvider registry={registry}>
+        {children}
+      </LibraryRegistryProvider>
     );
 
     const { result } = renderHook(() => useLibraryRegistry(), { wrapper });
@@ -139,10 +151,15 @@ describe("LibraryRegistryProvider & Hooks", () => {
 
   it("selects state slice and updates reactively with useLibraryRegistryStore", async () => {
     const wrapper = ({ children }: { children: React.ReactNode }) => (
-      <LibraryRegistryProvider registry={registry}>{children}</LibraryRegistryProvider>
+      <LibraryRegistryProvider registry={registry}>
+        {children}
+      </LibraryRegistryProvider>
     );
 
-    const { result } = renderHook(() => useLibraryRegistryStore((s) => s.loadedLibs), { wrapper });
+    const { result } = renderHook(
+      () => useLibraryRegistryStore((s) => s.loadedLibs),
+      { wrapper },
+    );
 
     expect(result.current).toEqual({});
 

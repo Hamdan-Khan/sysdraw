@@ -32,7 +32,9 @@ export const makeEdge = (
 export const makeStore = (nodes: Node[] = [], edges: Edge[] = []) =>
   createCanvasStore({ nodes, edges });
 
-export const makeNativeMouseEvent = (overrides?: Partial<MouseEvent>): MouseEvent =>
+export const makeNativeMouseEvent = (
+  overrides?: Partial<MouseEvent>,
+): MouseEvent =>
   ({
     preventDefault: vi.fn(),
     stopPropagation: vi.fn(),
@@ -41,7 +43,9 @@ export const makeNativeMouseEvent = (overrides?: Partial<MouseEvent>): MouseEven
     ...overrides,
   }) as unknown as MouseEvent;
 
-export const makeMouseEvent = (overrides?: Partial<React.MouseEvent>): React.MouseEvent =>
+export const makeMouseEvent = (
+  overrides?: Partial<React.MouseEvent>,
+): React.MouseEvent =>
   ({
     preventDefault: vi.fn(),
     stopPropagation: vi.fn(),

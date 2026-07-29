@@ -18,11 +18,19 @@ vi.mock("../../hooks/useHistory", () => ({
 describe("EdgeOptionBar", () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    mockGetEdge.mockImplementation((id: string) => ({ id, type: "straight", label: "" }));
+    mockGetEdge.mockImplementation((id: string) => ({
+      id,
+      type: "straight",
+      label: "",
+    }));
   });
 
   it("renders label toggle button and opens popover on click", () => {
-    mockGetEdge.mockReturnValue({ id: "e1", type: "straight", label: "Initial Label" });
+    mockGetEdge.mockReturnValue({
+      id: "e1",
+      type: "straight",
+      label: "Initial Label",
+    });
 
     render(<EdgeOptionBar edgeId="e1" />);
 
@@ -89,11 +97,17 @@ describe("EdgeOptionBar", () => {
     expect(updated[0].label).toBe("Flushed Label");
 
     // Popover should close on Enter
-    expect(screen.queryByPlaceholderText("Edge label...")).not.toBeInTheDocument();
+    expect(
+      screen.queryByPlaceholderText("Edge label..."),
+    ).not.toBeInTheDocument();
   });
 
   it("reverts input value on Escape key press", () => {
-    mockGetEdge.mockReturnValue({ id: "e1", type: "straight", label: "Original" });
+    mockGetEdge.mockReturnValue({
+      id: "e1",
+      type: "straight",
+      label: "Original",
+    });
 
     render(<EdgeOptionBar edgeId="e1" />);
 
@@ -106,6 +120,8 @@ describe("EdgeOptionBar", () => {
     fireEvent.keyDown(input, { key: "Escape", code: "Escape" });
 
     // Popover should close
-    expect(screen.queryByPlaceholderText("Edge label...")).not.toBeInTheDocument();
+    expect(
+      screen.queryByPlaceholderText("Edge label..."),
+    ).not.toBeInTheDocument();
   });
 });

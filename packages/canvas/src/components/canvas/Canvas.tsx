@@ -8,9 +8,16 @@ import { useCanvasExport } from "@/hooks/useCanvasExport";
 import { useCanvasHandlers } from "@/hooks/useCanvasHandlers";
 import { useCanvasStorage } from "@/hooks/useCanvasStorage";
 import { useShortcuts } from "@/hooks/useShortcuts";
-import { CanvasStoreProvider, useCanvasStore } from "@/store/CanvasStoreProvider";
+import {
+  CanvasStoreProvider,
+  useCanvasStore,
+} from "@/store/CanvasStoreProvider";
 import { CanvasStoreState } from "@/store/store";
-import { LibraryRegistry, LibraryRegistryProvider, useLibraryRegistryStore } from "@sysdraw/models";
+import {
+  LibraryRegistry,
+  LibraryRegistryProvider,
+  useLibraryRegistryStore,
+} from "@sysdraw/models";
 import { ReactFlow, ReactFlowProvider } from "@xyflow/react";
 import { createRef, useMemo } from "react";
 import { Toaster } from "sonner";
@@ -35,13 +42,14 @@ const selector = (state: CanvasStoreState) => ({
 const CanvasElement = () => {
   const dndWrapperRef = createRef<HTMLDivElement>();
 
-  const { loadedLibs } = useLibraryRegistryStore(useShallow((s) => ({ loadedLibs: s.loadedLibs })));
+  const { loadedLibs } = useLibraryRegistryStore(
+    useShallow((s) => ({ loadedLibs: s.loadedLibs })),
+  );
 
   const nodeTypes = useMemo(() => createNodeTypes(loadedLibs), [loadedLibs]);
 
-  const { edges, nodes, onEdgesChange, onNodesChange, isInteractive } = useCanvasStore(
-    useShallow(selector),
-  );
+  const { edges, nodes, onEdgesChange, onNodesChange, isInteractive } =
+    useCanvasStore(useShallow(selector));
 
   const {
     onDragOver,
@@ -56,7 +64,12 @@ const CanvasElement = () => {
   } = useCanvasHandlers();
 
   // registers keyboard shortcuts and custom context menu
-  const { contextMenu, closeContextMenu, isSaveDialogOpen, setIsSaveDialogOpen } = useShortcuts();
+  const {
+    contextMenu,
+    closeContextMenu,
+    isSaveDialogOpen,
+    setIsSaveDialogOpen,
+  } = useShortcuts();
 
   // syncs current canvas to / from localStorage
   useCanvasStorage();
@@ -65,8 +78,15 @@ const CanvasElement = () => {
   const { ExportCanvas } = useCanvasExport();
 
   return (
-    <div className="w-screen h-screen bg-bg relative" style={{ width: "100%", height: "100%" }}>
-      <DndWrapper wrapperRef={dndWrapperRef} onDrop={onDrop} onDragOver={onDragOver}>
+    <div
+      className="w-screen h-screen bg-bg relative"
+      style={{ width: "100%", height: "100%" }}
+    >
+      <DndWrapper
+        wrapperRef={dndWrapperRef}
+        onDrop={onDrop}
+        onDragOver={onDragOver}
+      >
         <Toolbar />
         <ControlsBar
           isSaveDialogOpen={isSaveDialogOpen}
@@ -99,7 +119,10 @@ const CanvasElement = () => {
           <CanvasGrid id="canvas" />
         </ReactFlow>
       </DndWrapper>
-      <CanvasContextMenu contextMenu={contextMenu} closeContextMenu={closeContextMenu} />
+      <CanvasContextMenu
+        contextMenu={contextMenu}
+        closeContextMenu={closeContextMenu}
+      />
       {ExportCanvas}
     </div>
   );

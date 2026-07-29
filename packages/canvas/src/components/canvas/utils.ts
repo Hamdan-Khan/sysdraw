@@ -24,7 +24,10 @@ export const getNodeRect = (internalNode: InternalNode<Node>): NodeRect => ({
  * Returns the pixel area of the overlap between two node rects.
  * Returns 0 when either rect is missing or has no area.
  */
-export const getIntersectingArea = (node?: NodeRect, group?: NodeRect): number => {
+export const getIntersectingArea = (
+  node?: NodeRect,
+  group?: NodeRect,
+): number => {
   if (!node || !group) {
     return 0;
   }
@@ -79,7 +82,10 @@ export const isGroup = (node: Node): boolean => {
  * array because xyflow renders nodes in the order they appear in the array and it
  * requires parent nodes to be drawn before child nodes
  */
-export const sortNodesAndGroups = (nodes: Node[], nodesMap: Map<string, Node>): Node[] => {
+export const sortNodesAndGroups = (
+  nodes: Node[],
+  nodesMap: Map<string, Node>,
+): Node[] => {
   const sysdrawNodes = nodes.filter((n) => !isGroup(n));
   const sysdrawGroups = nodes.filter((n) => isGroup(n));
 
@@ -114,7 +120,11 @@ export const sortNodesAndGroups = (nodes: Node[], nodesMap: Map<string, Node>): 
  * @param node2 - potential parent node
  * @param nodesMap - map of all nodes in the canvas
  */
-export const isChildNode = (node1: Node, node2: Node, nodesMap: Map<string, Node>): boolean => {
+export const isChildNode = (
+  node1: Node,
+  node2: Node,
+  nodesMap: Map<string, Node>,
+): boolean => {
   if (!node1.parentId) {
     return false;
   }
