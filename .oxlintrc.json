@@ -5,7 +5,7 @@
     "suspicious": "warn",
     "perf": "warn"
   },
-  "plugins": ["typescript", "react", "oxc", "react-perf"],
+  "plugins": ["typescript", "react", "oxc"],
   "jsPlugins": [
     "eslint-plugin-react-you-might-not-need-an-effect",
     "eslint-plugin-react-compiler",
