@@ -8,13 +8,14 @@
     ".": {
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
-    }
+    },
+    "./index.css": "./dist/index.css"
   },
   "files": [
     "dist"
   ],
   "scripts": {
-    "build": "tsup src/index.ts --format esm --dts",
+    "build": "tsup",
     "dev": "vite",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
