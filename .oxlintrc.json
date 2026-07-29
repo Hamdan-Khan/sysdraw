@@ -6,12 +6,49 @@
     "perf": "warn"
   },
   "plugins": ["typescript", "react", "oxc"],
+  "jsPlugins": [
+    "eslint-plugin-react-you-might-not-need-an-effect",
+    "eslint-plugin-react-compiler",
+    "eslint-plugin-sonarjs",
+    "eslint-plugin-regexp"
+  ],
   "rules": {
     "typescript/no-explicit-any": "warn",
     "typescript/await-thenable": "error",
     "react/react-in-jsx-scope": "allow",
     "react/rules-of-hooks": "error",
-    "react/only-export-components": ["warn", { "allowConstantExport": true }]
+    "react/only-export-components": ["warn", { "allowConstantExport": true }],
+    // react compiler
+    "react-compiler/react-compiler": "warn",
+    // useEffect
+    "react-you-might-not-need-an-effect/no-derived-state": "warn",
+    "react-you-might-not-need-an-effect/no-chain-state-updates": "warn",
+    "react-you-might-not-need-an-effect/no-event-handler": "warn",
+    "react-you-might-not-need-an-effect/no-adjust-state-on-prop-change": "warn",
+    "react-you-might-not-need-an-effect/no-reset-all-state-on-prop-change": "warn",
+    "react-you-might-not-need-an-effect/no-pass-live-state-to-parent": "warn",
+    "react-you-might-not-need-an-effect/no-pass-data-to-parent": "warn",
+    "react-you-might-not-need-an-effect/no-external-store-subscription": "warn",
+    "react-you-might-not-need-an-effect/no-initialize-state": "warn",
+    // sonarjs
+    "sonarjs/no-all-duplicated-branches": "warn",
+    "sonarjs/no-element-overwrite": "warn",
+    "sonarjs/no-identical-conditions": "warn",
+    "sonarjs/no-identical-expressions": "warn",
+    "sonarjs/no-extra-arguments": "warn",
+    "sonarjs/no-duplicated-branches": "warn",
+    "sonarjs/no-gratuitous-expressions": "warn",
+    "sonarjs/no-inverted-boolean-check": "warn",
+    "sonarjs/no-nested-switch": "warn",
+    "sonarjs/no-redundant-jump": "warn",
+    "sonarjs/no-redundant-optional": "warn",
+    "sonarjs/prefer-immediate-return": "warn",
+    "sonarjs/no-small-switch": "warn",
+    // regexp
+    "regexp/no-dupe-disjunctions": "warn",
+    "regexp/no-super-linear-backtracking": "error",
+    "regexp/no-unused-capturing-group": "warn",
+    "regexp/prefer-plus-quantifier": "warn"
   },
   "ignorePatterns": ["dist", "node_modules", "*.config.*", "*.test.ts"]
 }

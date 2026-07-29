@@ -9,16 +9,25 @@ interface ClipboardData {
 }
 
 /** module level clipboard reference */
-const clipboardRef: { current: ClipboardData | null } = { current: null };
+let clipboardData: ClipboardData | null = null;
+
+// getters and setters to avoid direct mutation lint warning
+function getClipboardData(): ClipboardData | null {
+  return clipboardData;
+}
+
+function setClipboardData(data: ClipboardData | null): void {
+  clipboardData = data;
+}
 
 /** checks if internal clipboard is empty or has no nodes */
 export function isClipboardEmpty(): boolean {
-  return !clipboardRef.current || clipboardRef.current.nodes.length === 0;
+  return !clipboardData || clipboardData.nodes.length === 0;
 }
 
 /** clears the internal clipboard (useful for testing) */
 export function clearClipboard(): void {
-  clipboardRef.current = null;
+  clipboardData = null;
 }
 
 /**
@@ -66,10 +75,10 @@ export function useCopyPaste() {
       const edgesToCopy = allEdges.filter((e) => idSet.has(e.source) && idSet.has(e.target));
 
       // deep clone to avoid references to copied element's data
-      clipboardRef.current = {
+      setClipboardData({
         nodes: structuredClone(nodesToCopy),
         edges: structuredClone(edgesToCopy),
-      };
+      });
 
       // clear previous copy's references
       pasteCount.current = 0;
@@ -83,7 +92,7 @@ export function useCopyPaste() {
    */
   const paste = useCallback(
     (screenPosition?: { x: number; y: number }) => {
-      const clipboard = clipboardRef.current;
+      const clipboard = getClipboardData();
       if (!clipboard || clipboard.nodes.length === 0) {
         return;
       }

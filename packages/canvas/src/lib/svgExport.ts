@@ -54,7 +54,7 @@ function isVisibleColor(color: string | undefined | null): boolean {
 function extractTranslate(el: HTMLElement): { x: number; y: number } {
   const transformStyle = el.style.transform;
   if (!transformStyle) return { x: 0, y: 0 };
-  const match = transformStyle.match(/translate(?:3d)?\(([^px,]+)px?,\s*([^px,]+)px?/);
+  const match = transformStyle.match(/translate(?:3d)?\(([-+\d.]+)(?:px)?,\s*([-+\d.]+)/);
   if (match) {
     return {
       x: parseFloat(match[1]) || 0,

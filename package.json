@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "format": "prettier --write .",
+    "format": "oxfmt",
     "lint": "oxlint",
     "lint:fix": "oxlint . --fix",
     "test": "cd packages/canvas && pnpm test && cd ../models && pnpm test",
@@ -26,9 +26,13 @@
     "@tailwindcss/vite": "catalog:",
     "@vitest/ui": "^4.1.10",
     "autoprefixer": "catalog:",
+    "eslint-plugin-react-compiler": "19.1.0-rc.2",
+    "eslint-plugin-react-you-might-not-need-an-effect": "^1.0.1",
+    "eslint-plugin-regexp": "^3.1.1",
+    "eslint-plugin-sonarjs": "^4.2.0",
+    "oxfmt": "^0.61.0",
     "oxlint": "catalog:",
     "postcss": "catalog:",
-    "prettier": "3.9.4",
     "tailwindcss": "catalog:",
     "tsup": "catalog:",
     "typescript": "catalog:"

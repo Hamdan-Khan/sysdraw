@@ -6,10 +6,8 @@ The base canvas package, exports the canvas component with all the canvas functi
 import { Canvas } from "@sysdraw/canvas";
 
 function App() {
-    const canvasState = { edges: [], nodes: [] };
-    return (
-        <Canvas canvasState={canvasState} />
-    );
+  const canvasState = { edges: [], nodes: [] };
+  return <Canvas canvasState={canvasState} />;
 }
 
 export default App;
@@ -36,5 +34,6 @@ export default App;
 - [ ] fix svg export renderer
 
 ### UX (later)
+
 - [ ] improve node dragging semantics i.e. nodes should appear as a canvas element while dragged from the toolbar, instead of being like a picture of the node element.
 - [ ] fix layering (z indexes)
