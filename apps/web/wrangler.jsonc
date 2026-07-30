@@ -1,7 +1,7 @@
 {
   "$schema": "https://www.unpkg.com/wrangler/config-schema.json",
   "name": "sysdraw",
-  "compatibility_date": "2026-07-31",
+  "compatibility_date": "2026-07-30",
   "compatibility_flags": ["nodejs_compat"],
   "main": "@tanstack/react-start/server-entry",
   "workers_dev": true,
