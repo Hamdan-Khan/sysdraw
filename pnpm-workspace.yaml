@@ -4,6 +4,7 @@ packages:
 
 allowBuilds:
   esbuild: true
+  workerd: true
 
 catalog:
   typescript: "~6.0.3"

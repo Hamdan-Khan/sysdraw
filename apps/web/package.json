@@ -35,6 +35,7 @@
     "zustand": "catalog:"
   },
   "devDependencies": {
+    "@cloudflare/vite-plugin": "^1.48.0",
     "@tailwindcss/vite": "catalog:",
     "@types/node": "^24.13.2",
     "@types/react": "catalog:",
