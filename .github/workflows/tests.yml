@@ -1,11 +1,14 @@
 name: Sysdraw Tests
 
 on:
+  push:
+    branches-ignore: [main]
   pull_request:
     branches: [main]
 
 jobs:
   test:
+    name: Tests
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
