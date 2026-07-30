@@ -12,7 +12,7 @@
   "devEngines": {
     "packageManager": {
       "name": "pnpm",
-      "version": "^11.8.0",
+      "version": "11.17.0",
       "onFail": "download"
     }
   },
@@ -46,6 +46,7 @@
     "postcss": "catalog:",
     "tailwindcss": "catalog:",
     "typescript": "catalog:",
-    "vite": "catalog:"
+    "vite": "catalog:",
+    "wrangler": "^4.115.0"
   }
 }
