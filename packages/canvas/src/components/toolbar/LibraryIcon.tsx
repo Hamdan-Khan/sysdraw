@@ -1,5 +1,7 @@
 import { NODE_ICON_CLASS_ID } from "@sysdraw/common";
 import type { IconType } from "@sysdraw/models";
+import DOMPurify from "dompurify";
+import { useMemo } from "react";
 
 export interface LibraryIconProps {
   icon?: IconType;
@@ -18,16 +20,25 @@ export const LibraryIcon = ({
   className = "",
   style,
 }: LibraryIconProps) => {
-  if (!icon || !icon.value) return null;
-
   const sizeStyle = size ? { width: size, height: size } : {};
+
+  const sanitizedSvg = useMemo(() => {
+    if (!icon || icon.kind !== "svg") {
+      return "";
+    }
+    return DOMPurify.sanitize(icon.value, { USE_PROFILES: { svg: true } });
+  }, [icon]);
+
+  if (!icon || !icon.value) {
+    return null;
+  }
 
   if (icon.kind === "svg") {
     return (
       <span
         className={`inline-flex items-center justify-center [&>svg]:w-full [&>svg]:h-full [&>svg]:shrink-0 ${NODE_ICON_CLASS_ID} ${className}`}
         style={{ ...sizeStyle, ...style }}
-        dangerouslySetInnerHTML={{ __html: icon.value }}
+        dangerouslySetInnerHTML={{ __html: sanitizedSvg }}
       />
     );
   }
@@ -37,6 +48,7 @@ export const LibraryIcon = ({
       <img
         src={icon.value}
         alt=""
+        referrerPolicy="no-referrer"
         className={`object-contain shrink-0 ${NODE_ICON_CLASS_ID} ${className}`}
         style={{ ...sizeStyle, ...style }}
       />
