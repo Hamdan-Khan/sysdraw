@@ -6,5 +6,11 @@
   "printWidth": 80,
   "tabWidth": 2,
   "sortPackageJson": false,
-  "ignorePatterns": ["dist", "node_modules", "pnpm-lock.yaml", "*.md"]
+  "ignorePatterns": [
+    "dist",
+    "node_modules",
+    "pnpm-lock.yaml",
+    "*.md",
+    "*.gen.ts"
+  ]
 }

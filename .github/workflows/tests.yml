@@ -1,11 +1,14 @@
 name: Sysdraw Tests
 
 on:
+  push:
+    branches-ignore: [main]
   pull_request:
     branches: [main]
 
 jobs:
   test:
+    name: Tests
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -13,8 +16,6 @@ jobs:
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v6
-        with:
-          version: 11
 
       - name: Setup Node
         uses: actions/setup-node@v6
