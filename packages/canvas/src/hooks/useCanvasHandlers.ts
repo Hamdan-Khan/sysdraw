@@ -10,7 +10,7 @@ import {
 } from "@/components/canvas/utils";
 import { defaultHandles } from "@/components/nodes/createNodeTypes";
 import { SYSDRAW_DRAG_DATA_FORMAT } from "@/components/toolbar/Toolbar";
-import { useCanvasStore } from "@/store/CanvasStoreProvider";
+import { useCanvasStore, useCanvasStoreApi } from "@/store/CanvasStoreProvider";
 import { CanvasStoreState } from "@/store/store";
 import { NODE_WRAPPER_CLASS_ID } from "@sysdraw/common";
 import { LibraryNode, useLibraryRegistryStore } from "@sysdraw/models";
@@ -31,8 +31,6 @@ import { useShallow } from "zustand/shallow";
 import { useHistory } from "./useHistory";
 
 const selector = (state: CanvasStoreState) => ({
-  nodes: state.nodes,
-  nodesMap: state.nodesMap,
   setNodes: state.setNodes,
   setEdges: state.setEdges,
   globalEdgeType: state.globalEdgeType,
@@ -68,8 +66,8 @@ const createNodeData = (kind: "node" | "group", nodeDef: LibraryNode) => {
  * event handlers for the canvas (drag, drop, re-parenting, etc.)
  */
 export const useCanvasHandlers = () => {
+  const store = useCanvasStoreApi();
   const {
-    nodesMap,
     setNodes,
     setEdges,
     globalEdgeType,
@@ -77,6 +75,10 @@ export const useCanvasHandlers = () => {
     globalEdgeMarkerEnd,
   } = useCanvasStore(useShallow(selector));
   const selectedLib = useLibraryRegistryStore((s) => s.selectedLib);
+
+  const getNodesMap = useCallback(() => {
+    return store.getState().nodesMap ?? new Map();
+  }, [store]);
 
   const {
     screenToFlowPosition,
@@ -260,6 +262,8 @@ export const useCanvasHandlers = () => {
    */
   const getBestDropGroup = useCallback(
     (nodes: Node[]): { group: Node; groupRect: NodeRect } | null => {
+      const nodesMap = getNodesMap();
+
       /** bounding rect for the whole selection */
       const multiSelectDragBounds =
         nodes.length > 1 ? getNodesBounds(nodes) : null;
@@ -347,7 +351,7 @@ export const useCanvasHandlers = () => {
       }
       return { group: best.group, groupRect: best.groupRect };
     },
-    [getIntersectingNodeGroup, getInternalNode, getNodesBounds, nodesMap],
+    [getIntersectingNodeGroup, getInternalNode, getNodesBounds, getNodesMap],
   );
 
   /**
@@ -417,6 +421,7 @@ export const useCanvasHandlers = () => {
       }
 
       const draggedNodeIds = new Set(nodes.map((dn) => dn.id));
+      const nodesMap = getNodesMap();
 
       if (best) {
         const { group: dropTarget, groupRect } = best;
@@ -472,7 +477,7 @@ export const useCanvasHandlers = () => {
         );
       }
     },
-    [getBestDropGroup, getInternalNode, setNodes, nodesMap],
+    [getBestDropGroup, getInternalNode, setNodes, getNodesMap],
   );
 
   /**

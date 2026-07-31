@@ -7,7 +7,7 @@ import { useCanvasStore } from "@/store/CanvasStoreProvider";
 import { CanvasStoreState } from "@/store/store";
 import { useLibraryRegistry, useLibraryRegistryStore } from "@sysdraw/models";
 import { Loader2, Menu, X } from "lucide-react";
-import { useMemo, useState } from "react";
+import { memo, useMemo, useState } from "react";
 import { toast } from "sonner";
 import { useShallow } from "zustand/shallow";
 import { LibraryDropdown } from "./LibraryDropdown";
@@ -19,7 +19,7 @@ const selector = (state: CanvasStoreState) => ({
   isInteractive: state.isInteractive,
 });
 
-export const Toolbar = () => {
+export const Toolbar = memo(() => {
   const { isInteractive } = useCanvasStore(useShallow(selector));
   const registry = useLibraryRegistry();
   const selectedLib = useLibraryRegistryStore((s) => s.selectedLib);
@@ -38,6 +38,8 @@ export const Toolbar = () => {
       setIsLibLoading(false);
     }
   };
+
+  console.log("rendered");
 
   const { nodes, groups } = useMemo(() => {
     const all = selectedLib?.nodes || [];
@@ -115,59 +117,61 @@ export const Toolbar = () => {
         <Divider />
 
         <div className="relative flex flex-col gap-3">
-          <div className="grid grid-cols-3 gap-3 px-4">
-            <h5 className="text-xs text-secondary uppercase col-span-3">
-              Nodes
-            </h5>
-            {nodes.length === 0 ? (
-              <span className="text-[11px] text-secondary col-span-3 italic">
-                No nodes available
-              </span>
-            ) : (
-              nodes.map((node) => {
-                const { label, icon, id } = node;
-                return (
-                  <div
-                    key={id}
-                    draggable
-                    onDragStart={(e) => onDragStart(e, { kind: "node", id })}
-                    onClick={() => handleClick({ kind: "node", id })}
-                    className="group relative px-3 py-2 bg-bg border border-border rounded text-sm cursor-grab active:cursor-grabbing text-text text-center font-extrabold flex items-center justify-center hover:bg-surface/50 transition-colors"
-                  >
-                    <LibraryIcon icon={icon} size={24} />
-                    <Tooltip text={label} />
-                  </div>
-                );
-              })
-            )}
+          <div className="flex flex-col gap-2 px-4">
+            <h5 className="text-xs text-secondary uppercase">Nodes</h5>
+            <div className="h-56 overflow-y-auto overflow-x-hidden grid grid-cols-3 gap-2 content-start pr-1">
+              {nodes.length === 0 ? (
+                <span className="text-[11px] text-secondary col-span-3 italic">
+                  No nodes available
+                </span>
+              ) : (
+                nodes.map((node) => {
+                  const { label, icon, id } = node;
+                  return (
+                    <div
+                      key={id}
+                      draggable
+                      onDragStart={(e) => onDragStart(e, { kind: "node", id })}
+                      onClick={() => handleClick({ kind: "node", id })}
+                      className="group relative p-2 bg-bg border border-border rounded text-sm cursor-grab active:cursor-grabbing text-text text-center font-extrabold flex items-center justify-center hover:bg-surface/50 transition-colors"
+                    >
+                      <LibraryIcon icon={icon} size={30} />
+                      <Tooltip text={label} />
+                    </div>
+                  );
+                })
+              )}
+            </div>
           </div>
 
           <Divider />
 
-          <div className="flex flex-col gap-3 px-4 mb-2">
+          <div className="flex flex-col gap-2 px-4 mb-2">
             <h5 className="text-xs text-secondary uppercase">Groups</h5>
-            {groups.length === 0 ? (
-              <span className="text-[11px] text-secondary italic">
-                No groups available
-              </span>
-            ) : (
-              groups.map((group) => {
-                const { label, icon, id } = group;
-                return (
-                  <div
-                    key={id}
-                    draggable
-                    onDragStart={(e) => onDragStart(e, { kind: "group", id })}
-                    onClick={() => handleClick({ kind: "group", id })}
-                    className="group relative px-3 py-2 bg-bg border border-dashed border-secondary rounded text-sm cursor-grab active:cursor-grabbing text-text text-center font-medium flex items-center justify-center gap-2 hover:bg-surface/50 transition-colors"
-                  >
-                    {icon && <LibraryIcon icon={icon} size={20} />}
-                    <span>{label}</span>
-                    <Tooltip text={label} />
-                  </div>
-                );
-              })
-            )}
+            <div className="h-44 overflow-y-auto overflow-x-hidden flex flex-col gap-2 pr-1">
+              {groups.length === 0 ? (
+                <span className="text-[11px] text-secondary italic">
+                  No groups available
+                </span>
+              ) : (
+                groups.map((group) => {
+                  const { label, icon, id } = group;
+                  return (
+                    <div
+                      key={id}
+                      draggable
+                      onDragStart={(e) => onDragStart(e, { kind: "group", id })}
+                      onClick={() => handleClick({ kind: "group", id })}
+                      className="group relative px-3 py-2 bg-bg border border-dashed border-secondary rounded text-sm cursor-grab active:cursor-grabbing text-text font-medium flex items-center gap-2 hover:bg-surface/50 transition-colors max-w-44"
+                    >
+                      {icon && <LibraryIcon icon={icon} size={20} />}
+                      <span>{label}</span>
+                      <Tooltip text={label} />
+                    </div>
+                  );
+                })
+              )}
+            </div>
           </div>
 
           {/* loading overlay */}
@@ -183,4 +187,4 @@ export const Toolbar = () => {
       </div>
     </>
   );
-};
+});

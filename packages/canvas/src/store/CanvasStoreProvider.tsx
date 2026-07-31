@@ -1,3 +1,4 @@
+// oxlint-disable react/only-export-components
 import { createContext, ReactNode, useContext } from "react";
 import { StoreApi, useStore } from "zustand";
 import { CanvasStoreState } from "./store";
@@ -29,5 +30,19 @@ function useCanvasStore<T = CanvasStoreState>(
   return useStore(store, selector);
 }
 
-// oxlint-disable-next-line react/only-export-components
-export { CanvasStoreContext, CanvasStoreProvider, useCanvasStore };
+function useCanvasStoreApi(): StoreApi<CanvasStoreState> {
+  const store = useContext(CanvasStoreContext);
+  if (!store) {
+    throw new Error(
+      "useCanvasStoreApi must be used within a CanvasStoreProvider",
+    );
+  }
+  return store;
+}
+
+export {
+  CanvasStoreContext,
+  CanvasStoreProvider,
+  useCanvasStore,
+  useCanvasStoreApi,
+};
