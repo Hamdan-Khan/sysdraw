@@ -165,7 +165,7 @@ export const Toolbar = memo(() => {
                       className="group relative px-3 py-2 bg-bg border border-dashed border-secondary rounded text-sm cursor-grab active:cursor-grabbing text-text font-medium flex items-center gap-2 hover:bg-surface/50 transition-colors max-w-44"
                     >
                       {icon && <LibraryIcon icon={icon} size={20} />}
-                      <span>{label}</span>
+                      <span className="truncate">{label}</span>
                       <Tooltip text={label} />
                     </div>
                   );

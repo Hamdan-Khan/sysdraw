@@ -32,6 +32,8 @@ export default App;
 - [ ] configure rolldown code splitting
 - [ ] add error boundary
 - [ ] fix svg export renderer
+- [ ] audit ui components and apply memo to prevent re-renders when parent `<CanvasElement />` re-renders during canvas pan/zoom or dragging.
+- [ ] audit custom hooks to avoid reactive zustand subscriptions for rapidly changing state. access state on demand via `useCanvasStoreApi()`.
 
 ### UX (later)
 
