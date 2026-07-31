@@ -16,7 +16,11 @@ interface LibraryMetadata {
   id: string;
   name: string;
   version: string;
-  icon?: IconSourceType;
+  icon?: string;
+  description?: string;
+  source?: string;
+  tags?: string[];
+  path?: string;
 }
 
 type LibraryManifest = {

@@ -42,11 +42,9 @@ const selector = (state: CanvasStoreState) => ({
 const CanvasElement = () => {
   const dndWrapperRef = createRef<HTMLDivElement>();
 
-  const { loadedLibs } = useLibraryRegistryStore(
-    useShallow((s) => ({ loadedLibs: s.loadedLibs })),
-  );
+  const selectedLib = useLibraryRegistryStore((s) => s.selectedLib);
 
-  const nodeTypes = useMemo(() => createNodeTypes(loadedLibs), [loadedLibs]);
+  const nodeTypes = useMemo(() => createNodeTypes(selectedLib), [selectedLib]);
 
   const { edges, nodes, onEdgesChange, onNodesChange, isInteractive } =
     useCanvasStore(useShallow(selector));

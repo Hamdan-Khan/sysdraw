@@ -38,7 +38,7 @@ export const Tooltip = ({
   return (
     <>
       <span
-        className={`pointer-events-none absolute ${tooltip} px-2 py-1 rounded-md bg-black/90 text-white text-xs font-medium whitespace-nowrap opacity-0 scale-95 ${origin} transition-all duration-150 ease-out group-hover:opacity-100 group-hover:scale-100 shadow-lg z-50`}
+        className={`pointer-events-none absolute ${tooltip} px-2 py-1 rounded-md bg-black/90 text-white text-xs font-medium whitespace-nowrap opacity-0 scale-95 ${origin} transition-all duration-150 ease-out group-hover:opacity-100 group-hover:scale-100 shadow-lg z-999999`}
       >
         {text}
         {/* arrow */}

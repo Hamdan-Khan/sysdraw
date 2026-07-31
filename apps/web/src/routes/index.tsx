@@ -44,7 +44,10 @@ function HomeComponent() {
     () => createCanvasStore({ nodes: [], edges: [] }),
     [],
   );
-  const libraryRegistry = useMemo(() => new LibraryRegistry(), []);
+  const libraryRegistry = useMemo(() => {
+    const libUrl = import.meta.env.VITE_LIBRARY_URL;
+    return new LibraryRegistry({ url: libUrl || "http://localhost/lib" });
+  }, []);
 
   return <Canvas libraryRegistry={libraryRegistry} canvasState={canvasState} />;
 }

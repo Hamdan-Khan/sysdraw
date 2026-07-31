@@ -13,80 +13,40 @@ describe("LibraryRegistry Instance", () => {
   let registry: LibraryRegistry;
 
   beforeEach(() => {
-    registry = new LibraryRegistry();
+    registry = new LibraryRegistry({ url: "http://localhost/lib" });
   });
 
   afterEach(() => {
     registry?.close();
   });
 
-  it("initializes with an empty loadedLibs state prior to ready", () => {
+  it("initializes with null or default library as selectedLib", async () => {
+    await registry.whenReady();
     const snapshot = registry.getSnapshot();
-    expect(snapshot.loadedLibs).toEqual({});
+    expect(snapshot.selectedLib?.id).toEqual(defaultLibrary.id);
   });
 
-  it("lists all available library metadata", () => {
-    const libraries = registry.listAllLibraries();
+  it("lists all available library metadata", async () => {
+    const libraries = await registry.listAllLibraries();
     expect(libraries).toHaveLength(1);
     expect(libraries[0]).toEqual({
       id: defaultLibrary.id,
       name: defaultLibrary.name,
       version: defaultLibrary.version,
+      description:
+        "Sysdraw's default library, sufficient for simple architecture diagrams.",
+      icon: "https://dummyimage.com/100x100/54ffcc/005e0e.png&text=Sd",
+      tags: ["basic"],
+      path: "data/default_library.json",
     });
   });
 
-  it("adds the default library successfully", async () => {
-    await registry.addLibrary(defaultLibrary.id);
+  it("selects the default library successfully", async () => {
+    await registry.selectLibrary(defaultLibrary.id);
 
     const snapshot = registry.getSnapshot();
-    expect(snapshot.loadedLibs[defaultLibrary.id]).toEqual(defaultLibrary);
-  });
-
-  it("does not duplicate or re-add library if added multiple times", async () => {
-    await registry.addLibrary(defaultLibrary.id);
-    const firstState = registry.getSnapshot().loadedLibs;
-
-    await registry.addLibrary(defaultLibrary.id);
-    const secondState = registry.getSnapshot().loadedLibs;
-
-    expect(secondState).toBe(firstState);
-    expect(Object.keys(secondState)).toHaveLength(1);
-  });
-
-  it("handles adding non-existent library ID gracefully", async () => {
-    await registry.addLibrary("non-existent-lib-id");
-    const snapshot = registry.getSnapshot();
-
-    expect(snapshot.loadedLibs["non-existent-lib-id"]).toBeUndefined();
-  });
-
-  it("removes an existing library from the registry", async () => {
-    await registry.addLibrary(defaultLibrary.id);
-    expect(registry.getSnapshot().loadedLibs[defaultLibrary.id]).toBeDefined();
-
-    await registry.removeLibrary(defaultLibrary.id);
-    expect(
-      registry.getSnapshot().loadedLibs[defaultLibrary.id],
-    ).toBeUndefined();
-    expect(registry.getSnapshot().loadedLibs).toEqual({});
-  });
-
-  it("logs an error and preserves state when removing a non-existent library", async () => {
-    const consoleError = vi
-      .spyOn(console, "error")
-      .mockImplementation(() => {});
-
-    await registry.addLibrary(defaultLibrary.id);
-    const stateBefore = registry.getSnapshot().loadedLibs;
-
-    await registry.removeLibrary("unknown-lib");
-
-    expect(consoleError).toHaveBeenCalledWith(
-      "Couldn't find library with id: unknown-lib in the registry",
-    );
-    expect(registry.getSnapshot().loadedLibs).toEqual(stateBefore);
-
-    consoleError.mockRestore();
+    expect(snapshot.selectedLib?.id).toBe(defaultLibrary.id);
+    expect(snapshot.selectedLib).toEqual(defaultLibrary);
   });
 
   it("exposes the underlying Zustand store via getStore", async () => {
@@ -94,12 +54,10 @@ describe("LibraryRegistry Instance", () => {
     expect(store.getState()).toEqual(registry.getSnapshot());
 
     await act(async () => {
-      await registry.addLibrary(defaultLibrary.id);
+      await registry.selectLibrary(defaultLibrary.id);
     });
 
-    expect(store.getState().loadedLibs[defaultLibrary.id]).toEqual(
-      defaultLibrary,
-    );
+    expect(store.getState().selectedLib).toEqual(defaultLibrary);
   });
 });
 
@@ -107,7 +65,7 @@ describe("LibraryRegistryProvider & Hooks", () => {
   let registry: LibraryRegistry;
 
   beforeEach(() => {
-    registry = new LibraryRegistry();
+    registry = new LibraryRegistry({ url: "http://localhost/lib" });
   });
 
   afterEach(() => {
@@ -157,22 +115,14 @@ describe("LibraryRegistryProvider & Hooks", () => {
     );
 
     const { result } = renderHook(
-      () => useLibraryRegistryStore((s) => s.loadedLibs),
+      () => useLibraryRegistryStore((s) => s.selectedLib),
       { wrapper },
     );
 
-    expect(result.current).toEqual({});
-
     await act(async () => {
-      await registry.addLibrary(defaultLibrary.id);
+      await registry.selectLibrary(defaultLibrary.id);
     });
 
-    expect(result.current[defaultLibrary.id]).toEqual(defaultLibrary);
-
-    await act(async () => {
-      await registry.removeLibrary(defaultLibrary.id);
-    });
-
-    expect(result.current).toEqual({});
+    expect(result.current).toEqual(defaultLibrary);
   });
 });

@@ -8,7 +8,8 @@ export const PlayGround = () => {
     edges: [],
     selectedEdgeType: RegisteredEdges.SMOOTHSTEP,
   });
-  const registry = new LibraryRegistry();
+  const libUrl = import.meta.env.VITE_LIBRARY_URL;
+  const registry = new LibraryRegistry({ url: libUrl });
 
   return <Canvas libraryRegistry={registry} canvasState={canvasState} />;
 };

@@ -41,7 +41,7 @@ function useLibraryRegistryStore<T = LibraryRegistryState>(
 
 /**
  * hook to access the current `LibraryRegistry` instance.
- * allows calling methods like `addLibrary`, `removeLibrary`, etc.
+ * allows calling methods like `selectLibrary`, `listAllLibraries`, etc.
  */
 function useLibraryRegistry(): LibraryRegistry {
   const registry = useContext(LibraryRegistryContext);

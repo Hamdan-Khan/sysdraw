@@ -1,6 +1,5 @@
 import {
   DropdownMenu,
-  DropdownMenuCheckboxItem,
   DropdownMenuContent,
   DropdownMenuGroup,
   DropdownMenuLabel,
@@ -12,73 +11,191 @@ import {
   useLibraryRegistry,
   useLibraryRegistryStore,
 } from "@sysdraw/models";
-import { ChevronRight, Image } from "lucide-react";
+import { Check, ChevronRight, Image, Info, Package } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { LibraryInfoDialog } from "./LibraryInfoDialog";
 
-export const LibraryDropdown = () => {
+const LibraryThumbnail = ({ src, alt }: { src?: string; alt: string }) => {
+  const [hasError, setHasError] = useState(false);
+
+  if (!src || hasError) {
+    return (
+      <div className="size-6 rounded bg-dim border border-border flex items-center justify-center text-secondary shrink-0">
+        <Package size={13} />
+      </div>
+    );
+  }
+
+  return (
+    <img
+      src={src}
+      alt={alt}
+      onError={() => setHasError(true)}
+      className="size-6 rounded object-contain border border-border/60 shrink-0 p-0.5 bg-dim"
+    />
+  );
+};
+
+export interface LibraryDropdownProps {
+  onSelectLibrary?: (id: string) => void;
+}
+
+export const LibraryDropdown = ({ onSelectLibrary }: LibraryDropdownProps) => {
   const registry = useLibraryRegistry();
-  const loadedLibs = useLibraryRegistryStore((state) => state.loadedLibs);
+  const selectedLib = useLibraryRegistryStore((state) => state.selectedLib);
 
-  const libraries: LibraryMetadata[] = registry.listAllLibraries();
-  const selectedCount = Object.keys(loadedLibs).length;
+  const [libraries, setLibraries] = useState<LibraryMetadata[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [infoLib, setInfoLib] = useState<LibraryMetadata | null>(null);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const isDialogOpenRef = useRef(false);
 
-  const toggleLibrary = (id: string) => {
-    if (loadedLibs[id]) {
-      registry.removeLibrary(id);
+  useEffect(() => {
+    async function listLibraries() {
+      try {
+        const libs = await registry.listAllLibraries();
+        setLibraries(libs);
+      } catch (err) {
+        console.error("Failed to load libraries list", err);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    listLibraries();
+  }, [registry]);
+
+  const handleDropdownOpenChange = (open: boolean) => {
+    // if info dialog is already open, we ignore close click events from the dropdown
+    if (!open && isDialogOpenRef.current) {
+      return;
+    }
+    setDropdownOpen(open);
+  };
+
+  const handleSelectLibrary = (id: string) => {
+    setDropdownOpen(false);
+    if (onSelectLibrary) {
+      onSelectLibrary(id);
     } else {
-      registry.addLibrary(id);
+      registry.selectLibrary(id);
+    }
+  };
+
+  const handleOpenInfo = (e: React.MouseEvent, lib: LibraryMetadata) => {
+    e.stopPropagation();
+    e.preventDefault();
+    isDialogOpenRef.current = true;
+    setInfoLib(lib);
+  };
+
+  const handleCloseInfo = (open: boolean) => {
+    if (!open) {
+      setInfoLib(null);
+      isDialogOpenRef.current = false;
     }
   };
 
   return (
-    <div className="w-full px-4">
-      <DropdownMenu>
-        <DropdownMenuTrigger
-          type="button"
-          aria-label="Libraries"
-          className="group w-full flex items-center justify-between gap-2 px-3 py-2 text-xs font-medium rounded border transition-all cursor-pointer bg-bg border-border text-primary hover:bg-surface/50 data-popup-open:bg-dim data-popup-open:border-primary data-open:bg-dim data-open:border-primary outline-none"
+    <>
+      <div className="w-full px-4">
+        <DropdownMenu
+          open={dropdownOpen}
+          onOpenChange={handleDropdownOpenChange}
         >
-          <div className="flex items-center gap-2">
-            <Image size={16} className="text-secondary" />
-            <span>Icon Pack</span>
-            {selectedCount > 0 && (
-              <span className="bg-primary/20 text-primary text-[10px] px-1.5 py-0.2 rounded-full font-semibold">
-                {selectedCount}
-              </span>
-            )}
-          </div>
-          <ChevronRight
-            size={14}
-            className="text-secondary transition-transform duration-150 group-data-popup-open:rotate-90 group-data-open:rotate-90"
-          />
-        </DropdownMenuTrigger>
-        <DropdownMenuContent
-          side="right"
-          align="start"
-          sideOffset={8}
-          className="w-52"
-        >
-          <DropdownMenuGroup>
-            <DropdownMenuLabel>
-              Libraries ({selectedCount}/{libraries.length})
-            </DropdownMenuLabel>
-            <DropdownMenuSeparator />
-            <div className="flex flex-col gap-0.5 max-h-60 overflow-y-auto">
-              {libraries.map((lib) => {
-                const isSelected = Boolean(loadedLibs[lib.id]);
-                return (
-                  <DropdownMenuCheckboxItem
-                    key={lib.id}
-                    checked={isSelected}
-                    onCheckedChange={() => toggleLibrary(lib.id)}
-                  >
-                    {lib.name}
-                  </DropdownMenuCheckboxItem>
-                );
-              })}
+          <DropdownMenuTrigger
+            type="button"
+            aria-label="Libraries"
+            className="group w-full flex items-center justify-between gap-2 px-3 py-2 text-xs font-medium rounded border transition-all cursor-pointer bg-bg border-border text-primary hover:bg-surface/50 data-popup-open:bg-dim data-popup-open:border-primary data-open:bg-dim data-open:border-primary outline-none"
+          >
+            <div className="flex items-center gap-2">
+              <Image size={16} className="text-secondary" />
+              <span>{selectedLib?.name || "Select library"}</span>
             </div>
-          </DropdownMenuGroup>
-        </DropdownMenuContent>
-      </DropdownMenu>
-    </div>
+            <ChevronRight
+              size={14}
+              className="text-secondary transition-transform duration-150 group-data-popup-open:rotate-90 group-data-open:rotate-90"
+            />
+          </DropdownMenuTrigger>
+          <DropdownMenuContent
+            side="right"
+            align="start"
+            sideOffset={8}
+            className="w-56 p-1.5"
+          >
+            <DropdownMenuGroup>
+              <DropdownMenuLabel className="px-2.5 py-1 text-[10px] uppercase tracking-wide text-secondary">
+                Libraries
+              </DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <div className="flex flex-col gap-0.5 max-h-64 overflow-y-auto overflow-x-clip">
+                {loading ? (
+                  <div className="flex items-center justify-center py-5 gap-2 text-xs text-secondary">
+                    <span>Loading...</span>
+                  </div>
+                ) : libraries.length === 0 ? (
+                  <div className="py-4 text-center text-xs text-secondary">
+                    No libraries available
+                  </div>
+                ) : (
+                  libraries.map((lib) => {
+                    const isSelected = selectedLib?.id === lib.id;
+                    return (
+                      <div
+                        key={lib.id}
+                        className={`group flex items-center gap-2 px-2 py-1.5 rounded-md cursor-pointer transition-colors ${
+                          isSelected
+                            ? "bg-primary/10 text-primary"
+                            : "hover:bg-dim text-primary"
+                        }`}
+                        onClick={() => handleSelectLibrary(lib.id)}
+                      >
+                        {/* Selection indicator: checkmark when selected, spacer when not */}
+                        <span className="size-3.5 shrink-0 flex items-center justify-center">
+                          {isSelected && (
+                            <Check
+                              size={13}
+                              strokeWidth={2.5}
+                              className="text-primary"
+                            />
+                          )}
+                        </span>
+
+                        {/* Icon */}
+                        <LibraryThumbnail src={lib.icon} alt={lib.name} />
+
+                        {/* Label */}
+                        <span className="flex-1 min-w-0 text-xs font-medium truncate">
+                          {lib.name}
+                        </span>
+
+                        {/* Info button */}
+                        <button
+                          type="button"
+                          title="View information"
+                          aria-label={`View ${lib.name} info`}
+                          onClick={(e) => handleOpenInfo(e, lib)}
+                          className="opacity-0 group-hover:opacity-100 shrink-0 flex items-center justify-center size-5 rounded text-secondary hover:text-primary hover:bg-surface transition-all"
+                        >
+                          <Info size={14} />
+                        </button>
+                      </div>
+                    );
+                  })
+                )}
+              </div>
+            </DropdownMenuGroup>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
+
+      {infoLib && (
+        <LibraryInfoDialog
+          lib={infoLib}
+          open={!!infoLib}
+          onOpenChange={handleCloseInfo}
+        />
+      )}
+    </>
   );
 };

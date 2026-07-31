@@ -1,6 +1,8 @@
-interface AppConfig {
-  /** ids of selected libraries */
-  selectedLibs: string[];
+const REGISTRY_CONFIG_KEY = "sysdraw-registry-config";
+
+interface RegistryConfig {
+  /** id of selected library */
+  selectedLib: string;
 }
 
-export type { AppConfig };
+export { REGISTRY_CONFIG_KEY, type RegistryConfig };

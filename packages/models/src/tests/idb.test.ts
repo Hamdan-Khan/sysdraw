@@ -1,89 +1,68 @@
-import {
-  IDB_CONFIG_KEY,
-  IDB_DATABASE_NAME,
-  IDB_DATABASE_VERSION,
-} from "@sysdraw/common";
+import { IDB_DATABASE_NAME, IDB_DATABASE_VERSION } from "@sysdraw/common";
 import "fake-indexeddb/auto";
 import { openDB } from "idb";
-import { afterEach, describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it } from "vitest";
+import { REGISTRY_CONFIG_KEY } from "../config";
 import defaultLibrary from "../library/default_library.json";
 import { LibraryRegistry } from "../library/LibraryRegistry";
 
-describe("LibraryRegistry IndexedDB Integration", () => {
+describe("LibraryRegistry IndexedDB & LocalStorage Integration", () => {
   let activeRegistries: LibraryRegistry[] = [];
 
   const createRegistry = () => {
-    const reg = new LibraryRegistry();
+    const reg = new LibraryRegistry({ url: "http://localhost/lib" });
     activeRegistries.push(reg);
     return reg;
   };
+
+  beforeEach(() => {
+    localStorage.clear();
+  });
 
   afterEach(() => {
     activeRegistries.forEach((reg) => reg.close());
     activeRegistries = [];
     indexedDB.deleteDatabase(IDB_DATABASE_NAME);
+    localStorage.clear();
   });
 
-  it("automatically seeds IndexedDB with default library and config on first initialization", async () => {
+  it("automatically seeds IndexedDB with default library on first initialization", async () => {
     const registry = createRegistry();
     await registry.whenReady();
 
     // Verify Zustand state auto-loaded default library on first init
-    expect(registry.getSnapshot().loadedLibs[defaultLibrary.id]).toEqual(
-      defaultLibrary,
-    );
+    expect(registry.getSnapshot().selectedLib).toEqual(defaultLibrary);
 
     // Verify raw IndexedDB contents
     const db = await openDB(IDB_DATABASE_NAME, IDB_DATABASE_VERSION);
     const storedLib = await db.get("libraries", defaultLibrary.id);
     expect(storedLib).toEqual(defaultLibrary);
-
-    const storedConfig = await db.get("config", IDB_CONFIG_KEY);
-    expect(storedConfig).toEqual({ selectedLibs: [defaultLibrary.id] });
     db.close();
   });
 
-  it("persists library addition to IndexedDB config", async () => {
+  it("persists selected library to localStorage", async () => {
     const registry = createRegistry();
     await registry.whenReady();
 
-    await registry.addLibrary("default");
+    await registry.selectLibrary("default");
 
-    const db = await openDB(IDB_DATABASE_NAME, IDB_DATABASE_VERSION);
-    const config = await db.get("config", IDB_CONFIG_KEY);
-    expect(config.selectedLibs).toContain("default");
-    db.close();
-  });
+    expect(registry.getSnapshot().selectedLib).toEqual(defaultLibrary);
 
-  it("persists library removal from IndexedDB config", async () => {
-    const registry = createRegistry();
-    await registry.whenReady();
-
-    await registry.removeLibrary(defaultLibrary.id);
-
-    expect(
-      registry.getSnapshot().loadedLibs[defaultLibrary.id],
-    ).toBeUndefined();
-
-    const db = await openDB(IDB_DATABASE_NAME, IDB_DATABASE_VERSION);
-    const config = await db.get("config", IDB_CONFIG_KEY);
-    expect(config.selectedLibs).not.toContain(defaultLibrary.id);
-    db.close();
-  });
-
-  it("loads configured libraries when re-instantiated with pre-existing IndexedDB state", async () => {
-    const registry1 = createRegistry();
-    await registry1.whenReady();
-
-    // Close first connection before starting new session
-    registry1.close();
-
-    // Re-instantiate LibraryRegistry in a new session simulation
-    const registry2 = createRegistry();
-    await registry2.whenReady();
-
-    expect(registry2.getSnapshot().loadedLibs[defaultLibrary.id]).toEqual(
-      defaultLibrary,
+    const storedConfig = JSON.parse(
+      localStorage.getItem(REGISTRY_CONFIG_KEY) || "{}",
     );
+    expect(storedConfig.selectedLib).toBe("default");
+  });
+
+  it("loads configured library from localStorage when re-instantiated", async () => {
+    localStorage.setItem(
+      REGISTRY_CONFIG_KEY,
+      JSON.stringify({ selectedLib: defaultLibrary.id }),
+    );
+
+    const registry = createRegistry();
+    await registry.whenReady();
+
+    expect(registry.getSnapshot().selectedLib).toEqual(defaultLibrary);
   });
 });

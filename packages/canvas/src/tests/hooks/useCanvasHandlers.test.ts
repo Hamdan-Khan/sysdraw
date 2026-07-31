@@ -84,7 +84,7 @@ const makeEvent = (kind: string, id: string) =>
     { clientX: 100, clientY: 100 },
   );
 
-const mockLibraryRegistry = new LibraryRegistry();
+const mockLibraryRegistry = new LibraryRegistry({ url: "http://localhost/lib" });
 
 const createWrapper = (store: any = {}) => {
   return ({ children }: { children: React.ReactNode }) =>
@@ -97,7 +97,7 @@ const createWrapper = (store: any = {}) => {
 describe("useCanvasHandlers", () => {
   beforeEach(async () => {
     vi.clearAllMocks();
-    await mockLibraryRegistry.addLibrary("default");
+    await mockLibraryRegistry.selectLibrary("default");
   });
 
   describe("onDrop", () => {

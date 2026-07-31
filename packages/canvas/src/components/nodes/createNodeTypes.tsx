@@ -66,15 +66,15 @@ const NodeComponent = (props: NodePropsType<CanvasNodeData>) => {
 };
 
 /**
- * creates a dynamic nodeTypes map from loaded library manifests,
+ * creates a dynamic nodeTypes map from loaded library manifest,
  * with a fallback for nodes whose libraries are not loaded at the moment.
  */
 export const createNodeTypes = (
-  loadedLibs: Record<string, LibraryManifest>,
+  selectedLib: LibraryManifest | null,
 ): Record<string, NodeComponentType<CanvasNodeData>> => {
   const nodeTypes: Record<string, NodeComponentType<CanvasNodeData>> = {};
 
-  const allNodes = Object.values(loadedLibs).flatMap((lib) => lib.nodes);
+  const allNodes = selectedLib?.nodes || [];
 
   for (const libNode of allNodes) {
     nodeTypes[libNode.id] = NodeComponent;

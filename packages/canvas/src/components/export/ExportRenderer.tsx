@@ -34,10 +34,8 @@ export function ExportRenderer({ onReady }: ExportRendererProps) {
   const { nodes, edges, exportOptions } = useCanvasStore(useShallow(selector));
   const { getNodesBounds } = useReactFlow();
 
-  const { loadedLibs } = useLibraryRegistryStore(
-    useShallow((s) => ({ loadedLibs: s.loadedLibs })),
-  );
-  const nodeTypes = useMemo(() => createNodeTypes(loadedLibs), [loadedLibs]);
+  const selectedLib = useLibraryRegistryStore((s) => s.selectedLib);
+  const nodeTypes = useMemo(() => createNodeTypes(selectedLib), [selectedLib]);
 
   // remove selected states
   const cleanNodes = useMemo(

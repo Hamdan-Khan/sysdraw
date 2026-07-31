@@ -1,11 +1,7 @@
-import {
-  IDB_CONFIG_KEY,
-  IDB_DATABASE_NAME,
-  IDB_DATABASE_VERSION,
-} from "@sysdraw/common";
+import { IDB_DATABASE_NAME, IDB_DATABASE_VERSION } from "@sysdraw/common";
 import { DBSchema, IDBPDatabase, openDB } from "idb";
 import { StoreApi, createStore } from "zustand/vanilla";
-import { AppConfig } from "../config";
+import { REGISTRY_CONFIG_KEY, RegistryConfig } from "../config";
 import defaultLibrary from "./default_library.json";
 import { LibraryManifest, LibraryMetadata } from "./types";
 
@@ -13,62 +9,85 @@ const defaultLibraryMetadata: LibraryMetadata = {
   id: defaultLibrary.id,
   name: defaultLibrary.name,
   version: defaultLibrary.version,
+  description:
+    "Sysdraw's default library, sufficient for simple architecture diagrams.",
+  icon: "https://dummyimage.com/100x100/54ffcc/005e0e.png&text=Sd",
+  tags: ["basic"],
+  path: "data/default_library.json",
 };
 
 interface LibraryRegistryState {
-  loadedLibs: Record<string, LibraryManifest>;
+  selectedLib: LibraryManifest | null;
 }
 
 interface SysdrawDB extends DBSchema {
-  config: {
-    key: string;
-    value: AppConfig;
-  };
   libraries: {
     key: string;
     value: LibraryManifest;
   };
 }
 
+interface LibraryRegistryOptions {
+  /** URL of the remote libraries repository */
+  url: string;
+}
+
 class LibraryRegistry {
   private store: StoreApi<LibraryRegistryState>;
+  private baseUrl: string;
   private idb: IDBPDatabase<SysdrawDB> | null = null;
   private initPromise: Promise<void>;
+  private config: RegistryConfig;
 
-  public constructor() {
+  public constructor({ url }: LibraryRegistryOptions) {
+    if (!url) {
+      throw new Error("LibraryRegistry requires a url");
+    }
+    this.baseUrl = url;
+    this.config = this.loadConfigFromLocalStorage();
+
     this.store = createStore<LibraryRegistryState>(() => ({
-      loadedLibs: {},
+      selectedLib: null,
     }));
 
     this.initPromise = this.initIDB();
+  }
+
+  private loadConfigFromLocalStorage(): RegistryConfig {
+    if (typeof window !== "undefined" && typeof localStorage !== "undefined") {
+      try {
+        const stored = localStorage.getItem(REGISTRY_CONFIG_KEY);
+        if (stored) {
+          const parsed = JSON.parse(stored);
+          if (parsed && typeof parsed.selectedLib === "string") {
+            return parsed;
+          }
+        }
+      } catch (e) {
+        console.error("Failed to read registry config from localStorage", e);
+      }
+    }
+    // ssr fallback
+    return { selectedLib: defaultLibraryMetadata.id };
+  }
+
+  private saveConfigToLocalStorage() {
+    if (typeof window !== "undefined" && typeof localStorage !== "undefined") {
+      try {
+        localStorage.setItem(REGISTRY_CONFIG_KEY, JSON.stringify(this.config));
+      } catch (e) {
+        console.error("Failed to save registry config to localStorage", e);
+      }
+    }
   }
 
   public whenReady = (): Promise<void> => {
     return this.initPromise;
   };
 
-  /** loads library from IDB and adds it to the store if it exists. */
-  private async loadLibraryFromIDB(id: string) {
-    if (this.store.getState().loadedLibs[id]) return;
-
-    if (this.isIDBLoaded) {
-      try {
-        const lib = await this.idb!.get("libraries", id);
-        if (lib) {
-          this.store.setState((s) => ({
-            loadedLibs: { ...s.loadedLibs, [id]: lib },
-          }));
-        }
-      } catch (e) {
-        console.error(`Failed to load library ${id} from IndexedDB`, e);
-      }
-    }
-  }
-
   /**
-   * initializes the IDB connection and loads all the selected libraries
-   * from the app config. On first load (when app config is empty), it sets
-   * the default library in the config and seeds the database with it.
+   * initializes the IDB connection and loads the selected library from local config.
+   * Seeds the database with default library if not present.
    */
   private async initIDB() {
     try {
@@ -77,10 +96,11 @@ class LibraryRegistry {
         IDB_DATABASE_VERSION,
         {
           upgrade(db) {
-            db.createObjectStore("config");
-            db.createObjectStore("libraries", {
-              keyPath: "id",
-            });
+            if (!db.objectStoreNames.contains("libraries")) {
+              db.createObjectStore("libraries", {
+                keyPath: "id",
+              });
+            }
           },
         },
       );
@@ -88,30 +108,10 @@ class LibraryRegistry {
       // seed the database with the default library if it's not already there
       const defaultLib = await this.idb.get("libraries", defaultLibrary.id);
       if (!defaultLib) {
-        await this.idb.put("libraries", defaultLibrary);
+        await this.idb.put("libraries", defaultLibrary as LibraryManifest);
       }
 
-      // after initialization, get all the selected libs from the config and add
-      // their library manifests to the store
-      let appConfig = await this.idb.get("config", IDB_CONFIG_KEY);
-
-      // if no libraries are selected, select the default one and update the config
-      if (
-        !appConfig ||
-        !appConfig.selectedLibs ||
-        appConfig.selectedLibs.length === 0
-      ) {
-        appConfig = { selectedLibs: [defaultLibrary.id] };
-        await this.idb.put("config", appConfig, IDB_CONFIG_KEY);
-      }
-
-      const promises = appConfig.selectedLibs.map((libId) =>
-        this.loadLibraryFromIDB(libId),
-      );
-
-      if (promises) {
-        await Promise.all(promises);
-      }
+      await this.selectLibrary(this.config.selectedLib);
     } catch (e) {
       console.error("Failed to initialize IndexedDB", e);
     }
@@ -121,68 +121,89 @@ class LibraryRegistry {
     return this.idb !== null;
   }
 
-  public listAllLibraries = (): LibraryMetadata[] => {
-    return [defaultLibraryMetadata];
-  };
+  public listAllLibraries = async (): Promise<LibraryMetadata[]> => {
+    if (!this.baseUrl) {
+      return [defaultLibraryMetadata];
+    }
 
-  public addLibrary = async (id: string): Promise<void> => {
-    await this.initPromise;
-
-    if (this.store.getState().loadedLibs[id]) return;
-
-    await this.loadLibraryFromIDB(id);
-
-    if (this.isIDBLoaded && this.store.getState().loadedLibs[id]) {
-      try {
-        let appConfig = await this.idb!.get("config", IDB_CONFIG_KEY);
-        if (!appConfig) {
-          appConfig = { selectedLibs: [] };
-        }
-        if (!appConfig.selectedLibs.includes(id)) {
-          appConfig.selectedLibs = [...appConfig.selectedLibs, id];
-          await this.idb!.put("config", appConfig, IDB_CONFIG_KEY);
-        }
-      } catch (e) {
-        console.error(
-          `Failed to update config in IndexedDB for library ${id}`,
-          e,
+    try {
+      const baseUrl = this.baseUrl.replace(/\/$/, "");
+      const response = await fetch(`${baseUrl}/metadata.json`);
+      if (!response.ok) {
+        throw new Error(
+          `Failed to fetch library metadata: ${response.statusText}`,
         );
       }
+      const data = await response.json();
+      if (Array.isArray(data.libraries)) {
+        return data.libraries;
+      }
+      return [defaultLibraryMetadata];
+    } catch (e) {
+      console.error("Failed to fetch library metadata from remote:", e);
+      return [defaultLibraryMetadata];
     }
   };
 
-  public removeLibrary = async (id: string): Promise<void> => {
-    // update state store
-    this.store.setState((s) => {
-      const { [id]: removedLib, ...rest } = s.loadedLibs;
+  /**
+   * selects a library for use in the application, by updating the local config
+   * and loading the library into the registry
+   */
+  public selectLibrary = async (id: string): Promise<void> => {
+    this.config.selectedLib = id;
+    this.saveConfigToLocalStorage();
 
-      if (!removedLib) {
-        console.error(`Couldn't find library with id: ${id} in the registry`);
-        return s;
-      }
+    let meta: LibraryMetadata | null = null;
+    try {
+      const metadataList = await this.listAllLibraries();
+      meta = metadataList.find((m) => m.id === id) ?? null;
+    } catch (e) {
+      console.error("Failed to list libraries when selecting library", e);
+    }
 
-      return { loadedLibs: rest };
-    });
-
-    await this.initPromise;
-
-    // update the indexedDB config
+    let cachedLib: LibraryManifest | null = null;
     if (this.isIDBLoaded) {
       try {
-        let appConfig = await this.idb!.get("config", IDB_CONFIG_KEY);
-        if (appConfig?.selectedLibs) {
-          appConfig.selectedLibs = appConfig.selectedLibs.filter(
-            (libId) => libId !== id,
-          );
-          await this.idb!.put("config", appConfig, IDB_CONFIG_KEY);
-        }
+        cachedLib = (await this.idb!.get("libraries", id)) ?? null;
       } catch (e) {
-        console.error(
-          `Failed to update config in IndexedDB when removing library ${id}`,
-          e,
-        );
+        console.error(`Failed to load library ${id} from IndexedDB`, e);
       }
     }
+
+    let manifestToUse: LibraryManifest | null = null;
+
+    // use the idb cached library if it is the same version as the remote one
+    if (cachedLib && meta && cachedLib.version === meta.version) {
+      manifestToUse = cachedLib;
+    } else if (meta && meta.path && this.baseUrl) {
+      // otherwise, fetch the library from the remote server and cache it
+      try {
+        const baseUrl = this.baseUrl.replace(/\/$/, "");
+        const cleanPath = meta.path.replace(/^\//, "");
+        const response = await fetch(`${baseUrl}/${cleanPath}`);
+        if (response.ok) {
+          const fetchedManifest = await response.json();
+          manifestToUse = fetchedManifest;
+          if (this.isIDBLoaded) {
+            await this.idb!.put("libraries", fetchedManifest);
+          }
+        }
+      } catch (e) {
+        console.error(`Failed to fetch library ${id} from remote:`, e);
+      }
+    }
+
+    // fallback to an outdated cached version if all else fails
+    // todo: we should probably show an error to the user in this case
+    if (!manifestToUse && cachedLib) {
+      manifestToUse = cachedLib;
+    } else if (id === defaultLibraryMetadata.id) {
+      manifestToUse = defaultLibrary as unknown as LibraryManifest;
+    }
+
+    this.store.setState({
+      selectedLib: manifestToUse,
+    });
   };
 
   public getStore = (): StoreApi<LibraryRegistryState> => {
@@ -202,5 +223,3 @@ class LibraryRegistry {
 }
 
 export { LibraryRegistry, type LibraryRegistryState };
-
-// todo: add proper error propagation, schema validation during load & saving

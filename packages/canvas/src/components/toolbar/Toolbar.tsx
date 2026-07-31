@@ -4,8 +4,9 @@ import { Tooltip } from "@/components/common/Tooltip";
 import { useCanvasHandlers } from "@/hooks/useCanvasHandlers";
 import { useCanvasStore } from "@/store/CanvasStoreProvider";
 import { CanvasStoreState } from "@/store/store";
-import { useLibraryRegistryStore } from "@sysdraw/models";
-import { useMemo } from "react";
+import { useLibraryRegistry, useLibraryRegistryStore } from "@sysdraw/models";
+import { Loader2 } from "lucide-react";
+import { useMemo, useState } from "react";
 import { toast } from "sonner";
 import { useShallow } from "zustand/shallow";
 import { LibraryDropdown } from "./LibraryDropdown";
@@ -19,20 +20,30 @@ const selector = (state: CanvasStoreState) => ({
 
 export const Toolbar = () => {
   const { isInteractive } = useCanvasStore(useShallow(selector));
-  const { loadedLibs } = useLibraryRegistryStore(
-    useShallow((s) => ({ loadedLibs: s.loadedLibs })),
-  );
+  const registry = useLibraryRegistry();
+  const selectedLib = useLibraryRegistryStore((s) => s.selectedLib);
   const { addNodeAtCenter } = useCanvasHandlers();
 
+  const [isLibLoading, setIsLibLoading] = useState(false);
+
+  const handleSelectLibrary = async (id: string) => {
+    setIsLibLoading(true);
+    try {
+      await registry.selectLibrary(id);
+    } catch (err) {
+      console.error("Failed to select library", err);
+    } finally {
+      setIsLibLoading(false);
+    }
+  };
+
   const { nodes, groups } = useMemo(() => {
-    const all = Object.values(loadedLibs)
-      .map((lib) => lib.nodes)
-      .flat();
+    const all = selectedLib?.nodes || [];
     return {
       nodes: all.filter((n) => n.type === "node"),
       groups: all.filter((n) => n.type === "group"),
     };
-  }, [loadedLibs]);
+  }, [selectedLib]);
 
   /**
    * Handler for when a node or group is dragged from the toolbar
@@ -63,50 +74,76 @@ export const Toolbar = () => {
   return (
     <div
       data-no-context-menu
-      className="absolute left-4 top-1/2 -translate-y-1/2 z-10 bg-surface border border-border rounded-lg py-2 flex flex-col gap-3 shadow-md"
+      className="absolute left-4 top-1/2 -translate-y-1/2 z-10 bg-surface border border-border rounded-lg py-2 flex flex-col gap-3 shadow-md min-w-35"
     >
-      <LibraryDropdown />
-      <Divider />
-
-      <div className="grid grid-cols-3 gap-3 px-4">
-        <h5 className="text-xs text-secondary uppercase col-span-3">Nodes</h5>
-        {nodes.map((node) => {
-          const { label, icon, id } = node;
-          return (
-            <div
-              key={id}
-              draggable
-              onDragStart={(e) => onDragStart(e, { kind: "node", id })}
-              onClick={() => handleClick({ kind: "node", id })}
-              className="group relative px-3 py-2 bg-bg border border-border rounded text-sm cursor-grab active:cursor-grabbing text-text text-center font-extrabold flex items-center justify-center hover:bg-surface/50 transition-colors"
-            >
-              <LibraryIcon icon={icon} size={24} />
-              <Tooltip text={label} />
-            </div>
-          );
-        })}
-      </div>
+      <h5 className="text-xs text-secondary uppercase px-4">Libraries</h5>
+      <LibraryDropdown onSelectLibrary={handleSelectLibrary} />
 
       <Divider />
 
-      <div className="flex flex-col gap-3 px-4 mb-2">
-        <h5 className="text-xs text-secondary uppercase">Groups</h5>
-        {groups.map((group) => {
-          const { label, icon, id } = group;
-          return (
-            <div
-              key={id}
-              draggable
-              onDragStart={(e) => onDragStart(e, { kind: "group", id })}
-              onClick={() => handleClick({ kind: "group", id })}
-              className="group relative px-3 py-2 bg-bg border border-dashed border-secondary rounded text-sm cursor-grab active:cursor-grabbing text-text text-center font-medium flex items-center justify-center gap-2 hover:bg-surface/50 transition-colors"
-            >
-              {icon && <LibraryIcon icon={icon} size={20} />}
-              <span>{label}</span>
-              <Tooltip text={label} />
+      <div className="relative flex flex-col gap-3">
+        <div className="grid grid-cols-3 gap-3 px-4">
+          <h5 className="text-xs text-secondary uppercase col-span-3">Nodes</h5>
+          {nodes.length === 0 ? (
+            <span className="text-[11px] text-secondary col-span-3 italic">
+              No nodes available
+            </span>
+          ) : (
+            nodes.map((node) => {
+              const { label, icon, id } = node;
+              return (
+                <div
+                  key={id}
+                  draggable
+                  onDragStart={(e) => onDragStart(e, { kind: "node", id })}
+                  onClick={() => handleClick({ kind: "node", id })}
+                  className="group relative px-3 py-2 bg-bg border border-border rounded text-sm cursor-grab active:cursor-grabbing text-text text-center font-extrabold flex items-center justify-center hover:bg-surface/50 transition-colors"
+                >
+                  <LibraryIcon icon={icon} size={24} />
+                  <Tooltip text={label} />
+                </div>
+              );
+            })
+          )}
+        </div>
+
+        <Divider />
+
+        <div className="flex flex-col gap-3 px-4 mb-2">
+          <h5 className="text-xs text-secondary uppercase">Groups</h5>
+          {groups.length === 0 ? (
+            <span className="text-[11px] text-secondary italic">
+              No groups available
+            </span>
+          ) : (
+            groups.map((group) => {
+              const { label, icon, id } = group;
+              return (
+                <div
+                  key={id}
+                  draggable
+                  onDragStart={(e) => onDragStart(e, { kind: "group", id })}
+                  onClick={() => handleClick({ kind: "group", id })}
+                  className="group relative px-3 py-2 bg-bg border border-dashed border-secondary rounded text-sm cursor-grab active:cursor-grabbing text-text text-center font-medium flex items-center justify-center gap-2 hover:bg-surface/50 transition-colors"
+                >
+                  {icon && <LibraryIcon icon={icon} size={20} />}
+                  <span>{label}</span>
+                  <Tooltip text={label} />
+                </div>
+              );
+            })
+          )}
+        </div>
+
+        {/* loading overlay */}
+        {isLibLoading && (
+          <div className="absolute -inset-x-1 -top-3 -bottom-2 z-20 flex flex-col items-center justify-center bg-linear-to-b from-surface/20 via-surface/75 to-surface/30 dark:from-bg/20 dark:via-bg/75 dark:to-bg/30 backdrop-blur-xs overflow-hidden pointer-events-auto transition-opacity duration-300 glass-overlay-fade">
+            <div className="absolute inset-0 bg-linear-to-r from-transparent via-white/30 dark:via-white/15 to-transparent animate-shimmer pointer-events-none" />
+            <div className="relative z-10 flex items-center justify-center p-2 rounded-full bg-surface/90 dark:bg-surface/90 backdrop-blur-md border border-border shadow-md text-primary animate-pulse">
+              <Loader2 className="size-4 animate-spin text-primary" />
             </div>
-          );
-        })}
+          </div>
+        )}
       </div>
     </div>
   );

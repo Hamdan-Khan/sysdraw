@@ -76,9 +76,7 @@ export const useCanvasHandlers = () => {
     globalEdgeAnimated,
     globalEdgeMarkerEnd,
   } = useCanvasStore(useShallow(selector));
-  const { loadedLibs } = useLibraryRegistryStore(
-    useShallow((s) => ({ loadedLibs: s.loadedLibs })),
-  );
+  const selectedLib = useLibraryRegistryStore((s) => s.selectedLib);
 
   const {
     screenToFlowPosition,
@@ -142,9 +140,7 @@ export const useCanvasHandlers = () => {
         y: event.clientY,
       });
 
-      const allLibNodes = Object.values(loadedLibs || {}).flatMap(
-        (lib) => lib.nodes || [],
-      );
+      const allLibNodes = selectedLib?.nodes || [];
       const nodeDef = allLibNodes.find((n) => n.id === id);
 
       if (!nodeDef) {
@@ -174,7 +170,7 @@ export const useCanvasHandlers = () => {
         return [...prev, newNode];
       });
     },
-    [screenToFlowPosition, setNodes, commit, loadedLibs],
+    [screenToFlowPosition, setNodes, commit, selectedLib?.nodes],
   );
 
   /**
@@ -207,9 +203,7 @@ export const useCanvasHandlers = () => {
         y: flowPos.y - defaultHeight / 2 + offset,
       };
 
-      const allLibNodes = Object.values(loadedLibs || {}).flatMap(
-        (lib) => lib.nodes || [],
-      );
+      const allLibNodes = selectedLib?.nodes || [];
       const nodeDef = allLibNodes.find((n) => n.id === id);
 
       if (!nodeDef) {
@@ -244,7 +238,7 @@ export const useCanvasHandlers = () => {
         prev.map((e) => (e.selected ? { ...e, selected: false } : e)),
       );
     },
-    [screenToFlowPosition, loadedLibs, commit, setNodes, setEdges],
+    [screenToFlowPosition, commit, setNodes, setEdges, selectedLib?.nodes],
   );
 
   /**

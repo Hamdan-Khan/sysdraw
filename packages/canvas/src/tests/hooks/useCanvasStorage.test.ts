@@ -18,7 +18,8 @@ const createWrapper = (
   store: StoreApi<CanvasStoreState>,
   registry?: LibraryRegistry,
 ) => {
-  const libRegistry = registry || new LibraryRegistry();
+  const libRegistry =
+    registry || new LibraryRegistry({ url: "http://localhost/lib" });
   return ({ children }: { children: React.ReactNode }) =>
     createElement(CanvasStoreProvider, {
       store,
@@ -63,7 +64,7 @@ describe("useCanvasStorage", () => {
     localStorage.setItem(CANVAS_LOCALSTORAGE_KEY, JSON.stringify(flow));
 
     const store = makeStore();
-    const libRegistry = new LibraryRegistry();
+    const libRegistry = new LibraryRegistry({ url: "http://localhost/lib" });
     renderHook(() => useCanvasStorage(), {
       wrapper: createWrapper(store, libRegistry),
     });
@@ -82,7 +83,7 @@ describe("useCanvasStorage", () => {
 
   it("auto-saves when nodes or edges change after mount (debounced)", async () => {
     const store = makeStore();
-    const libRegistry = new LibraryRegistry();
+    const libRegistry = new LibraryRegistry({ url: "http://localhost/lib" });
     renderHook(() => useCanvasStorage(), {
       wrapper: createWrapper(store, libRegistry),
     });
