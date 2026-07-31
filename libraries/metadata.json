@@ -1,0 +1,23 @@
+{
+  "version": "1",
+  "libraries": [
+    {
+      "id": "default",
+      "name": "Sysdraw",
+      "description": "Sysdraw's default library, sufficient for simple architecture diagrams.",
+      "version": "0.1.0",
+      "icon": "https://dummyimage.com/100x100/54ffcc/005e0e.png&text=Sd",
+      "tags": ["basic"],
+      "path": "data/default_library.json"
+    },
+    {
+      "id": "sample",
+      "name": "Sysdraw Sample",
+      "description": "A sample library for demonstration purposes.",
+      "version": "1.0.0",
+      "icon": "https://dummyimage.com/100x100/4a90e2/000000.png&text=S",
+      "tags": ["sample", "basic"],
+      "path": "data/sample_lib.json"
+    }
+  ]
+}
