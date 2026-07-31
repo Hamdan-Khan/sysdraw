@@ -3,6 +3,7 @@ import tailwindcss from "@tailwindcss/vite";
 import { tanstackStart } from "@tanstack/react-start/plugin/vite";
 import react from "@vitejs/plugin-react";
 import path from "node:path";
+import { visualizer } from "rollup-plugin-visualizer";
 import { defineConfig } from "vite";
 
 // https://vite.dev/config/
@@ -21,5 +22,6 @@ export default defineConfig({
     cloudflare({ viteEnvironment: { name: "ssr" } }),
     tanstackStart(),
     react(),
+    visualizer({ filename: "output/stats.html", gzipSize: true }),
   ],
 });

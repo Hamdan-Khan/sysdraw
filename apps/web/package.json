@@ -44,6 +44,7 @@
     "autoprefixer": "catalog:",
     "oxlint": "catalog:",
     "postcss": "catalog:",
+    "rollup-plugin-visualizer": "catalog:",
     "tailwindcss": "catalog:",
     "typescript": "catalog:",
     "vite": "catalog:",
