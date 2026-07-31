@@ -7,17 +7,17 @@
       "description": "Sysdraw's default library, sufficient for simple architecture diagrams.",
       "version": "0.1.0",
       "icon": "https://dummyimage.com/100x100/54ffcc/005e0e.png&text=Sd",
-      "tags": ["basic"],
+      "tags": ["sysdraw"],
       "path": "data/default_library.json"
     },
     {
-      "id": "sample",
-      "name": "Sysdraw Sample",
-      "description": "A sample library for demonstration purposes.",
+      "id": "aws",
+      "name": "AWS",
+      "description": "Official library of AWS icons",
       "version": "1.0.0",
-      "icon": "https://dummyimage.com/100x100/4a90e2/000000.png&text=S",
-      "tags": ["sample", "basic"],
-      "path": "data/sample_lib.json"
+      "icon": "https://upload.wikimedia.org/wikipedia/commons/f/f1/Aws_logo.svg",
+      "tags": ["aws", "cloud"],
+      "path": "data/aws_lib.json"
     }
   ]
 }
