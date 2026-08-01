@@ -1,7 +1,7 @@
 import { NODE_ICON_CLASS_ID } from "@sysdraw/common";
 import type { IconType } from "@sysdraw/models";
 import DOMPurify from "dompurify";
-import { useMemo } from "react";
+import { memo, useMemo } from "react";
 
 export interface LibraryIconProps {
   icon?: IconType;
@@ -10,11 +10,7 @@ export interface LibraryIconProps {
   style?: React.CSSProperties;
 }
 
-/**
- * Component to render a node icon from a LibraryNode definition.
- * Supports both raw SVG string and image URLs.
- */
-export const LibraryIcon = ({
+const LibraryIconComponent = ({
   icon,
   size,
   className = "",
@@ -57,3 +53,9 @@ export const LibraryIcon = ({
 
   return null;
 };
+
+/**
+ * Component to render a node icon from a LibraryNode definition.
+ * Supports both raw SVG string and image URLs.
+ */
+export const LibraryIcon = memo(LibraryIconComponent);

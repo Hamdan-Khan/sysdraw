@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { memo, useCallback, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 
 export type TooltipDirection = "up" | "down" | "left" | "right";
@@ -29,7 +29,7 @@ const directionStyles: Record<
   },
 };
 
-export const Tooltip = ({
+const TooltipComponent = ({
   text,
   direction = "up",
 }: {
@@ -140,3 +140,5 @@ export const Tooltip = ({
     </>
   );
 };
+
+export const Tooltip = memo(TooltipComponent);
