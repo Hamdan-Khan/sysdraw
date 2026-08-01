@@ -64,6 +64,7 @@
     "postcss": "catalog:",
     "react": "catalog:",
     "react-dom": "catalog:",
+    "react-scan": "^0.5.7",
     "tailwindcss": "catalog:",
     "tsup": "catalog:",
     "typescript": "catalog:",

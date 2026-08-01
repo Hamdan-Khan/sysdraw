@@ -1,7 +1,7 @@
 import type { DnDTransferData } from "@/components/canvas/types";
 import { Divider } from "@/components/common/Divider";
 import { Tooltip } from "@/components/common/Tooltip";
-import { useCanvasHandlers } from "@/hooks/useCanvasHandlers";
+import { useAddNodeAtCenter } from "@/hooks/useAddNodeAtCenter";
 import { cn } from "@/lib/utils";
 import { useCanvasStore } from "@/store/CanvasStoreProvider";
 import { CanvasStoreState } from "@/store/store";
@@ -25,7 +25,7 @@ export const Toolbar = memo(() => {
   const { isInteractive } = useCanvasStore(useShallow(selector));
   const registry = useLibraryRegistry();
   const selectedLib = useLibraryRegistryStore((s) => s.selectedLib);
-  const { addNodeAtCenter } = useCanvasHandlers();
+  const { addNodeAtCenter } = useAddNodeAtCenter();
 
   const [isOpen, setIsOpen] = useState(true);
   const [isLibLoading, setIsLibLoading] = useState(false);
