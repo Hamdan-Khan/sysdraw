@@ -206,9 +206,7 @@ class LibraryRegistry {
     const remoteList = this.remoteLibrariesList ?? [defaultLibraryMetadata];
 
     const conflictingLocal = currentLocal.find((m) => {
-      return (
-        m.name.trim().toLowerCase() === normalizedName && m.id !== manifest.id
-      );
+      return m.name.trim().toLowerCase() === normalizedName;
     });
     const conflictingRemote = remoteList.find(
       (m) => m.name.trim().toLowerCase() === normalizedName,

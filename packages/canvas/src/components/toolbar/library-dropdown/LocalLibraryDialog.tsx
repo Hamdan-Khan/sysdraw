@@ -112,7 +112,7 @@ export const LocalLibraryDialog = ({
         return;
       }
 
-      await processManifest(parseResult.data as LibraryManifest);
+      await processManifest(parseResult.data);
     } catch (err) {
       console.error("Failed to parse library file", err);
       toast.error(
@@ -157,6 +157,7 @@ export const LocalLibraryDialog = ({
                     rel="noopener noreferrer"
                   />
                 }
+                nativeButton={false}
                 variant="outline"
                 color="primary"
                 size="lg"
@@ -212,8 +213,8 @@ export const LocalLibraryDialog = ({
           <DialogContent className="sm:max-w-sm">
             <DialogHeader>
               <DialogTitle className="flex items-center gap-2">
-                <AlertTriangle className="size-4 text-amber-500" />
-                Library Conflict
+                <AlertTriangle className="size-4 text-amber-800" />
+                Warning
               </DialogTitle>
               <DialogDescription>
                 A library named <strong>"{conflictLib.name}"</strong> (v
@@ -221,9 +222,9 @@ export const LocalLibraryDialog = ({
               </DialogDescription>
             </DialogHeader>
 
-            <div className="p-3 bg-amber-500/10 border border-amber-500/20 rounded-md text-xs text-secondary">
-              Replacing it will overwrite the library definition stored in your
-              local storage.
+            <div className="p-3 bg-amber-500/5 border border-amber-500/20 rounded-md text-xs text-secondary">
+              Replacing it will overwrite the library definition stored locally
+              on your device.
             </div>
 
             <DialogFooter className="flex items-center justify-end gap-2 pt-2">
@@ -239,7 +240,7 @@ export const LocalLibraryDialog = ({
               <Button
                 type="button"
                 variant="outline"
-                color="destructive"
+                color="primary"
                 size="default"
                 disabled={isLoading}
                 onClick={handleReplaceConfirm}
