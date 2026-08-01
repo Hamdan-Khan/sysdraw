@@ -69,6 +69,7 @@ describe("LibraryRegistry Instance", () => {
 
     expect(store.getState().selectedLib).toEqual(defaultLibrary);
   });
+
   it("throws an error if constructor url option is missing or empty", () => {
     expect(() => new LibraryRegistry({ url: "" })).toThrow(
       "LibraryRegistry requires a url",
@@ -160,6 +161,22 @@ describe("LibraryRegistry Instance", () => {
     const state = registry.getSnapshot();
     expect(state.localLibraries).toHaveLength(1);
     expect(state.localLibraries[0].id).toBe("custom-1");
+  });
+
+  it("selects a local library and updates selectedLib in state", async () => {
+    const mockLocalLib = {
+      id: "local-select-test",
+      name: "Local Select Test",
+      version: "2.0.0",
+      nodes: [{ id: "n1", type: "node", label: "Test Node" }],
+    };
+
+    await registry.addLocalLibrary(mockLocalLib);
+    await registry.selectLibrary("local-select-test");
+
+    const snapshot = registry.getSnapshot();
+    expect(snapshot.selectedLib?.id).toBe("local-select-test");
+    expect(snapshot.selectedLib?.name).toBe("Local Select Test");
   });
 
   it("detects name conflict when adding a local library with an existing name", async () => {
@@ -312,7 +329,9 @@ describe("LibraryRegistryProvider & Hooks", () => {
 
     const Wrapper = ({ children }: { children: React.ReactNode }) => {
       const [currentReg, setCurrentReg] = React.useState(registry);
-      setRegFn = setCurrentReg;
+      React.useEffect(() => {
+        setRegFn = setCurrentReg;
+      }, []);
       return (
         <LibraryRegistryProvider registry={currentReg}>
           {children}
