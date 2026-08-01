@@ -185,8 +185,8 @@ export const Toolbar = memo(() => {
                   onClick={() => setIsNodeSearchOpen(true)}
                   className="p-1 rounded text-secondary hover:text-text hover:bg-dim cursor-pointer transition-colors"
                   aria-label="Search nodes"
-                  title="Search nodes"
                 >
+                  <Tooltip text="Search nodes" direction="up" />
                   <Search className="size-3.5" />
                 </button>
               )}
@@ -272,8 +272,8 @@ export const Toolbar = memo(() => {
                   onClick={() => setIsGroupSearchOpen(true)}
                   className="p-1 rounded text-secondary hover:text-text hover:bg-dim cursor-pointer transition-colors"
                   aria-label="Search groups"
-                  title="Search groups"
                 >
+                  <Tooltip text="Search groups" direction="up" />
                   <Search className="size-3.5" />
                 </button>
               )}

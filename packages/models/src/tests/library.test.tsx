@@ -11,14 +11,23 @@ import {
 
 describe("LibraryRegistry Instance", () => {
   let registry: LibraryRegistry;
+  let consoleSpy: ReturnType<typeof vi.spyOn>;
 
   beforeEach(() => {
+    consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
     registry = new LibraryRegistry({ url: "http://localhost/lib" });
   });
 
-  afterEach(() => {
+  afterEach(async () => {
+    try {
+      await registry?.whenReady();
+    } catch {}
     registry?.close();
+    consoleSpy.mockRestore();
   });
+
+
+
 
   it("initializes with null or default library as selectedLib", async () => {
     await registry.whenReady();
@@ -59,42 +68,98 @@ describe("LibraryRegistry Instance", () => {
 
     expect(store.getState().selectedLib).toEqual(defaultLibrary);
   });
+  it("throws an error if constructor url option is missing or empty", () => {
+    expect(() => new LibraryRegistry({ url: "" })).toThrow(
+      "LibraryRegistry requires a url",
+    );
+  });
+
+  it("fetches and returns library metadata list from remote when available", async () => {
+    const mockMetaList = [
+      {
+        id: "aws-icons",
+        name: "AWS Icons",
+        version: "1.0.0",
+        description: "AWS Cloud Icons",
+        path: "data/aws.json",
+      },
+    ];
+
+    const fetchSpy = vi.spyOn(globalThis, "fetch").mockResolvedValueOnce(
+      Response.json({ libraries: mockMetaList }),
+    );
+
+    const libraries = await registry.listAllLibraries();
+    expect(fetchSpy).toHaveBeenCalledWith("http://localhost/lib/metadata.json");
+    expect(libraries).toEqual(mockMetaList);
+
+    fetchSpy.mockRestore();
+  });
+
+  it("falls back to default library metadata when remote fetch fails", async () => {
+    const fetchSpy = vi.spyOn(globalThis, "fetch").mockRejectedValueOnce(new Error("Network Error"));
+
+    const libraries = await registry.listAllLibraries();
+    expect(libraries).toHaveLength(1);
+    expect(libraries[0].id).toBe(defaultLibrary.id);
+
+    fetchSpy.mockRestore();
+  });
+
+  it("falls back to default library metadata when remote data has unexpected shape", async () => {
+    const fetchSpy = vi.spyOn(globalThis, "fetch").mockResolvedValueOnce(
+      Response.json({ libraries: "invalid_format" }),
+    );
+
+    const libraries = await registry.listAllLibraries();
+    expect(libraries).toHaveLength(1);
+    expect(libraries[0].id).toBe(defaultLibrary.id);
+
+    fetchSpy.mockRestore();
+  });
+
+  it("sets selectedLib to null when selecting an unknown library with no cache or remote", async () => {
+    const fetchSpy = vi.spyOn(globalThis, "fetch").mockRejectedValue(new Error("404 Not Found"));
+
+    await act(async () => {
+      await registry.selectLibrary("non-existent-id");
+    });
+
+    expect(registry.getSnapshot().selectedLib).toBeNull();
+
+    fetchSpy.mockRestore();
+  });
 });
 
 describe("LibraryRegistryProvider & Hooks", () => {
   let registry: LibraryRegistry;
+  let consoleSpy: ReturnType<typeof vi.spyOn>;
 
   beforeEach(() => {
+    consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
     registry = new LibraryRegistry({ url: "http://localhost/lib" });
   });
 
-  afterEach(() => {
+  afterEach(async () => {
+    try {
+      await registry?.whenReady();
+    } catch {}
     registry?.close();
+    consoleSpy.mockRestore();
   });
 
   it("throws an error when useLibraryRegistry is used outside LibraryRegistryProvider", () => {
-    const consoleError = vi
-      .spyOn(console, "error")
-      .mockImplementation(() => {});
-
     expect(() => renderHook(() => useLibraryRegistry())).toThrow(
       "useLibraryRegistry must be used within a LibraryRegistryProvider",
     );
-
-    consoleError.mockRestore();
   });
 
   it("throws an error when useLibraryRegistryStore is used outside LibraryRegistryProvider", () => {
-    const consoleError = vi
-      .spyOn(console, "error")
-      .mockImplementation(() => {});
-
     expect(() => renderHook(() => useLibraryRegistryStore((s) => s))).toThrow(
       "useLibraryRegistryStore must be used within a LibraryRegistryProvider",
     );
-
-    consoleError.mockRestore();
   });
+
 
   it("provides access to the LibraryRegistry instance via useLibraryRegistry", () => {
     const wrapper = ({ children }: { children: React.ReactNode }) => (
@@ -125,4 +190,36 @@ describe("LibraryRegistryProvider & Hooks", () => {
 
     expect(result.current).toEqual(defaultLibrary);
   });
+
+  it("updates returned registry when provider registry prop changes", async () => {
+    const secondRegistry = new LibraryRegistry({ url: "http://localhost/lib2" });
+
+    let setRegFn: (r: LibraryRegistry) => void = () => {};
+
+    const Wrapper = ({ children }: { children: React.ReactNode }) => {
+      const [currentReg, setCurrentReg] = React.useState(registry);
+      setRegFn = setCurrentReg;
+      return (
+        <LibraryRegistryProvider registry={currentReg}>
+          {children}
+        </LibraryRegistryProvider>
+      );
+    };
+
+    const { result } = renderHook(() => useLibraryRegistry(), { wrapper: Wrapper });
+
+    expect(result.current).toBe(registry);
+
+    act(() => {
+      setRegFn(secondRegistry);
+    });
+
+    expect(result.current).toBe(secondRegistry);
+
+    await secondRegistry.whenReady();
+    secondRegistry.close();
+  });
 });
+
+
+

@@ -38,7 +38,7 @@ export const SearchInput = ({
         className="absolute right-1 text-secondary/60 hover:text-text cursor-pointer p-0.5"
         aria-label="Close search"
       >
-        <X className="size-3" />
+        <X className="size-3" strokeWidth={2.5} />
       </button>
     </div>
   );

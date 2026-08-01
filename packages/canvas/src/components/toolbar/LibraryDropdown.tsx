@@ -13,6 +13,7 @@ import {
 } from "@sysdraw/models";
 import { Check, ChevronRight, Image, Info, Package } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
+import { Tooltip } from "../common/Tooltip";
 import { LibraryInfoDialog } from "./LibraryInfoDialog";
 
 const LibraryThumbnail = ({ src, alt }: { src?: string; alt: string }) => {
@@ -172,11 +173,11 @@ export const LibraryDropdown = ({ onSelectLibrary }: LibraryDropdownProps) => {
                         {/* Info button */}
                         <button
                           type="button"
-                          title="View information"
                           aria-label={`View ${lib.name} info`}
                           onClick={(e) => handleOpenInfo(e, lib)}
                           className="opacity-0 group-hover:opacity-100 shrink-0 flex items-center justify-center size-5 rounded text-secondary hover:text-primary hover:bg-surface transition-all"
                         >
+                          <Tooltip text="View Information" direction="up" />
                           <Info size={14} />
                         </button>
                       </div>
