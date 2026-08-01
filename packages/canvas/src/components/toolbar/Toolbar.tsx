@@ -6,8 +6,9 @@ import { cn } from "@/lib/utils";
 import { useCanvasStore } from "@/store/CanvasStoreProvider";
 import { CanvasStoreState } from "@/store/store";
 import { useLibraryRegistry, useLibraryRegistryStore } from "@sysdraw/models";
+import { useVirtualizer } from "@tanstack/react-virtual";
 import { Loader2, Menu, Search, X } from "lucide-react";
-import { memo, useMemo, useState } from "react";
+import { memo, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 import { useShallow } from "zustand/shallow";
 import { LibraryDropdown } from "./LibraryDropdown";
@@ -32,6 +33,9 @@ export const Toolbar = memo(() => {
   const [groupSearch, setGroupSearch] = useState("");
   const [isNodeSearchOpen, setIsNodeSearchOpen] = useState(false);
   const [isGroupSearchOpen, setIsGroupSearchOpen] = useState(false);
+
+  const nodesRef = useRef(null);
+  const groupsRef = useRef(null);
 
   const handleSelectLibrary = async (id: string) => {
     setIsLibLoading(true);
@@ -77,6 +81,23 @@ export const Toolbar = memo(() => {
         g.id.toLowerCase().includes(query),
     );
   }, [groups, groupSearch]);
+
+  const COLUMNS = 3;
+  const rowCount = Math.ceil(filteredNodes.length / COLUMNS);
+
+  const rowVirtualizer = useVirtualizer({
+    count: rowCount,
+    getScrollElement: () => nodesRef.current,
+    estimateSize: () => 48,
+    gap: 8,
+  });
+
+  const groupVirtualizer = useVirtualizer({
+    count: filteredGroups.length,
+    getScrollElement: () => groupsRef.current,
+    estimateSize: () => 38,
+    gap: 8,
+  });
 
   /**
    * Handler for when a node or group is dragged from the toolbar
@@ -171,27 +192,64 @@ export const Toolbar = memo(() => {
               )}
             </div>
 
-            <div className="min-h-44 max-h-56 overflow-y-auto overflow-x-hidden grid grid-cols-3 gap-2 content-start pr-1">
+            <div
+              ref={nodesRef}
+              className="min-h-44 max-h-56 overflow-y-auto overflow-x-hidden pr-1"
+            >
               {filteredNodes.length === 0 ? (
-                <span className="text-[11px] text-secondary col-span-3 italic">
+                <span className="text-[11px] text-secondary italic block">
                   No nodes found
                 </span>
               ) : (
-                filteredNodes.map((node) => {
-                  const { label, icon, id } = node;
-                  return (
-                    <div
-                      key={id}
-                      draggable
-                      onDragStart={(e) => onDragStart(e, { kind: "node", id })}
-                      onClick={() => handleClick({ kind: "node", id })}
-                      className="group relative p-2 bg-bg border border-border rounded text-sm cursor-grab active:cursor-grabbing text-text text-center font-extrabold flex items-center justify-center hover:bg-surface/50 transition-colors"
-                    >
-                      <LibraryIcon icon={icon} size={30} />
-                      <Tooltip text={label} />
-                    </div>
-                  );
-                })
+                <div
+                  style={{
+                    height: `${rowVirtualizer.getTotalSize()}px`,
+                    width: "100%",
+                    position: "relative",
+                  }}
+                >
+                  {rowVirtualizer.getVirtualItems().map((virtualRow) => {
+                    const startIndex = virtualRow.index * COLUMNS;
+                    const rowNodes = filteredNodes.slice(
+                      startIndex,
+                      startIndex + COLUMNS,
+                    );
+
+                    return (
+                      <div
+                        key={virtualRow.key}
+                        data-index={virtualRow.index}
+                        ref={rowVirtualizer.measureElement}
+                        style={{
+                          position: "absolute",
+                          top: 0,
+                          left: 0,
+                          width: "100%",
+                          transform: `translateY(${virtualRow.start}px)`,
+                        }}
+                        className="grid grid-cols-3 gap-2"
+                      >
+                        {rowNodes.map((node) => {
+                          const { label, icon, id } = node;
+                          return (
+                            <div
+                              key={id}
+                              draggable
+                              onDragStart={(e) =>
+                                onDragStart(e, { kind: "node", id })
+                              }
+                              onClick={() => handleClick({ kind: "node", id })}
+                              className="group relative p-2 bg-bg border border-border rounded text-sm cursor-grab active:cursor-grabbing text-text text-center font-extrabold flex items-center justify-center hover:bg-surface/50 transition-colors"
+                            >
+                              <LibraryIcon icon={icon} size={30} />
+                              <Tooltip text={label} />
+                            </div>
+                          );
+                        })}
+                      </div>
+                    );
+                  })}
+                </div>
               )}
             </div>
           </div>
@@ -221,28 +279,54 @@ export const Toolbar = memo(() => {
               )}
             </div>
 
-            <div className="min-h-36 max-h-44 overflow-y-auto overflow-x-hidden flex flex-col gap-2 pr-1">
+            <div
+              ref={groupsRef}
+              className="min-h-36 max-h-44 overflow-y-auto overflow-x-hidden w-44 pr-1"
+            >
               {filteredGroups.length === 0 ? (
-                <span className="text-[11px] text-secondary italic">
+                <span className="text-[11px] text-secondary italic block">
                   No groups found
                 </span>
               ) : (
-                filteredGroups.map((group) => {
-                  const { label, icon, id } = group;
-                  return (
-                    <div
-                      key={id}
-                      draggable
-                      onDragStart={(e) => onDragStart(e, { kind: "group", id })}
-                      onClick={() => handleClick({ kind: "group", id })}
-                      className="group relative px-3 py-2 bg-bg border border-dashed border-secondary rounded text-sm cursor-grab active:cursor-grabbing text-text font-medium flex items-center gap-2 hover:bg-surface/50 transition-colors w-44 max-w-44"
-                    >
-                      {icon && <LibraryIcon icon={icon} size={20} />}
-                      <span className="truncate">{label}</span>
-                      <Tooltip text={label} />
-                    </div>
-                  );
-                })
+                <div
+                  style={{
+                    height: `${groupVirtualizer.getTotalSize()}px`,
+                    width: "100%",
+                    position: "relative",
+                  }}
+                >
+                  {groupVirtualizer.getVirtualItems().map((virtualRow) => {
+                    const group = filteredGroups[virtualRow.index];
+                    const { label, icon, id } = group;
+                    return (
+                      <div
+                        key={virtualRow.key}
+                        data-index={virtualRow.index}
+                        ref={groupVirtualizer.measureElement}
+                        style={{
+                          position: "absolute",
+                          top: 0,
+                          left: 0,
+                          width: "100%",
+                          transform: `translateY(${virtualRow.start}px)`,
+                        }}
+                      >
+                        <div
+                          draggable
+                          onDragStart={(e) =>
+                            onDragStart(e, { kind: "group", id })
+                          }
+                          onClick={() => handleClick({ kind: "group", id })}
+                          className="group relative px-3 py-2 bg-bg border border-dashed border-secondary rounded text-sm cursor-grab active:cursor-grabbing text-text font-medium flex items-center gap-2 hover:bg-surface/50 transition-colors w-44 max-w-44"
+                        >
+                          {icon && <LibraryIcon icon={icon} size={20} />}
+                          <span className="truncate">{label}</span>
+                          <Tooltip text={label} />
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
               )}
             </div>
           </div>
