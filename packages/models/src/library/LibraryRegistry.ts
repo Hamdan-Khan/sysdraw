@@ -38,6 +38,7 @@ class LibraryRegistry {
   private idb: IDBPDatabase<SysdrawDB> | null = null;
   private initPromise: Promise<void>;
   private config: RegistryConfig;
+  private librariesList: LibraryMetadata[] | null = null;
 
   public constructor({ url }: LibraryRegistryOptions) {
     if (!url) {
@@ -123,6 +124,7 @@ class LibraryRegistry {
 
   public listAllLibraries = async (): Promise<LibraryMetadata[]> => {
     if (!this.baseUrl) {
+      this.librariesList = [defaultLibraryMetadata];
       return [defaultLibraryMetadata];
     }
 
@@ -136,11 +138,13 @@ class LibraryRegistry {
       }
       const data = await response.json();
       if (Array.isArray(data.libraries)) {
+        this.librariesList = data.libraries;
         return data.libraries;
       }
       return [defaultLibraryMetadata];
     } catch (e) {
       console.error("Failed to fetch library metadata from remote:", e);
+      this.librariesList = [defaultLibraryMetadata];
       return [defaultLibraryMetadata];
     }
   };
@@ -155,8 +159,11 @@ class LibraryRegistry {
 
     let meta: LibraryMetadata | null = null;
     try {
-      const metadataList = await this.listAllLibraries();
-      meta = metadataList.find((m) => m.id === id) ?? null;
+      // fetch libraries list if not available in memory
+      if (!this.librariesList) {
+        await this.listAllLibraries();
+      }
+      meta = this.librariesList?.find((m) => m.id === id) ?? null;
     } catch (e) {
       console.error("Failed to list libraries when selecting library", e);
     }
@@ -172,8 +179,11 @@ class LibraryRegistry {
 
     let manifestToUse: LibraryManifest | null = null;
 
-    // use the idb cached library if it is the same version as the remote one
-    if (cachedLib && meta && cachedLib.version === meta.version) {
+    if (id === defaultLibraryMetadata.id) {
+      // if default library is requested,we can use it directly as its a part of this module
+      manifestToUse = defaultLibrary as unknown as LibraryManifest;
+    } else if (cachedLib && meta && cachedLib.version === meta.version) {
+      // use the idb cached library if it is the same version as the remote one
       manifestToUse = cachedLib;
     } else if (meta && meta.path && this.baseUrl) {
       // otherwise, fetch the library from the remote server and cache it
