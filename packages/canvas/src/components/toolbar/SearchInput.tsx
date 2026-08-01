@@ -28,9 +28,10 @@ export const SearchInput = ({
             onSearchOpenChange(false);
           }
         }}
-        className="w-24 pl-5 pr-4 py-0.5 text-[11px] bg-bg border border-border rounded text-text placeholder:text-secondary/50 focus:outline-none focus:border-primary/60 transition-all"
+        className="w-24 pl-5 pr-4 py-0.5 text-[11px] bg-bg border border-border rounded text-text placeholder:text-secondary/50 focus:outline-none focus:border-primary/60 transition-colors"
       />
       <button
+        type="button"
         onClick={() => {
           setSearchValue("");
           onSearchOpenChange(false);

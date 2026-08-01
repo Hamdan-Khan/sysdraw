@@ -92,9 +92,8 @@ export const LocalLibraryDialog = ({
     } catch (err) {
       console.error("Failed to add library", err);
       toast.error("An unexpected error occurred while adding the library.");
-    } finally {
-      setIsLoading(false);
     }
+    setIsLoading(false);
   };
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {

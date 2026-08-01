@@ -101,9 +101,10 @@ export const OptionBar = ({ type, onAddLabel }: OptionBarProps) => {
             className="relative flex items-center justify-center group"
           >
             <button
+              type="button"
               onClick={opt.action}
               disabled={opt.disabled}
-              className="p-1.5 rounded-md text-secondary hover:text-primary hover:bg-dim transition-all flex items-center justify-center cursor-pointer outline-none disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-transparent disabled:hover:text-secondary"
+              className="p-1.5 rounded-md text-secondary hover:text-primary hover:bg-dim transition-colors flex items-center justify-center cursor-pointer outline-none disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-transparent disabled:hover:text-secondary"
               aria-label={opt.label}
             >
               <Icon size={16} />

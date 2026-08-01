@@ -130,6 +130,7 @@ export const Toolbar = memo(() => {
       {/* menu button shown at top left when toolbar is closed */}
       {!isOpen && (
         <button
+          type="button"
           onClick={() => setIsOpen(true)}
           aria-label="Open Toolbar"
           title="Open Toolbar"
@@ -156,6 +157,7 @@ export const Toolbar = memo(() => {
           </h5>
           <div className="flex items-center gap-1">
             <button
+              type="button"
               onClick={() => setIsUploadDialogOpen(true)}
               className="p-1 rounded text-secondary hover:text-text hover:bg-dim cursor-pointer transition-colors"
               aria-label="Add local library"
@@ -164,6 +166,7 @@ export const Toolbar = memo(() => {
               <Plus className="size-3.5" />
             </button>
             <button
+              type="button"
               onClick={() => setIsOpen(false)}
               className="p-1 rounded text-secondary hover:text-text hover:bg-dim cursor-pointer transition-colors"
               aria-label="Close Toolbar"
@@ -195,6 +198,7 @@ export const Toolbar = memo(() => {
                 />
               ) : (
                 <button
+                  type="button"
                   onClick={() => setIsNodeSearchOpen(true)}
                   className="p-1 rounded text-secondary hover:text-text hover:bg-dim cursor-pointer transition-colors"
                   aria-label="Search nodes"
@@ -282,6 +286,7 @@ export const Toolbar = memo(() => {
                 />
               ) : (
                 <button
+                  type="button"
                   onClick={() => setIsGroupSearchOpen(true)}
                   className="p-1 rounded text-secondary hover:text-text hover:bg-dim cursor-pointer transition-colors"
                   aria-label="Search groups"

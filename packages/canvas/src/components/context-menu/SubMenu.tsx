@@ -54,6 +54,7 @@ export const SubMenuItem = ({ item, onClose }: SubMenuItemProps) => {
       onMouseLeave={closeSubmenu}
     >
       <button
+        type="button"
         role="menuitem"
         disabled={item.disabled}
         onClick={() => {

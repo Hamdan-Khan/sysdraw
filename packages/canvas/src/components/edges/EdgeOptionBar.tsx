@@ -192,8 +192,9 @@ export const EdgeOptionBar = ({ edgeId }: EdgeOptionBarProps) => {
         ref={popoverRef}
       >
         <button
+          type="button"
           onClick={handleToggleLabelPopover}
-          className={`p-1.5 rounded-md transition-all flex items-center justify-center cursor-pointer outline-none ${
+          className={`p-1.5 rounded-md transition-colors flex items-center justify-center cursor-pointer outline-none ${
             isLabelOpen || Boolean(currentLabel)
               ? "text-primary bg-dim"
               : "text-secondary hover:text-primary hover:bg-dim"
@@ -214,7 +215,7 @@ export const EdgeOptionBar = ({ edgeId }: EdgeOptionBarProps) => {
               onChange={handleLabelInputChange}
               onKeyDown={handleLabelInputKeyDown}
               placeholder="Edge label..."
-              className="w-full bg-dim text-primary text-xs px-2 py-1 rounded outline-none border border-transparent focus:border-border transition-all"
+              className="w-full bg-dim text-primary text-xs px-2 py-1 rounded outline-none border border-transparent focus:border-border transition-colors"
             />
             {/* tooltip arrow originating from element */}
             <span className="absolute top-full left-1/2 -translate-x-1/2 border-[5px] border-transparent border-t-border pointer-events-none" />
@@ -229,8 +230,9 @@ export const EdgeOptionBar = ({ edgeId }: EdgeOptionBarProps) => {
           className="relative flex items-center justify-center group"
         >
           <button
+            type="button"
             onClick={onClick}
-            className={`p-1.5 rounded-md transition-all flex items-center justify-center cursor-pointer outline-none ${
+            className={`p-1.5 rounded-md transition-colors flex items-center justify-center cursor-pointer outline-none ${
               active !== undefined
                 ? active
                   ? "text-primary bg-dim"

@@ -271,6 +271,7 @@ const ControlsBarComponent = ({
               {item.type === "button" ? (
                 <div className="relative flex items-center justify-center group">
                   <button
+                    type="button"
                     id={item.id}
                     onClick={item.action}
                     disabled={item.disabled}

@@ -103,8 +103,8 @@ export const useCanvasExport = () => {
       const bgColor = background === "white" ? "#ffffff" : undefined;
       const { flowEl, width, height } = payload;
 
+      let dataUrl: string | null = null;
       try {
-        let dataUrl: string | null = null;
         if (format === FILE_EXTENSIONS.PNG) {
           dataUrl = await toPng(flowEl, {
             width,
@@ -119,14 +119,13 @@ export const useCanvasExport = () => {
         } else if (format === FILE_EXTENSIONS.SVG) {
           dataUrl = renderToNativeSvg(flowEl, width, height, bgColor);
         }
-        return dataUrl;
       } catch (error) {
         console.error(error);
         toast.error("Failed to capture diagram");
-        return null;
-      } finally {
-        setIsExporting(false);
       }
+
+      setIsExporting(false);
+      return dataUrl;
     },
     [storeApi],
   );

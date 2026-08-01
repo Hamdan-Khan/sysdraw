@@ -107,6 +107,7 @@ export const Dropdown = <T extends string>({
         return (
           <button
             key={opt.value}
+            type="button"
             role="option"
             aria-selected={isActive}
             onClick={() => {
@@ -130,12 +131,13 @@ export const Dropdown = <T extends string>({
     <div className="relative flex items-center justify-center">
       <button
         ref={triggerRef}
+        type="button"
         id={id}
         onClick={toggleOpen}
         aria-label={ariaLabel}
         aria-haspopup="listbox"
         aria-expanded={open}
-        className={`flex items-center gap-1 p-2 rounded-md transition-all cursor-pointer outline-none ${
+        className={`flex items-center gap-1 p-2 rounded-md transition-colors cursor-pointer outline-none ${
           open
             ? "text-primary bg-dim"
             : "text-secondary hover:text-primary hover:bg-dim"

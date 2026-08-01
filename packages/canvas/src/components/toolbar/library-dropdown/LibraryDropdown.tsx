@@ -51,9 +51,8 @@ const LibraryDropdownComponent = ({
         setBuiltinLibs(remote);
       } catch (err) {
         console.error("Failed to load built-in libraries", err);
-      } finally {
-        setLoading(false);
       }
+      setLoading(false);
     }
     loadRemoteLibraries();
   }, [registry]);
@@ -114,10 +113,9 @@ const LibraryDropdownComponent = ({
     } catch (err) {
       console.error("Failed to delete library", err);
       toast.error("Failed to delete library.");
-    } finally {
-      setDeletingLib(null);
-      isDialogOpenRef.current = false;
     }
+    setDeletingLib(null);
+    isDialogOpenRef.current = false;
   };
 
   const handleCloseDeleteConfirm = (open: boolean) => {
@@ -137,7 +135,7 @@ const LibraryDropdownComponent = ({
           <DropdownMenuTrigger
             type="button"
             aria-label="Libraries"
-            className="group w-full flex items-center justify-between gap-2 px-3 py-2 text-xs font-medium rounded border transition-all cursor-pointer bg-bg border-border text-primary hover:bg-surface/50 data-popup-open:bg-dim data-popup-open:border-primary data-open:bg-dim data-open:border-primary outline-none"
+            className="group w-full flex items-center justify-between gap-2 px-3 py-2 text-xs font-medium rounded border transition-colors cursor-pointer bg-bg border-border text-primary hover:bg-surface/50 data-popup-open:bg-dim data-popup-open:border-primary data-open:bg-dim data-open:border-primary outline-none"
           >
             <div className="flex items-center gap-2 min-w-0">
               <Image size={16} className="text-secondary shrink-0" />

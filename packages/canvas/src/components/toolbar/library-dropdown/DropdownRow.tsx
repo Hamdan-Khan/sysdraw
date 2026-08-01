@@ -50,7 +50,7 @@ export const DropdownRow = ({
           type="button"
           aria-label={`View ${lib.name} info`}
           onClick={(e) => handleOpenInfo(e, lib)}
-          className="shrink-0 flex items-center justify-center size-5 rounded text-secondary hover:text-primary hover:bg-surface transition-all cursor-pointer"
+          className="shrink-0 flex items-center justify-center size-5 rounded text-secondary hover:text-primary hover:bg-surface transition-colors cursor-pointer"
         >
           <Tooltip text="View Information" direction="up" />
           <Info size={14} />
@@ -62,7 +62,7 @@ export const DropdownRow = ({
             type="button"
             aria-label={`Delete ${lib.name}`}
             onClick={(e) => handleDeleteLocal(e, lib)}
-            className={`shrink-0 flex items-center justify-center size-5 rounded transition-all ${
+            className={`shrink-0 flex items-center justify-center size-5 rounded transition-colors ${
               isSelected
                 ? "text-secondary/40 cursor-not-allowed"
                 : "text-secondary hover:text-red-500 hover:bg-surface cursor-pointer"
