@@ -18,7 +18,10 @@ const defaultLibraryMetadata: LibraryMetadata = {
 
 interface LibraryRegistryState {
   selectedLib: LibraryManifest | null;
+  localLibraries: LibraryMetadata[];
 }
+
+type AddLibraryResult = { success: boolean; conflict?: LibraryMetadata };
 
 interface SysdrawDB extends DBSchema {
   libraries: {
@@ -38,17 +41,18 @@ class LibraryRegistry {
   private idb: IDBPDatabase<SysdrawDB> | null = null;
   private initPromise: Promise<void>;
   private config: RegistryConfig;
-  private librariesList: LibraryMetadata[] | null = null;
+  private remoteLibrariesList: LibraryMetadata[] | null = null;
 
   public constructor({ url }: LibraryRegistryOptions) {
     if (!url) {
       throw new Error("LibraryRegistry requires a url");
     }
-    this.baseUrl = url;
+    this.baseUrl = url.replace(/\/$/, "");
     this.config = this.loadConfigFromLocalStorage();
 
     this.store = createStore<LibraryRegistryState>(() => ({
       selectedLib: null,
+      localLibraries: [],
     }));
 
     this.initPromise = this.initIDB();
@@ -112,6 +116,7 @@ class LibraryRegistry {
         await this.idb.put("libraries", defaultLibrary as LibraryManifest);
       }
 
+      await this.listLocalLibraries();
       await this.selectLibrary(this.config.selectedLib);
     } catch (e) {
       console.error("Failed to initialize IndexedDB", e);
@@ -122,30 +127,122 @@ class LibraryRegistry {
     return this.idb !== null;
   }
 
-  public listAllLibraries = async (): Promise<LibraryMetadata[]> => {
-    if (!this.baseUrl) {
-      this.librariesList = [defaultLibraryMetadata];
-      return [defaultLibraryMetadata];
+  /**
+   * lists all local libraries stored in the registry.
+   * also updates the local store state
+   */
+  public listLocalLibraries = async (): Promise<LibraryMetadata[]> => {
+    if (!this.isIDBLoaded) {
+      return this.store.getState().localLibraries;
     }
 
+    // to get the exclusively local libraries, we filter out the remote libraries
+    // from the idb, because remote libs are the source of truth for us
     try {
-      const baseUrl = this.baseUrl.replace(/\/$/, "");
-      const response = await fetch(`${baseUrl}/metadata.json`);
-      if (!response.ok) {
-        throw new Error(
-          `Failed to fetch library metadata: ${response.statusText}`,
-        );
+      const allManifests = await this.idb!.getAll("libraries");
+      const remoteIds = new Set(
+        (this.remoteLibrariesList ?? [defaultLibraryMetadata]).map((m) => m.id),
+      );
+
+      const localMetas: LibraryMetadata[] = allManifests
+        .filter((manifest) => {
+          if (remoteIds.has(manifest.id)) {
+            return false;
+          }
+          if (!this.remoteLibrariesList && manifest.path) {
+            return false;
+          }
+          return true;
+        })
+        .map((manifest) => {
+          const { nodes: _nodes, ...metadata } = manifest;
+          return metadata;
+        });
+
+      this.store.setState({ localLibraries: localMetas });
+      return localMetas;
+    } catch (e) {
+      console.error("Failed to list local libraries from IndexedDB", e);
+      return this.store.getState().localLibraries;
+    }
+  };
+
+  public listAllLibraries = async (): Promise<LibraryMetadata[]> => {
+    let remoteList: LibraryMetadata[] = [defaultLibraryMetadata];
+
+    try {
+      const response = await fetch(`${this.baseUrl}/metadata.json`);
+      if (response.ok) {
+        const data = await response.json();
+        if (Array.isArray(data.libraries)) {
+          remoteList = data.libraries;
+        }
       }
-      const data = await response.json();
-      if (Array.isArray(data.libraries)) {
-        this.librariesList = data.libraries;
-        return data.libraries;
-      }
-      return [defaultLibraryMetadata];
     } catch (e) {
       console.error("Failed to fetch library metadata from remote:", e);
-      this.librariesList = [defaultLibraryMetadata];
-      return [defaultLibraryMetadata];
+    }
+
+    this.remoteLibrariesList = remoteList;
+
+    const localList = await this.listLocalLibraries();
+    const remoteIds = new Set(remoteList.map((m) => m.id));
+    const uniqueLocalList = localList.filter((m) => !remoteIds.has(m.id));
+
+    return [...remoteList, ...uniqueLocalList];
+  };
+
+  /**
+   * adds a local library to the regitry and stores it in idb.
+   * in case of a conflict (duplicate name), it fails and returns a conflict
+   */
+  public addLocalLibrary = async (
+    manifest: LibraryManifest,
+    force?: boolean,
+  ): Promise<AddLibraryResult> => {
+    await this.whenReady();
+
+    const normalizedName = manifest.name.trim().toLowerCase();
+    const currentLocal = this.store.getState().localLibraries;
+    const remoteList = this.remoteLibrariesList ?? [defaultLibraryMetadata];
+
+    const conflictingLocal = currentLocal.find((m) => {
+      return (
+        m.name.trim().toLowerCase() === normalizedName && m.id !== manifest.id
+      );
+    });
+    const conflictingRemote = remoteList.find(
+      (m) => m.name.trim().toLowerCase() === normalizedName,
+    );
+
+    const conflict = conflictingLocal || conflictingRemote;
+
+    // dont proceed if there is a conflict and the force flag is not set
+    if (conflict && !force) {
+      return { success: false, conflict };
+    }
+
+    if (this.isIDBLoaded) {
+      await this.idb!.put("libraries", manifest);
+    }
+
+    await this.listLocalLibraries();
+    return { success: true };
+  };
+
+  public deleteLocalLibrary = async (id: string): Promise<void> => {
+    await this.whenReady();
+
+    if (this.isIDBLoaded) {
+      await this.idb!.delete("libraries", id);
+    }
+
+    await this.listLocalLibraries();
+
+    if (
+      this.config.selectedLib === id ||
+      this.store.getState().selectedLib?.id === id
+    ) {
+      await this.selectLibrary(defaultLibraryMetadata.id);
     }
   };
 
@@ -157,17 +254,19 @@ class LibraryRegistry {
     this.config.selectedLib = id;
     this.saveConfigToLocalStorage();
 
+    /**  remote library's metadata, without the nodes / groups data */
     let meta: LibraryMetadata | null = null;
     try {
       // fetch libraries list if not available in memory
-      if (!this.librariesList) {
+      if (!this.remoteLibrariesList) {
         await this.listAllLibraries();
       }
-      meta = this.librariesList?.find((m) => m.id === id) ?? null;
+      meta = this.remoteLibrariesList?.find((m) => m.id === id) ?? null;
     } catch (e) {
       console.error("Failed to list libraries when selecting library", e);
     }
 
+    /** cached library from idb */
     let cachedLib: LibraryManifest | null = null;
     if (this.isIDBLoaded) {
       try {
@@ -182,15 +281,17 @@ class LibraryRegistry {
     if (id === defaultLibraryMetadata.id) {
       // if default library is requested,we can use it directly as its a part of this module
       manifestToUse = defaultLibrary as unknown as LibraryManifest;
-    } else if (cachedLib && meta && cachedLib.version === meta.version) {
-      // use the idb cached library if it is the same version as the remote one
+    } else if (
+      cachedLib &&
+      ((meta && cachedLib.version === meta.version) || !meta)
+    ) {
+      // use the idb cached library if it matches version or is a local library (no remote meta)
       manifestToUse = cachedLib;
-    } else if (meta && meta.path && this.baseUrl) {
+    } else if (meta && meta.path) {
       // otherwise, fetch the library from the remote server and cache it
       try {
-        const baseUrl = this.baseUrl.replace(/\/$/, "");
         const cleanPath = meta.path.replace(/^\//, "");
-        const response = await fetch(`${baseUrl}/${cleanPath}`);
+        const response = await fetch(`${this.baseUrl}/${cleanPath}`);
         if (response.ok) {
           const fetchedManifest = await response.json();
           manifestToUse = fetchedManifest;
@@ -208,7 +309,7 @@ class LibraryRegistry {
     if (!manifestToUse && cachedLib) {
       manifestToUse = cachedLib;
     } else if (id === defaultLibraryMetadata.id) {
-      manifestToUse = defaultLibrary as unknown as LibraryManifest;
+      manifestToUse = defaultLibrary as LibraryManifest;
     }
 
     this.store.setState({
@@ -232,4 +333,4 @@ class LibraryRegistry {
   };
 }
 
-export { LibraryRegistry, type LibraryRegistryState };
+export { LibraryRegistry, type AddLibraryResult, type LibraryRegistryState };
