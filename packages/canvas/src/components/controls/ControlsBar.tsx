@@ -21,7 +21,7 @@ import {
   Undo,
   Unlock,
 } from "lucide-react";
-import { useRef, useState } from "react";
+import { memo, useRef, useState } from "react";
 import { toast } from "sonner";
 import { useShallow } from "zustand/shallow";
 import { ConfirmDialog } from "./ConfirmDialog";
@@ -29,8 +29,6 @@ import { ExportDialog } from "./ExportDialog";
 import { SaveProjectDialog } from "./SaveProjectDialog";
 
 const selector = (s: CanvasStoreState) => ({
-  nodes: s.nodes,
-  edges: s.edges,
   isInteractive: s.isInteractive,
   setIsInteractive: s.setIsInteractive,
   globalEdgeType: s.globalEdgeType,
@@ -69,7 +67,7 @@ interface ControlsBarProps {
   setIsSaveDialogOpen?: (open: boolean) => void;
 }
 
-export const ControlsBar = ({
+const ControlsBarComponent = ({
   isSaveDialogOpen = false,
   setIsSaveDialogOpen,
 }: ControlsBarProps) => {
@@ -77,11 +75,13 @@ export const ControlsBar = ({
   const [isImportConfirmOpen, setIsImportConfirmOpen] = useState(false);
   const [isClearConfirmOpen, setIsClearConfirmOpen] = useState(false);
 
+  const hasContent = useCanvasStore(
+    (s) => s.nodes.length > 0 || s.edges.length > 0,
+  );
+
   const { undo, redo, canUndo, canRedo, commit } = useHistory();
   const { fitView, setViewport } = useReactFlow();
   const {
-    nodes,
-    edges,
     isInteractive,
     setIsInteractive,
     globalEdgeType,
@@ -112,7 +112,7 @@ export const ControlsBar = ({
    * otherwise, ask for a confirmation
    */
   const handleOpenClick = () => {
-    if (nodes.length > 0 || edges.length > 0) {
+    if (hasContent) {
       setIsImportConfirmOpen(true);
     } else {
       openProjectFile();
@@ -167,8 +167,6 @@ export const ControlsBar = ({
       }
     }
   };
-
-  const hasContent = nodes.length > 0 || edges.length > 0;
 
   const items: ControlItem[] = [
     {
@@ -345,3 +343,5 @@ export const ControlsBar = ({
     </>
   );
 };
+
+export const ControlsBar = memo(ControlsBarComponent);
