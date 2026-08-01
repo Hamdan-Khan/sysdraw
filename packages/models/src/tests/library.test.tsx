@@ -26,9 +26,6 @@ describe("LibraryRegistry Instance", () => {
     consoleSpy.mockRestore();
   });
 
-
-
-
   it("initializes with null or default library as selectedLib", async () => {
     await registry.whenReady();
     const snapshot = registry.getSnapshot();
@@ -85,9 +82,9 @@ describe("LibraryRegistry Instance", () => {
       },
     ];
 
-    const fetchSpy = vi.spyOn(globalThis, "fetch").mockResolvedValueOnce(
-      Response.json({ libraries: mockMetaList }),
-    );
+    const fetchSpy = vi
+      .spyOn(globalThis, "fetch")
+      .mockResolvedValueOnce(Response.json({ libraries: mockMetaList }));
 
     const libraries = await registry.listAllLibraries();
     expect(fetchSpy).toHaveBeenCalledWith("http://localhost/lib/metadata.json");
@@ -97,7 +94,9 @@ describe("LibraryRegistry Instance", () => {
   });
 
   it("falls back to default library metadata when remote fetch fails", async () => {
-    const fetchSpy = vi.spyOn(globalThis, "fetch").mockRejectedValueOnce(new Error("Network Error"));
+    const fetchSpy = vi
+      .spyOn(globalThis, "fetch")
+      .mockRejectedValueOnce(new Error("Network Error"));
 
     const libraries = await registry.listAllLibraries();
     expect(libraries).toHaveLength(1);
@@ -107,9 +106,9 @@ describe("LibraryRegistry Instance", () => {
   });
 
   it("falls back to default library metadata when remote data has unexpected shape", async () => {
-    const fetchSpy = vi.spyOn(globalThis, "fetch").mockResolvedValueOnce(
-      Response.json({ libraries: "invalid_format" }),
-    );
+    const fetchSpy = vi
+      .spyOn(globalThis, "fetch")
+      .mockResolvedValueOnce(Response.json({ libraries: "invalid_format" }));
 
     const libraries = await registry.listAllLibraries();
     expect(libraries).toHaveLength(1);
@@ -119,7 +118,9 @@ describe("LibraryRegistry Instance", () => {
   });
 
   it("sets selectedLib to null when selecting an unknown library with no cache or remote", async () => {
-    const fetchSpy = vi.spyOn(globalThis, "fetch").mockRejectedValue(new Error("404 Not Found"));
+    const fetchSpy = vi
+      .spyOn(globalThis, "fetch")
+      .mockRejectedValue(new Error("404 Not Found"));
 
     await act(async () => {
       await registry.selectLibrary("non-existent-id");
@@ -160,7 +161,6 @@ describe("LibraryRegistryProvider & Hooks", () => {
     );
   });
 
-
   it("provides access to the LibraryRegistry instance via useLibraryRegistry", () => {
     const wrapper = ({ children }: { children: React.ReactNode }) => (
       <LibraryRegistryProvider registry={registry}>
@@ -192,7 +192,9 @@ describe("LibraryRegistryProvider & Hooks", () => {
   });
 
   it("updates returned registry when provider registry prop changes", async () => {
-    const secondRegistry = new LibraryRegistry({ url: "http://localhost/lib2" });
+    const secondRegistry = new LibraryRegistry({
+      url: "http://localhost/lib2",
+    });
 
     let setRegFn: (r: LibraryRegistry) => void = () => {};
 
@@ -206,7 +208,9 @@ describe("LibraryRegistryProvider & Hooks", () => {
       );
     };
 
-    const { result } = renderHook(() => useLibraryRegistry(), { wrapper: Wrapper });
+    const { result } = renderHook(() => useLibraryRegistry(), {
+      wrapper: Wrapper,
+    });
 
     expect(result.current).toBe(registry);
 
@@ -220,6 +224,3 @@ describe("LibraryRegistryProvider & Hooks", () => {
     secondRegistry.close();
   });
 });
-
-
-

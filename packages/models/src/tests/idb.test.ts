@@ -30,9 +30,6 @@ describe("LibraryRegistry IndexedDB & LocalStorage Integration", () => {
     consoleSpy.mockRestore();
   });
 
-
-
-
   it("automatically seeds IndexedDB with default library on first initialization", async () => {
     const registry = createRegistry();
     await registry.whenReady();
@@ -85,16 +82,18 @@ describe("LibraryRegistry IndexedDB & LocalStorage Integration", () => {
       nodes: [{ id: "n1", type: "node", label: "Custom Node" }],
     };
 
-    const fetchSpy = vi.spyOn(globalThis, "fetch").mockImplementation(async (url: RequestInfo | URL) => {
-      const urlStr = String(url);
-      if (urlStr.endsWith("metadata.json")) {
-        return Response.json({ libraries: [customMeta] });
-      }
-      if (urlStr.endsWith("data/custom.json")) {
-        return Response.json(customManifest);
-      }
-      return new Response(null, { status: 404 });
-    });
+    const fetchSpy = vi
+      .spyOn(globalThis, "fetch")
+      .mockImplementation(async (url: RequestInfo | URL) => {
+        const urlStr = String(url);
+        if (urlStr.endsWith("metadata.json")) {
+          return Response.json({ libraries: [customMeta] });
+        }
+        if (urlStr.endsWith("data/custom.json")) {
+          return Response.json(customManifest);
+        }
+        return new Response(null, { status: 404 });
+      });
 
     const registry = createRegistry();
     await registry.whenReady();
@@ -138,13 +137,15 @@ describe("LibraryRegistry IndexedDB & LocalStorage Integration", () => {
       path: "data/cached.json",
     };
 
-    const fetchSpy = vi.spyOn(globalThis, "fetch").mockImplementation(async (url: RequestInfo | URL) => {
-      const urlStr = String(url);
-      if (urlStr.endsWith("metadata.json")) {
-        return Response.json({ libraries: [remoteMeta] });
-      }
-      throw new Error(`Unexpected fetch call to ${urlStr}`);
-    });
+    const fetchSpy = vi
+      .spyOn(globalThis, "fetch")
+      .mockImplementation(async (url: RequestInfo | URL) => {
+        const urlStr = String(url);
+        if (urlStr.endsWith("metadata.json")) {
+          return Response.json({ libraries: [remoteMeta] });
+        }
+        throw new Error(`Unexpected fetch call to ${urlStr}`);
+      });
 
     const registry = createRegistry();
     await registry.whenReady();
@@ -185,13 +186,15 @@ describe("LibraryRegistry IndexedDB & LocalStorage Integration", () => {
       path: "data/stale.json",
     };
 
-    const fetchSpy = vi.spyOn(globalThis, "fetch").mockImplementation(async (url: RequestInfo | URL) => {
-      const urlStr = String(url);
-      if (urlStr.endsWith("metadata.json")) {
-        return Response.json({ libraries: [remoteMeta] });
-      }
-      return new Response(null, { status: 500, statusText: "Server Error" });
-    });
+    const fetchSpy = vi
+      .spyOn(globalThis, "fetch")
+      .mockImplementation(async (url: RequestInfo | URL) => {
+        const urlStr = String(url);
+        if (urlStr.endsWith("metadata.json")) {
+          return Response.json({ libraries: [remoteMeta] });
+        }
+        return new Response(null, { status: 500, statusText: "Server Error" });
+      });
 
     const registry = createRegistry();
     await registry.whenReady();
@@ -204,7 +207,6 @@ describe("LibraryRegistry IndexedDB & LocalStorage Integration", () => {
     fetchSpy.mockRestore();
   });
 
-
   it("allows calling close multiple times without error", async () => {
     const registry = createRegistry();
     await registry.whenReady();
@@ -215,4 +217,3 @@ describe("LibraryRegistry IndexedDB & LocalStorage Integration", () => {
     }).not.toThrow();
   });
 });
-

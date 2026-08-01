@@ -85,7 +85,9 @@ const makeEvent = (kind: string, id: string) =>
     { clientX: 100, clientY: 100 },
   );
 
-const mockLibraryRegistry = new LibraryRegistry({ url: "http://localhost/lib" });
+const mockLibraryRegistry = new LibraryRegistry({
+  url: "http://localhost/lib",
+});
 
 const defaultMockStore = {
   getState: () => ({
@@ -101,12 +103,19 @@ const createWrapper = (store: any = defaultMockStore) => {
   const finalStore =
     store && store.getState
       ? store
-      : { ...defaultMockStore, ...store, getState: store?.getState || defaultMockStore.getState };
+      : {
+          ...defaultMockStore,
+          ...store,
+          getState: store?.getState || defaultMockStore.getState,
+        };
 
   return ({ children }: { children: React.ReactNode }) =>
     createElement(LibraryRegistryProvider, {
       registry: mockLibraryRegistry,
-      children: createElement(CanvasStoreProvider, { store: finalStore, children }),
+      children: createElement(CanvasStoreProvider, {
+        store: finalStore,
+        children,
+      }),
     });
 };
 
