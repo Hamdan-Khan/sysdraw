@@ -6,12 +6,13 @@ import { cn } from "@/lib/utils";
 import { useCanvasStore } from "@/store/CanvasStoreProvider";
 import { CanvasStoreState } from "@/store/store";
 import { useLibraryRegistry, useLibraryRegistryStore } from "@sysdraw/models";
-import { Loader2, Menu, X } from "lucide-react";
+import { Loader2, Menu, Search, X } from "lucide-react";
 import { memo, useMemo, useState } from "react";
 import { toast } from "sonner";
 import { useShallow } from "zustand/shallow";
 import { LibraryDropdown } from "./LibraryDropdown";
 import { LibraryIcon } from "./LibraryIcon";
+import { SearchInput } from "./SearchInput";
 
 export const SYSDRAW_DRAG_DATA_FORMAT = "application/sysdraw";
 
@@ -27,11 +28,19 @@ export const Toolbar = memo(() => {
 
   const [isOpen, setIsOpen] = useState(true);
   const [isLibLoading, setIsLibLoading] = useState(false);
+  const [nodeSearch, setNodeSearch] = useState("");
+  const [groupSearch, setGroupSearch] = useState("");
+  const [isNodeSearchOpen, setIsNodeSearchOpen] = useState(false);
+  const [isGroupSearchOpen, setIsGroupSearchOpen] = useState(false);
 
   const handleSelectLibrary = async (id: string) => {
     setIsLibLoading(true);
     try {
       await registry.selectLibrary(id);
+      setNodeSearch("");
+      setGroupSearch("");
+      setIsNodeSearchOpen(false);
+      setIsGroupSearchOpen(false);
     } catch (err) {
       console.error("Failed to select library", err);
     } finally {
@@ -48,6 +57,26 @@ export const Toolbar = memo(() => {
       groups: all.filter((n) => n.type === "group"),
     };
   }, [selectedLib]);
+
+  const filteredNodes = useMemo(() => {
+    if (!nodeSearch.trim()) return nodes;
+    const query = nodeSearch.toLowerCase().trim();
+    return nodes.filter(
+      (n) =>
+        n.label.toLowerCase().includes(query) ||
+        n.id.toLowerCase().includes(query),
+    );
+  }, [nodes, nodeSearch]);
+
+  const filteredGroups = useMemo(() => {
+    if (!groupSearch.trim()) return groups;
+    const query = groupSearch.toLowerCase().trim();
+    return groups.filter(
+      (g) =>
+        g.label.toLowerCase().includes(query) ||
+        g.id.toLowerCase().includes(query),
+    );
+  }, [groups, groupSearch]);
 
   /**
    * Handler for when a node or group is dragged from the toolbar
@@ -101,7 +130,9 @@ export const Toolbar = memo(() => {
       >
         {/* libraries label & close button */}
         <div className="flex items-center justify-between px-4">
-          <h5 className="text-xs text-secondary uppercase">Libraries</h5>
+          <h5 className="text-xs text-secondary font-bold uppercase">
+            Libraries
+          </h5>
           <button
             onClick={() => setIsOpen(false)}
             className="p-1 rounded text-secondary hover:text-text hover:bg-dim cursor-pointer transition-colors"
@@ -118,14 +149,35 @@ export const Toolbar = memo(() => {
 
         <div className="relative flex flex-col gap-3">
           <div className="flex flex-col gap-2 px-4">
-            <h5 className="text-xs text-secondary uppercase">Nodes</h5>
-            <div className="h-56 overflow-y-auto overflow-x-hidden grid grid-cols-3 gap-2 content-start pr-1">
-              {nodes.length === 0 ? (
+            <div className="flex items-center justify-between gap-2 min-h-6">
+              <h5 className="text-xs text-secondary font-bold uppercase">
+                Nodes
+              </h5>
+              {isNodeSearchOpen ? (
+                <SearchInput
+                  searchValue={nodeSearch}
+                  setSearchValue={setNodeSearch}
+                  onSearchOpenChange={setIsNodeSearchOpen}
+                />
+              ) : (
+                <button
+                  onClick={() => setIsNodeSearchOpen(true)}
+                  className="p-1 rounded text-secondary hover:text-text hover:bg-dim cursor-pointer transition-colors"
+                  aria-label="Search nodes"
+                  title="Search nodes"
+                >
+                  <Search className="size-3.5" />
+                </button>
+              )}
+            </div>
+
+            <div className="min-h-44 max-h-56 overflow-y-auto overflow-x-hidden grid grid-cols-3 gap-2 content-start pr-1">
+              {filteredNodes.length === 0 ? (
                 <span className="text-[11px] text-secondary col-span-3 italic">
-                  No nodes available
+                  No nodes found
                 </span>
               ) : (
-                nodes.map((node) => {
+                filteredNodes.map((node) => {
                   const { label, icon, id } = node;
                   return (
                     <div
@@ -147,14 +199,35 @@ export const Toolbar = memo(() => {
           <Divider />
 
           <div className="flex flex-col gap-2 px-4 mb-2">
-            <h5 className="text-xs text-secondary uppercase">Groups</h5>
-            <div className="h-44 overflow-y-auto overflow-x-hidden flex flex-col gap-2 pr-1">
-              {groups.length === 0 ? (
+            <div className="flex items-center justify-between gap-2 min-h-6">
+              <h5 className="text-xs text-secondary font-bold uppercase">
+                Groups
+              </h5>
+              {isGroupSearchOpen ? (
+                <SearchInput
+                  searchValue={groupSearch}
+                  setSearchValue={setGroupSearch}
+                  onSearchOpenChange={setIsGroupSearchOpen}
+                />
+              ) : (
+                <button
+                  onClick={() => setIsGroupSearchOpen(true)}
+                  className="p-1 rounded text-secondary hover:text-text hover:bg-dim cursor-pointer transition-colors"
+                  aria-label="Search groups"
+                  title="Search groups"
+                >
+                  <Search className="size-3.5" />
+                </button>
+              )}
+            </div>
+
+            <div className="min-h-36 max-h-44 overflow-y-auto overflow-x-hidden flex flex-col gap-2 pr-1">
+              {filteredGroups.length === 0 ? (
                 <span className="text-[11px] text-secondary italic">
-                  No groups available
+                  No groups found
                 </span>
               ) : (
-                groups.map((group) => {
+                filteredGroups.map((group) => {
                   const { label, icon, id } = group;
                   return (
                     <div
@@ -162,7 +235,7 @@ export const Toolbar = memo(() => {
                       draggable
                       onDragStart={(e) => onDragStart(e, { kind: "group", id })}
                       onClick={() => handleClick({ kind: "group", id })}
-                      className="group relative px-3 py-2 bg-bg border border-dashed border-secondary rounded text-sm cursor-grab active:cursor-grabbing text-text font-medium flex items-center gap-2 hover:bg-surface/50 transition-colors max-w-44"
+                      className="group relative px-3 py-2 bg-bg border border-dashed border-secondary rounded text-sm cursor-grab active:cursor-grabbing text-text font-medium flex items-center gap-2 hover:bg-surface/50 transition-colors w-44 max-w-44"
                     >
                       {icon && <LibraryIcon icon={icon} size={20} />}
                       <span className="truncate">{label}</span>
