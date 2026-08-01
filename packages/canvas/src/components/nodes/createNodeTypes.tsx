@@ -1,5 +1,5 @@
 import { NodeComponentType, NodePropsType } from "@/components/canvas/types";
-import { LibraryIcon } from "@/components/toolbar/LibraryIcon";
+import { LibraryIcon } from "@/components/toolbar/library-dropdown/LibraryIcon";
 import {
   IconType,
   LibraryManifest,

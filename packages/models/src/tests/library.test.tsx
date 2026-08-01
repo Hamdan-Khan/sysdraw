@@ -1,4 +1,6 @@
+import { IDB_DATABASE_NAME } from "@sysdraw/common";
 import { act, renderHook } from "@testing-library/react";
+import "fake-indexeddb/auto";
 import React from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import defaultLibrary from "../library/default_library.json";
@@ -23,6 +25,8 @@ describe("LibraryRegistry Instance", () => {
       await registry?.whenReady();
     } catch {}
     registry?.close();
+    indexedDB.deleteDatabase(IDB_DATABASE_NAME);
+    localStorage.clear();
     consoleSpy.mockRestore();
   });
 
@@ -127,6 +131,114 @@ describe("LibraryRegistry Instance", () => {
     });
 
     expect(registry.getSnapshot().selectedLib).toBeNull();
+
+    fetchSpy.mockRestore();
+  });
+
+  it("adds a local library and listLocalLibraries returns it", async () => {
+    const mockLocalLib = {
+      id: "custom-1",
+      name: "Custom Icons",
+      version: "1.0.0",
+      description: "My custom icons",
+      nodes: [
+        {
+          id: "n1",
+          type: "node",
+          label: "Server",
+        },
+      ],
+    };
+
+    const addResult = await registry.addLocalLibrary(mockLocalLib);
+    expect(addResult).toEqual({ success: true });
+
+    const localLibs = await registry.listLocalLibraries();
+    expect(localLibs).toHaveLength(1);
+    expect(localLibs[0].name).toBe("Custom Icons");
+
+    const state = registry.getSnapshot();
+    expect(state.localLibraries).toHaveLength(1);
+    expect(state.localLibraries[0].id).toBe("custom-1");
+  });
+
+  it("detects name conflict when adding a local library with an existing name", async () => {
+    const lib1 = {
+      id: "custom-1",
+      name: "Network Icons",
+      version: "1.0.0",
+      nodes: [],
+    };
+
+    const lib2 = {
+      id: "custom-2",
+      name: "network icons ", // case & space insensitive duplicate
+      version: "1.0.0",
+      nodes: [],
+    };
+
+    await registry.addLocalLibrary(lib1);
+    const conflictResult = await registry.addLocalLibrary(lib2);
+
+    expect(conflictResult.success).toBe(false);
+    if (!conflictResult.success) {
+      expect(conflictResult.conflict?.id).toBe("custom-1");
+    }
+
+    // Overwrite with force: true
+    const forceResult = await registry.addLocalLibrary(lib2, true);
+    expect(forceResult).toEqual({ success: true });
+  });
+
+  it("deletes a local library and falls back to default if deleted lib was selected", async () => {
+    const mockLocalLib = {
+      id: "custom-del",
+      name: "Delete Me",
+      version: "1.0.0",
+      nodes: [],
+    };
+
+    await registry.addLocalLibrary(mockLocalLib);
+    await registry.selectLibrary("custom-del");
+
+    expect(registry.getSnapshot().selectedLib?.id).toBe("custom-del");
+
+    await registry.deleteLocalLibrary("custom-del");
+    expect(registry.getSnapshot().selectedLib?.id).toBe(defaultLibrary.id);
+    expect(registry.getSnapshot().localLibraries).toHaveLength(0);
+  });
+
+  it("merges remote and local libraries when calling listAllLibraries", async () => {
+    const mockMetaList = [
+      {
+        id: "aws-icons",
+        name: "AWS Icons",
+        version: "1.0.0",
+        path: "data/aws.json",
+      },
+    ];
+
+    const fetchSpy = vi
+      .spyOn(globalThis, "fetch")
+      .mockImplementation(async () =>
+        Response.json({ libraries: mockMetaList }),
+      );
+
+    const localLib = {
+      id: "my-local",
+      name: "My Local",
+      version: "1.0.0",
+      nodes: [],
+    };
+
+    await registry.addLocalLibrary(localLib);
+
+    const allLibs = await registry.listAllLibraries();
+    expect(allLibs.map((l) => l.id)).toEqual([
+      "aws-icons",
+      "default",
+      "my-local",
+    ]);
 
     fetchSpy.mockRestore();
   });

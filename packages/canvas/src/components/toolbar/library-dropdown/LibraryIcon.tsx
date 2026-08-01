@@ -1,6 +1,6 @@
+import { sanitizeSvgString } from "@/lib/sanitizeSvg";
 import { NODE_ICON_CLASS_ID } from "@sysdraw/common";
 import type { IconType } from "@sysdraw/models";
-import DOMPurify from "dompurify";
 import { memo, useMemo } from "react";
 
 export interface LibraryIconProps {
@@ -22,7 +22,7 @@ const LibraryIconComponent = ({
     if (!icon || icon.kind !== "svg") {
       return "";
     }
-    return DOMPurify.sanitize(icon.value, { USE_PROFILES: { svg: true } });
+    return sanitizeSvgString(icon.value);
   }, [icon]);
 
   if (!icon || !icon.value) {

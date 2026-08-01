@@ -7,12 +7,13 @@ import { useCanvasStore } from "@/store/CanvasStoreProvider";
 import { CanvasStoreState } from "@/store/store";
 import { useLibraryRegistry, useLibraryRegistryStore } from "@sysdraw/models";
 import { useVirtualizer } from "@tanstack/react-virtual";
-import { Loader2, Menu, Search, X } from "lucide-react";
+import { Loader2, Menu, Plus, Search, X } from "lucide-react";
 import { memo, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 import { useShallow } from "zustand/shallow";
-import { LibraryDropdown } from "./LibraryDropdown";
-import { LibraryIcon } from "./LibraryIcon";
+import { LibraryDropdown } from "./library-dropdown/LibraryDropdown";
+import { LibraryIcon } from "./library-dropdown/LibraryIcon";
+import { LocalLibraryDialog } from "./library-dropdown/LocalLibraryDialog";
 import { SearchInput } from "./SearchInput";
 
 export const SYSDRAW_DRAG_DATA_FORMAT = "application/sysdraw";
@@ -29,6 +30,7 @@ export const Toolbar = memo(() => {
 
   const [isOpen, setIsOpen] = useState(true);
   const [isLibLoading, setIsLibLoading] = useState(false);
+  const [isUploadDialogOpen, setIsUploadDialogOpen] = useState(false);
   const [nodeSearch, setNodeSearch] = useState("");
   const [groupSearch, setGroupSearch] = useState("");
   const [isNodeSearchOpen, setIsNodeSearchOpen] = useState(false);
@@ -51,8 +53,6 @@ export const Toolbar = memo(() => {
       setIsLibLoading(false);
     }
   };
-
-  console.log("rendered");
 
   const { nodes, groups } = useMemo(() => {
     const all = selectedLib?.nodes || [];
@@ -154,17 +154,30 @@ export const Toolbar = memo(() => {
           <h5 className="text-xs text-secondary font-bold uppercase">
             Libraries
           </h5>
-          <button
-            onClick={() => setIsOpen(false)}
-            className="p-1 rounded text-secondary hover:text-text hover:bg-dim cursor-pointer transition-colors"
-            aria-label="Close Toolbar"
-            title="Close Toolbar"
-          >
-            <X className="size-3.5" />
-          </button>
+          <div className="flex items-center gap-1">
+            <button
+              onClick={() => setIsUploadDialogOpen(true)}
+              className="p-1 rounded text-secondary hover:text-text hover:bg-dim cursor-pointer transition-colors"
+              aria-label="Add local library"
+            >
+              <Tooltip text="Add local library" />
+              <Plus className="size-3.5" />
+            </button>
+            <button
+              onClick={() => setIsOpen(false)}
+              className="p-1 rounded text-secondary hover:text-text hover:bg-dim cursor-pointer transition-colors"
+              aria-label="Close Toolbar"
+            >
+              <Tooltip text="Close toolbar" />
+              <X className="size-3.5" />
+            </button>
+          </div>
         </div>
 
-        <LibraryDropdown onSelectLibrary={handleSelectLibrary} />
+        <LibraryDropdown
+          onSelectLibrary={handleSelectLibrary}
+          onOpenUploadDialog={() => setIsUploadDialogOpen(true)}
+        />
 
         <Divider />
 
@@ -342,6 +355,11 @@ export const Toolbar = memo(() => {
           )}
         </div>
       </div>
+
+      <LocalLibraryDialog
+        open={isUploadDialogOpen}
+        onOpenChange={setIsUploadDialogOpen}
+      />
     </>
   );
 });
