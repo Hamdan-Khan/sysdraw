@@ -46,7 +46,7 @@ function HomeComponent() {
   );
   const libraryRegistry = useMemo(() => {
     const libUrl = import.meta.env.VITE_LIBRARY_URL;
-    return new LibraryRegistry({ url: libUrl || "http://localhost/lib" });
+    return new LibraryRegistry({ url: libUrl });
   }, []);
 
   return <Canvas libraryRegistry={libraryRegistry} canvasState={canvasState} />;
