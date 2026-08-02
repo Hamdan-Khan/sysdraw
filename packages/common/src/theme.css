@@ -1,4 +1,6 @@
 @theme {
+  --font-sans: "Inter Variable", system-ui, "Segoe UI", Roboto, sans-serif;
+  --font-mono: ui-monospace, Consolas, monospace;
   --color-bg: var(--theme-bg);
   --color-surface: var(--theme-surface);
   --color-text: var(--theme-text);

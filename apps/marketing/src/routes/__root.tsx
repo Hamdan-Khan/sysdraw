@@ -9,10 +9,23 @@ export const Route = createRootRoute({
       },
       {
         name: "viewport",
-        content: "width=device-width, initial-scale=1",
+        content: "width=device-width, initial-scale=1, shrink-to-fit=no",
       },
       {
-        title: "TanStack Start Starter",
+        title: "SysDraw | System Design for Everyone | Free to use",
+      },
+      {
+        name: "title",
+        content: "SysDraw | System Design for Everyone | Free to use",
+      },
+      {
+        name: "description",
+        content:
+          "SysDraw is a free and open-source system design diagramming tool with zero-friction drag & drop, custom icon libraries, and high-level system architecture sketching.",
+      },
+      {
+        name: "referrer",
+        content: "origin",
       },
     ],
     links: [
@@ -31,7 +44,8 @@ function RootDocument({ children }: { children: React.ReactNode }) {
       <head>
         <HeadContent />
       </head>
-      <body>
+      <body className="bg-bg text-text font-sans antialiased selection:bg-black selection:text-white">
+        <h1 className="sr-only">SysDraw | System Design for Everyone</h1>
         {children}
         <Scripts />
       </body>
