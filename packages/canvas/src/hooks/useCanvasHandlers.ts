@@ -9,11 +9,9 @@ import {
   sortNodesAndGroups,
 } from "@/components/canvas/utils";
 import { defaultHandles } from "@/components/nodes/createNodeTypes";
-import { SYSDRAW_DRAG_DATA_FORMAT } from "@/components/toolbar/Toolbar";
+import { DRAG_DATA_FORMAT } from "@/components/toolbar/Toolbar";
 import { useCanvasStore, useCanvasStoreApi } from "@/store/CanvasStoreProvider";
 import { CanvasStoreState } from "@/store/store";
-import { NODE_WRAPPER_CLASS_ID } from "@sysdraw/common";
-import { LibraryNode, useLibraryRegistryStore } from "@sysdraw/models";
 import {
   addEdge,
   Edge,
@@ -24,6 +22,8 @@ import {
   useReactFlow,
   type OnConnect,
 } from "@xyflow/react";
+import { NODE_WRAPPER_CLASS_ID } from "@zero-sketch/common";
+import { LibraryNode, useLibraryRegistryStore } from "@zero-sketch/models";
 import { nanoid } from "nanoid";
 import { useCallback } from "react";
 import { toast } from "sonner";
@@ -125,7 +125,7 @@ export const useCanvasHandlers = () => {
     (event: React.DragEvent) => {
       event.preventDefault();
 
-      const raw = event.dataTransfer.getData(SYSDRAW_DRAG_DATA_FORMAT);
+      const raw = event.dataTransfer.getData(DRAG_DATA_FORMAT);
 
       if (!raw) {
         console.error("No drag n drop data (e.dataTransfer) found.");

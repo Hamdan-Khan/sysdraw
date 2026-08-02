@@ -1,4 +1,3 @@
-import { HANDLE_DOT_CLASS_ID } from "@sysdraw/common";
 import {
   Handle,
   Position,
@@ -6,6 +5,7 @@ import {
   useViewport,
   type HandleProps,
 } from "@xyflow/react";
+import { HANDLE_DOT_CLASS_ID } from "@zero-sketch/common";
 import { memo, useState } from "react";
 
 const ARROW_ROTATION: Record<Position, number> = {

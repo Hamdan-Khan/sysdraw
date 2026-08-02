@@ -22,7 +22,7 @@ import {
 } from "@/hooks/useCanvasExport";
 import { useCanvasStore } from "@/store/CanvasStoreProvider";
 import { CanvasStoreState } from "@/store/store";
-import { FILE_EXTENSIONS } from "@sysdraw/common";
+import { FILE_EXTENSIONS } from "@zero-sketch/common";
 import { Download, Loader2, Image as LucideImage } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useShallow } from "zustand/shallow";

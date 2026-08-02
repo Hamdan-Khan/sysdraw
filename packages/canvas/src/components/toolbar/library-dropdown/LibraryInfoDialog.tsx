@@ -4,7 +4,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { LibraryMetadata } from "@sysdraw/models";
+import { LibraryMetadata } from "@zero-sketch/models";
 import { ExternalLink, Package } from "lucide-react";
 import { useState } from "react";
 

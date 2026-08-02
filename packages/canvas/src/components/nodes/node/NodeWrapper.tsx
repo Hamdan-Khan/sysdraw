@@ -1,8 +1,8 @@
 import { useHistory } from "@/hooks/useHistory";
 import { useCanvasStore } from "@/store/CanvasStoreProvider";
-import { NODE_CLASS_ID } from "@sysdraw/common";
-import type { NodeHandleConfig } from "@sysdraw/models";
 import { useNodeId, useUpdateNodeInternals } from "@xyflow/react";
+import { NODE_CLASS_ID } from "@zero-sketch/common";
+import type { NodeHandleConfig } from "@zero-sketch/models";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { CommonNodeWrapper } from "../CommonNodeWrapper";
 

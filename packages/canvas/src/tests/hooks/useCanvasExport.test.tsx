@@ -6,8 +6,8 @@ import {
 import { renderToNativeSvg } from "@/lib/svgExport";
 import { downloadFile } from "@/lib/utils";
 import { CanvasStoreProvider } from "@/store/CanvasStoreProvider";
-import { FILE_EXTENSIONS } from "@sysdraw/common";
 import { renderHook } from "@testing-library/react";
+import { FILE_EXTENSIONS } from "@zero-sketch/common";
 import { toPng } from "html-to-image";
 import React from "react";
 import { toast } from "sonner";

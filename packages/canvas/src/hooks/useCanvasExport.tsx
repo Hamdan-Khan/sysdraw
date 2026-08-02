@@ -9,8 +9,8 @@ import {
   useCanvasStore,
 } from "@/store/CanvasStoreProvider";
 import { CanvasStoreState } from "@/store/store";
-import { FILE_EXTENSIONS, PROJECT_VERSION } from "@sysdraw/common";
 import { Edge, Node, useReactFlow, Viewport } from "@xyflow/react";
+import { FILE_EXTENSIONS, PROJECT_VERSION } from "@zero-sketch/common";
 import { toPng } from "html-to-image";
 import { useCallback, useContext } from "react";
 import { toast } from "sonner";
@@ -20,7 +20,7 @@ export type ExportBackground = "white" | "transparent";
 export type ExportScale = 1 | 2 | 3;
 export type ExportFormat = FILE_EXTENSIONS;
 
-/** sysdraw project file schema for export / import */
+/** zero-sketch project file schema for export / import */
 export type ProjectFile = {
   nodes: Node[];
   edges: Edge[];

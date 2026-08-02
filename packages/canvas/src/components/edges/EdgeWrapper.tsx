@@ -1,5 +1,3 @@
-import { EDGE_LABEL_CLASS_ID, EDGE_PATH_CLASS_ID } from "@sysdraw/common";
-import { RegisteredEdges } from "@sysdraw/models";
 import {
   BaseEdge,
   EdgeLabelRenderer,
@@ -12,6 +10,8 @@ import {
   useStore,
   useViewport,
 } from "@xyflow/react";
+import { EDGE_LABEL_CLASS_ID, EDGE_PATH_CLASS_ID } from "@zero-sketch/common";
+import { RegisteredEdges } from "@zero-sketch/models";
 import { EdgeOptionBar } from "./EdgeOptionBar";
 
 const defaultStyle = {};

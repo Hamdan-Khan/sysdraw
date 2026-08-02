@@ -1,4 +1,4 @@
-import { IDB_DATABASE_NAME, IDB_DATABASE_VERSION } from "@sysdraw/common";
+import { IDB_DATABASE_NAME, IDB_DATABASE_VERSION } from "@zero-sketch/common";
 import "fake-indexeddb/auto";
 import { openDB } from "idb";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";

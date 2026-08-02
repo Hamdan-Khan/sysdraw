@@ -1,5 +1,5 @@
-import { NodeKinds } from "@sysdraw/models";
 import { Edge, EdgeProps, Node, NodeProps } from "@xyflow/react";
+import { NodeKinds } from "@zero-sketch/models";
 
 /**
  * data transferred when dragging a node or group from the toolbar to the canvas

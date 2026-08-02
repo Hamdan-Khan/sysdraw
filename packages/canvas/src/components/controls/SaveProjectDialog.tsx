@@ -41,7 +41,7 @@ export const SaveProjectDialog = ({
         <DialogHeader>
           <DialogTitle>Save Project</DialogTitle>
           <DialogDescription>
-            Save your diagram as a .sysdraw project file.
+            Save your diagram as a .zerosketch project file.
           </DialogDescription>
         </DialogHeader>
 
@@ -63,7 +63,9 @@ export const SaveProjectDialog = ({
                 autoFocus
                 required
               />
-              <span className="text-xs text-secondary shrink-0">.sysdraw</span>
+              <span className="text-xs text-secondary shrink-0">
+                .zerosketch
+              </span>
             </div>
           </div>
 

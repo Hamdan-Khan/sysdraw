@@ -1,5 +1,4 @@
 import { DEFAULT_EXPORT_OPTIONS, ExportOptions } from "@/hooks/useCanvasExport";
-import { RegisteredEdges } from "@sysdraw/models";
 import {
   applyEdgeChanges,
   applyNodeChanges,
@@ -8,6 +7,7 @@ import {
   type OnEdgesChange,
   type OnNodesChange,
 } from "@xyflow/react";
+import { RegisteredEdges } from "@zero-sketch/models";
 import { create } from "zustand";
 
 type InitialCanvasStoreState = {

@@ -1,4 +1,4 @@
-import { LibraryRegistry, RegisteredEdges } from "@sysdraw/models";
+import { LibraryRegistry, RegisteredEdges } from "@zero-sketch/models";
 import { Canvas } from "../src/components/canvas/Canvas";
 import { createCanvasStore } from "../src/store/store";
 

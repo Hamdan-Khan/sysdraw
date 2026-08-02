@@ -1,4 +1,4 @@
-import { RegisteredEdges } from "@sysdraw/models";
+import { RegisteredEdges } from "@zero-sketch/models";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { makeEdge, makeNode, makeStore } from "../utils/utils";
 

@@ -13,12 +13,12 @@ import {
   useCanvasStore,
 } from "@/store/CanvasStoreProvider";
 import { CanvasStoreState } from "@/store/store";
+import { ReactFlow, ReactFlowProvider } from "@xyflow/react";
 import {
   LibraryRegistry,
   LibraryRegistryProvider,
   useLibraryRegistryStore,
-} from "@sysdraw/models";
-import { ReactFlow, ReactFlowProvider } from "@xyflow/react";
+} from "@zero-sketch/models";
 import { createRef, useMemo } from "react";
 import { Toaster } from "sonner";
 import { StoreApi } from "zustand";

@@ -1,12 +1,12 @@
 import { NodeComponentType, NodePropsType } from "@/components/canvas/types";
 import { LibraryIcon } from "@/components/toolbar/library-dropdown/LibraryIcon";
+import { Position } from "@xyflow/react";
 import {
   IconType,
   LibraryManifest,
   NodeHandleConfig,
   NodeKinds,
-} from "@sysdraw/models";
-import { Position } from "@xyflow/react";
+} from "@zero-sketch/models";
 import { GenericGroup } from "./group/GenericGroup";
 import { GroupWrapper } from "./group/GroupWrapper";
 import { NodeWrapper } from "./node/NodeWrapper";

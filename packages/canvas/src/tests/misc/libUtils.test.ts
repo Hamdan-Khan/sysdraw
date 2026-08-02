@@ -1,5 +1,5 @@
 import { cn, downloadFile } from "@/lib/utils";
-import { FILE_EXTENSIONS } from "@sysdraw/common";
+import { FILE_EXTENSIONS } from "@zero-sketch/common";
 import { describe, expect, it, vi } from "vitest";
 
 describe("lib/utils", () => {

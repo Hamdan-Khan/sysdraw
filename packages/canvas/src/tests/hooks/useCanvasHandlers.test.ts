@@ -1,12 +1,12 @@
-import { SYSDRAW_DRAG_DATA_FORMAT } from "@/components/toolbar/Toolbar";
+import { DRAG_DATA_FORMAT } from "@/components/toolbar/Toolbar";
 import { useCanvasHandlers } from "@/hooks/useCanvasHandlers";
 import { CanvasStoreProvider } from "@/store/CanvasStoreProvider";
+import { act, renderHook } from "@testing-library/react";
 import {
   LibraryRegistry,
   LibraryRegistryProvider,
   RegisteredEdges,
-} from "@sysdraw/models";
-import { act, renderHook } from "@testing-library/react";
+} from "@zero-sketch/models";
 import React, { createElement } from "react";
 import { toast } from "sonner";
 import { beforeEach, describe, expect, it, vi } from "vitest";
@@ -58,8 +58,8 @@ vi.mock("zustand", async (importOriginal) => {
   };
 });
 
-vi.mock("@sysdraw/models", async (importOriginal) => ({
-  ...(await importOriginal<typeof import("@sysdraw/models")>()),
+vi.mock("@zero-sketch/models", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("@zero-sketch/models")>()),
   defaultNodesMap: { rectangle: { label: "default rect" } },
   defaultGroupsMap: { container: { label: "default group" } },
 }));
@@ -81,7 +81,7 @@ vi.mock("@/components/canvas/utils", async (importOriginal) => {
 
 const makeEvent = (kind: string, id: string) =>
   makeDragEvent(
-    { [SYSDRAW_DRAG_DATA_FORMAT]: JSON.stringify({ kind, id }) },
+    { [DRAG_DATA_FORMAT]: JSON.stringify({ kind, id }) },
     { clientX: 100, clientY: 100 },
   );
 

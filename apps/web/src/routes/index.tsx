@@ -1,6 +1,6 @@
-import { Canvas, createCanvasStore } from "@sysdraw/canvas";
-import { LibraryRegistry } from "@sysdraw/models";
 import { createFileRoute } from "@tanstack/react-router";
+import { Canvas, createCanvasStore } from "@zero-sketch/canvas";
+import { LibraryRegistry } from "@zero-sketch/models";
 import { useMemo } from "react";
 import { Classic } from "../components/loading-ui/classic";
 
@@ -10,16 +10,16 @@ export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
       {
-        title: "SysDraw | System Design Canvas",
+        title: "ZeroSketch | System Design Canvas",
       },
       {
         name: "title",
-        content: "Sysdraw | A high level system design tool | Free to use",
+        content: "ZeroSketch | A high level system design tool | Free to use",
       },
       {
         name: "description",
         content:
-          "Sysdraw is a free, high level system design diagramming tool that lets you easily create software architecture diagrams.",
+          "ZeroSketch is a free, high level system design diagramming tool that lets you easily create software architecture diagrams.",
       },
     ],
   }),

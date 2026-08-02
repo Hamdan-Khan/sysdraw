@@ -1,6 +1,6 @@
 {
   "$schema": "https://www.unpkg.com/wrangler/config-schema.json",
-  "name": "sysdraw",
+  "name": "zerosketch",
   "compatibility_date": "2026-07-29",
   "compatibility_flags": ["nodejs_compat"],
   "main": "@tanstack/react-start/server-entry",

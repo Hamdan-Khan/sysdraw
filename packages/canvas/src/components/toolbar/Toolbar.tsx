@@ -5,8 +5,11 @@ import { useAddNodeAtCenter } from "@/hooks/useAddNodeAtCenter";
 import { cn } from "@/lib/utils";
 import { useCanvasStore } from "@/store/CanvasStoreProvider";
 import { CanvasStoreState } from "@/store/store";
-import { useLibraryRegistry, useLibraryRegistryStore } from "@sysdraw/models";
 import { useVirtualizer } from "@tanstack/react-virtual";
+import {
+  useLibraryRegistry,
+  useLibraryRegistryStore,
+} from "@zero-sketch/models";
 import { Loader2, Menu, Plus, Search, X } from "lucide-react";
 import { memo, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
@@ -16,7 +19,7 @@ import { LibraryIcon } from "./library-dropdown/LibraryIcon";
 import { LocalLibraryDialog } from "./library-dropdown/LocalLibraryDialog";
 import { SearchInput } from "./SearchInput";
 
-export const SYSDRAW_DRAG_DATA_FORMAT = "application/sysdraw";
+export const DRAG_DATA_FORMAT = "application/zero-sketch";
 
 const selector = (state: CanvasStoreState) => ({
   isInteractive: state.isInteractive,
@@ -110,7 +113,7 @@ export const Toolbar = memo(() => {
       toast.error("Please unlock the canvas to add nodes and groups.");
       return;
     }
-    event.dataTransfer.setData(SYSDRAW_DRAG_DATA_FORMAT, JSON.stringify(data));
+    event.dataTransfer.setData(DRAG_DATA_FORMAT, JSON.stringify(data));
     event.dataTransfer.effectAllowed = "move";
   }
 

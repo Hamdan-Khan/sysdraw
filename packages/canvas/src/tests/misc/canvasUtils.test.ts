@@ -9,9 +9,9 @@ import {
 } from "../../components/canvas/utils";
 import { makeGroupNode, makeNode, makeRegularNode } from "../utils/utils";
 
-// mock @sysdraw/models so tests aren't coupled to the real registered group list
-vi.mock("@sysdraw/models", async (importOriginal) => {
-  const actual = await importOriginal<typeof import("@sysdraw/models")>();
+// mock @zero-sketch/models so tests aren't coupled to the real registered group list
+vi.mock("@zero-sketch/models", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("@zero-sketch/models")>();
   return {
     ...actual,
     RegisteredGroups: {

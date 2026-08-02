@@ -1,7 +1,6 @@
 import { CustomHandle } from "@/components/common/CustomHandle";
 import { OptionBar } from "@/components/common/OptionBar";
 import { useCanvasStore } from "@/store/CanvasStoreProvider";
-import type { NodeHandleConfig } from "@sysdraw/models";
 import {
   NodeResizer,
   NodeToolbar,
@@ -9,6 +8,7 @@ import {
   useNodeId,
   useViewport,
 } from "@xyflow/react";
+import type { NodeHandleConfig } from "@zero-sketch/models";
 
 export interface CommonNodeWrapperProps {
   children: React.ReactNode;

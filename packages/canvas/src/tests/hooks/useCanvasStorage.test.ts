@@ -4,8 +4,8 @@ import {
 } from "@/hooks/useCanvasStorage";
 import { CanvasStoreProvider } from "@/store/CanvasStoreProvider";
 import { CanvasStoreState } from "@/store/store";
-import { LibraryRegistry, LibraryRegistryProvider } from "@sysdraw/models";
 import { act, renderHook, waitFor } from "@testing-library/react";
+import { LibraryRegistry, LibraryRegistryProvider } from "@zero-sketch/models";
 import React, { createElement } from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { StoreApi } from "zustand";

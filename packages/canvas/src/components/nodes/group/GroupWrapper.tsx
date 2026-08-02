@@ -1,4 +1,4 @@
-import type { NodeHandleConfig } from "@sysdraw/models";
+import type { NodeHandleConfig } from "@zero-sketch/models";
 import { CommonNodeWrapper } from "../CommonNodeWrapper";
 
 export interface GroupWrapperProps {

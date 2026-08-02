@@ -1,7 +1,7 @@
 import {
   GROUP_CONTAINER_CLASS_ID,
   GROUP_LABEL_CLASS_ID,
-} from "@sysdraw/common";
+} from "@zero-sketch/common";
 
 export const GenericGroup = ({
   data,

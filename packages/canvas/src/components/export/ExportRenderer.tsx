@@ -1,7 +1,7 @@
 import { useCanvasStore } from "@/store/CanvasStoreProvider";
 import { CanvasStoreState } from "@/store/store";
-import { useLibraryRegistryStore } from "@sysdraw/models";
 import { ReactFlow, ReactFlowProvider, useReactFlow } from "@xyflow/react";
+import { useLibraryRegistryStore } from "@zero-sketch/models";
 import { useLayoutEffect, useMemo, useRef } from "react";
 import { createPortal } from "react-dom";
 import { useShallow } from "zustand/shallow";

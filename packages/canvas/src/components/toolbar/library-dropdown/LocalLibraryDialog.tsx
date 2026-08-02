@@ -13,7 +13,7 @@ import {
   LibraryManifest,
   LibraryMetadata,
   useLibraryRegistry,
-} from "@sysdraw/models";
+} from "@zero-sketch/models";
 import { AlertTriangle, ExternalLink, Upload } from "lucide-react";
 import React, { useRef, useState } from "react";
 import { toast } from "sonner";

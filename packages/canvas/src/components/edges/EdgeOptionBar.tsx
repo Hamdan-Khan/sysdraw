@@ -1,8 +1,8 @@
 import { Dropdown } from "@/components/common/Dropdown";
 import { Tooltip } from "@/components/common/Tooltip";
 import { useHistory } from "@/hooks/useHistory";
-import { RegisteredEdges } from "@sysdraw/models";
 import { Edge, MarkerType, useReactFlow } from "@xyflow/react";
+import { RegisteredEdges } from "@zero-sketch/models";
 import debounce from "lodash-es/debounce";
 import { ArrowRight, Trash2, Type, Zap } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";

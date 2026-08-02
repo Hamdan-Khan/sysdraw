@@ -7,7 +7,7 @@ import {
   NODE_CLASS_ID,
   NODE_ICON_CLASS_ID,
   NODE_WRAPPER_CLASS_ID,
-} from "@sysdraw/common";
+} from "@zero-sketch/common";
 import { CANVAS_GRID_BG_COLOR } from "../components/canvas/CanvasGrid";
 import { EXPORT_CANVAS_GRID_ID } from "../components/export/ExportRenderer";
 

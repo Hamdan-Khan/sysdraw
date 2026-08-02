@@ -1,4 +1,4 @@
-import { IDB_DATABASE_NAME, IDB_DATABASE_VERSION } from "@sysdraw/common";
+import { IDB_DATABASE_NAME, IDB_DATABASE_VERSION } from "@zero-sketch/common";
 import { DBSchema, IDBPDatabase, openDB } from "idb";
 import { StoreApi, createStore } from "zustand/vanilla";
 import { REGISTRY_CONFIG_KEY, RegistryConfig } from "../config";
@@ -10,7 +10,7 @@ const defaultLibraryMetadata: LibraryMetadata = {
   name: defaultLibrary.name,
   version: defaultLibrary.version,
   description:
-    "Sysdraw's default library, sufficient for simple architecture diagrams.",
+    "ZeroSketch's default library, sufficient for simple architecture diagrams.",
   icon: "https://dummyimage.com/100x100/54ffcc/005e0e.png&text=Sd",
   tags: ["basic"],
   path: "data/default_library.json",
@@ -23,7 +23,7 @@ interface LibraryRegistryState {
 
 type AddLibraryResult = { success: boolean; conflict?: LibraryMetadata };
 
-interface SysdrawDB extends DBSchema {
+interface ZeroSketchDB extends DBSchema {
   libraries: {
     key: string;
     value: LibraryManifest;
@@ -38,7 +38,7 @@ interface LibraryRegistryOptions {
 class LibraryRegistry {
   private store: StoreApi<LibraryRegistryState>;
   private baseUrl: string;
-  private idb: IDBPDatabase<SysdrawDB> | null = null;
+  private idb: IDBPDatabase<ZeroSketchDB> | null = null;
   private initPromise: Promise<void>;
   private config: RegistryConfig;
   private remoteLibrariesList: LibraryMetadata[] | null = null;
@@ -96,7 +96,7 @@ class LibraryRegistry {
    */
   private async initIDB() {
     try {
-      this.idb = await openDB<SysdrawDB>(
+      this.idb = await openDB<ZeroSketchDB>(
         IDB_DATABASE_NAME,
         IDB_DATABASE_VERSION,
         {

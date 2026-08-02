@@ -12,16 +12,16 @@ export const Route = createRootRoute({
         content: "width=device-width, initial-scale=1, shrink-to-fit=no",
       },
       {
-        title: "SysDraw | System Design for Everyone | Free to use",
+        title: "ZeroSketch | System Design for Everyone | Free to use",
       },
       {
         name: "title",
-        content: "SysDraw | System Design for Everyone | Free to use",
+        content: "ZeroSketch | System Design for Everyone | Free to use",
       },
       {
         name: "description",
         content:
-          "SysDraw is a free and open-source system design diagramming tool with zero-friction drag & drop, custom icon libraries, and high-level system architecture sketching.",
+          "ZeroSketch is a free and open-source system design diagramming tool with zero-friction drag & drop, custom icon libraries, and high-level system architecture sketching.",
       },
       {
         name: "referrer",
@@ -45,7 +45,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
         <HeadContent />
       </head>
       <body className="bg-bg text-text font-sans antialiased selection:bg-black selection:text-white">
-        <h1 className="sr-only">SysDraw | System Design for Everyone</h1>
+        <h1 className="sr-only">ZeroSketch | System Design for Everyone</h1>
         {children}
         <Scripts />
       </body>

@@ -1,10 +1,10 @@
 import { useAddNodeAtCenter } from "@/hooks/useAddNodeAtCenter";
 import { CanvasStoreProvider } from "@/store/CanvasStoreProvider";
-import { LibraryRegistry, LibraryRegistryProvider } from "@sysdraw/models";
 import { act, renderHook } from "@testing-library/react";
+import { LibraryRegistry, LibraryRegistryProvider } from "@zero-sketch/models";
 import React, { createElement } from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { mockSetEdges, mockSetNodes } from "../utils/mocks";
+import { mockSetNodes } from "../utils/mocks";
 
 vi.mock("nanoid", () => ({ nanoid: () => "new-id" }));
 
@@ -39,8 +39,8 @@ vi.mock("zustand", async (importOriginal) => {
   };
 });
 
-vi.mock("@sysdraw/models", async (importOriginal) => ({
-  ...(await importOriginal<typeof import("@sysdraw/models")>()),
+vi.mock("@zero-sketch/models", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("@zero-sketch/models")>()),
   defaultNodesMap: { rectangle: { label: "default rect" } },
   defaultGroupsMap: { container: { label: "default group" } },
 }));

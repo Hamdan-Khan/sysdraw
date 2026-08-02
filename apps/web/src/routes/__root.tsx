@@ -28,19 +28,19 @@ export const Route = createRootRoute({
       },
       {
         name: "apple-mobile-web-app-title",
-        content: "Sysdraw",
+        content: "ZeroSketch",
       },
       {
-        title: "SysDraw | System Design Canvas",
+        title: "ZeroSketch | System Design Canvas",
       },
       {
         name: "title",
-        content: "Sysdraw | A high level system design tool | Free to use",
+        content: "ZeroSketch | A high level system design tool | Free to use",
       },
       {
         name: "description",
         content:
-          "Sysdraw is a free, high level system design diagramming tool that lets you easily create software architecture diagrams.",
+          "ZeroSketch is a free, high level system design diagramming tool that lets you easily create software architecture diagrams.",
       },
     ],
     links: [
@@ -75,7 +75,7 @@ function RootDocument({ children }: Readonly<{ children: ReactNode }>) {
       <body>
         <noscript>You need to enable JavaScript to run this app.</noscript>
         <header>
-          <h1 className="sr-only">SysDraw</h1>
+          <h1 className="sr-only">ZeroSketch</h1>
         </header>
         {children}
         <Scripts />

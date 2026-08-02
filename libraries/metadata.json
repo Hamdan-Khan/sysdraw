@@ -3,11 +3,11 @@
   "libraries": [
     {
       "id": "default",
-      "name": "Sysdraw",
-      "description": "Sysdraw's default library, sufficient for simple architecture diagrams.",
+      "name": "ZeroSketch",
+      "description": "ZeroSketch's default library, sufficient for simple architecture diagrams.",
       "version": "0.1.0",
       "icon": "https://dummyimage.com/100x100/54ffcc/005e0e.png&text=Sd",
-      "tags": ["sysdraw"],
+      "tags": ["basic"],
       "path": "data/default_library.json"
     },
     {

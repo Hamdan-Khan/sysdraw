@@ -1,5 +1,5 @@
 import { Tooltip } from "@/components/common/Tooltip";
-import { LibraryManifest, LibraryMetadata } from "@sysdraw/models";
+import { LibraryManifest, LibraryMetadata } from "@zero-sketch/models";
 import { Check, Info, Package, Trash2 } from "lucide-react";
 import { useState } from "react";
 

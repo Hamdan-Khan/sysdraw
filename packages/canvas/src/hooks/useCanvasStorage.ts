@@ -1,7 +1,7 @@
 import { useCanvasStore } from "@/store/CanvasStoreProvider";
 import { CanvasStoreState } from "@/store/store";
-import { useLibraryRegistry } from "@sysdraw/models";
 import { Edge, Node, ReactFlowJsonObject, useReactFlow } from "@xyflow/react";
+import { useLibraryRegistry } from "@zero-sketch/models";
 import { useCallback, useEffect, useRef } from "react";
 import { toast } from "sonner";
 import { useShallow } from "zustand/shallow";
@@ -13,7 +13,7 @@ const selector = (state: CanvasStoreState) => ({
   setEdges: state.setEdges,
 });
 
-export const CANVAS_LOCALSTORAGE_KEY = "sysdraw-canvas-snapshot";
+export const CANVAS_LOCALSTORAGE_KEY = "zero-sketch-canvas-snapshot";
 
 export const useCanvasStorage = () => {
   const { nodes, edges, setEdges, setNodes } = useCanvasStore(

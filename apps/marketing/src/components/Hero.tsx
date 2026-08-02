@@ -9,7 +9,7 @@ export const Hero = () => {
         <div className="flex flex-col gap-6 md:gap-8">
           <div>
             <h1 className="text-6xl font-black tracking-tight sm:text-7xl md:text-8xl lg:text-9xl text-black">
-              sysdraw
+              ZeroSketch
             </h1>
             <p className="mt-3 text-xl font-medium sm:text-2xl md:text-3xl lg:text-4xl text-neutral-600">
               system design for everyone

@@ -1,5 +1,5 @@
 {
-  "name": "@sysdraw/models",
+  "name": "@zero-sketch/models",
   "version": "0.1.0",
   "type": "module",
   "main": "./dist/index.js",
@@ -31,7 +31,7 @@
     "vitest": "catalog:"
   },
   "dependencies": {
-    "@sysdraw/common": "workspace:*",
+    "@zero-sketch/common": "workspace:*",
     "@xyflow/react": "catalog:",
     "idb": "^8.0.3",
     "react": "catalog:",

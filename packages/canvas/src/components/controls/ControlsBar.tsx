@@ -6,9 +6,9 @@ import { parseProjectFile } from "@/lib/import/importFile";
 import { cn } from "@/lib/utils";
 import { useCanvasStore } from "@/store/CanvasStoreProvider";
 import { CanvasStoreState } from "@/store/store";
-import { FILE_EXTENSIONS } from "@sysdraw/common";
-import { RegisteredEdges } from "@sysdraw/models";
 import { Edge, Node, useReactFlow } from "@xyflow/react";
+import { FILE_EXTENSIONS } from "@zero-sketch/common";
+import { RegisteredEdges } from "@zero-sketch/models";
 import {
   Download,
   ExternalLink,

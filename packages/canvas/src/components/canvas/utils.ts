@@ -70,7 +70,7 @@ export const clampPositionInsideGroup = (
 };
 
 /**
- * returns true if the given node is a sysdraw group node
+ * returns true if the given node is a group node
  */
 export const isGroup = (node: Node): boolean => {
   if (!node.type) return false;
@@ -83,11 +83,11 @@ export const isGroup = (node: Node): boolean => {
  * requires parent nodes to be drawn before child nodes
  */
 export const sortNodesAndGroups = (
-  nodes: Node[],
+  xyNodes: Node[],
   nodesMap: Map<string, Node>,
 ): Node[] => {
-  const sysdrawNodes = nodes.filter((n) => !isGroup(n));
-  const sysdrawGroups = nodes.filter((n) => isGroup(n));
+  const nodes = xyNodes.filter((n) => !isGroup(n));
+  const groups = xyNodes.filter((n) => isGroup(n));
 
   const depthCache = new Map<string, number>();
 
@@ -108,9 +108,9 @@ export const sortNodesAndGroups = (
     return depth;
   };
 
-  sysdrawGroups.sort((a, b) => getDepth(a.id) - getDepth(b.id));
+  groups.sort((a, b) => getDepth(a.id) - getDepth(b.id));
 
-  return [...sysdrawGroups, ...sysdrawNodes];
+  return [...groups, ...nodes];
 };
 
 /**

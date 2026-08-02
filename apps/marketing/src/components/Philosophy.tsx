@@ -10,7 +10,7 @@ export const Philosophy = () => {
         </h2>
 
         <p className="mb-10 text-lg leading-relaxed sm:text-2xl sm:leading-relaxed text-neutral-800">
-          SysDraw is built for system design with{" "}
+          ZeroSketch is built for system design with{" "}
           <span className="font-semibold text-black">least friction</span>.
           Simple drag and drop sketching with zero bloat. Easily customize your
           architecture using{" "}

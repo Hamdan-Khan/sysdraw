@@ -1,6 +1,6 @@
 import { sanitizeSvgString } from "@/lib/sanitizeSvg";
-import { NODE_ICON_CLASS_ID } from "@sysdraw/common";
-import type { IconType } from "@sysdraw/models";
+import { NODE_ICON_CLASS_ID } from "@zero-sketch/common";
+import type { IconType } from "@zero-sketch/models";
 import { memo, useMemo } from "react";
 
 export interface LibraryIconProps {

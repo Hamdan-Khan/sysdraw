@@ -1,7 +1,7 @@
 import { CanvasStoreState } from "@/store/store";
-import { RegisteredEdges } from "@sysdraw/models";
 import "@testing-library/jest-dom/vitest";
 import { cleanup } from "@testing-library/react";
+import { RegisteredEdges } from "@zero-sketch/models";
 import "fake-indexeddb/auto";
 import { afterEach, vi } from "vitest";
 import { StoreApi } from "zustand";

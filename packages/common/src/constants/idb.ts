@@ -1,4 +1,4 @@
-const IDB_DATABASE_NAME = "sysdraw";
+const IDB_DATABASE_NAME = "zero-sketch";
 const IDB_DATABASE_VERSION = 1;
 const IDB_CONFIG_KEY = "app";
 

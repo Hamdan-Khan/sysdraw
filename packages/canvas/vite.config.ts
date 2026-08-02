@@ -9,7 +9,7 @@ export default defineConfig({
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
-      "@sysdraw/canvas": path.resolve(__dirname, "./src/index.ts"),
+      "@zero-sketch/canvas": path.resolve(__dirname, "./src/index.ts"),
     },
   },
   root: "./dev",

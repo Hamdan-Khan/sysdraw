@@ -8,7 +8,7 @@
     "types": ["vite/client", "react", "react-dom"],
     "paths": {
       "@/*": ["./src/*"],
-      "@sysdraw/canvas": ["./src/index.ts"]
+      "@zero-sketch/canvas": ["./src/index.ts"]
     }
   },
   "include": ["src", "dev"]

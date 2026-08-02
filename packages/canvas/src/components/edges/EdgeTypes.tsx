@@ -1,7 +1,7 @@
 import { EdgePropsType } from "@/components/canvas/types";
 import { DropdownOption } from "@/components/common/Dropdown";
-import { RegisteredEdges } from "@sysdraw/models";
 import { EdgeTypes } from "@xyflow/react";
+import { RegisteredEdges } from "@zero-sketch/models";
 import {
   CornerDownRight,
   LucideIcon,

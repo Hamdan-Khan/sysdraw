@@ -12,7 +12,7 @@ import {
   LibraryMetadata,
   useLibraryRegistry,
   useLibraryRegistryStore,
-} from "@sysdraw/models";
+} from "@zero-sketch/models";
 import { ChevronRight, Image, Plus, Trash2 } from "lucide-react";
 import React, { memo, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";

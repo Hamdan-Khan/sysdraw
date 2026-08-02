@@ -200,7 +200,7 @@ describe("importFile schema validation", () => {
   });
 
   describe("ImportSchema", () => {
-    it("validates a full sysdraw project import file", () => {
+    it("validates a full zero-sketch project import file", () => {
       const projectFile = {
         version: "0.1",
         viewport: { x: 0, y: 0, zoom: 1 },

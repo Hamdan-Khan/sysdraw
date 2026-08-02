@@ -3,7 +3,7 @@
 The base canvas package, exports the canvas component with all the canvas functionality.
 
 ```jsx
-import { Canvas } from "@sysdraw/canvas";
+import { Canvas } from "@zero-sketch/canvas";
 
 function App() {
   const canvasState = { edges: [], nodes: [] };
@@ -26,7 +26,7 @@ export default App;
 - [x] add labels on edges
 - [x] fix multi nodes on ctrl+v paste
 - [x] remove barrel imports for components
-- [x] export as png, svg and .sysdraw
+- [x] export as png, svg and .zerosketch
 - [x] add labels to standard nodes
 - [ ] optimize undo/redo history state
 - [ ] configure rolldown code splitting

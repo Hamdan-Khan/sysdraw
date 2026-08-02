@@ -1,4 +1,4 @@
-name: Sysdraw Tests
+name: ZeroSketch Tests
 
 on:
   pull_request:

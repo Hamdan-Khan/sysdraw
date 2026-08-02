@@ -1,5 +1,5 @@
-import { IDB_DATABASE_NAME } from "@sysdraw/common";
 import { act, renderHook } from "@testing-library/react";
+import { IDB_DATABASE_NAME } from "@zero-sketch/common";
 import "fake-indexeddb/auto";
 import React from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
@@ -44,7 +44,7 @@ describe("LibraryRegistry Instance", () => {
       name: defaultLibrary.name,
       version: defaultLibrary.version,
       description:
-        "Sysdraw's default library, sufficient for simple architecture diagrams.",
+        "ZeroSketch's default library, sufficient for simple architecture diagrams.",
       icon: "https://dummyimage.com/100x100/54ffcc/005e0e.png&text=Sd",
       tags: ["basic"],
       path: "data/default_library.json",
