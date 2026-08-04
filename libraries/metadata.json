@@ -8,7 +8,7 @@
       "version": "0.1.0",
       "icon": "https://dummyimage.com/100x100/54ffcc/005e0e.png&text=Sd",
       "tags": ["basic"],
-      "path": "data/default_library.json"
+      "path": "data/default_lib.json"
     },
     {
       "id": "aws",
