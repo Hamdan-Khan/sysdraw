@@ -1,3 +1,4 @@
+import { LIBRARY_URL } from "@/lib/constants";
 import { createFileRoute } from "@tanstack/react-router";
 import { Canvas, createCanvasStore } from "@zero-sketch/canvas";
 import { LibraryRegistry } from "@zero-sketch/models";
@@ -45,8 +46,7 @@ function HomeComponent() {
     [],
   );
   const libraryRegistry = useMemo(() => {
-    const libUrl = import.meta.env.VITE_LIBRARY_URL;
-    return new LibraryRegistry({ url: libUrl });
+    return new LibraryRegistry({ url: LIBRARY_URL });
   }, []);
 
   return <Canvas libraryRegistry={libraryRegistry} canvasState={canvasState} />;

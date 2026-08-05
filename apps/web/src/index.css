@@ -1,5 +1,7 @@
 @import "@xyflow/react/dist/style.css" layer(base);
-@import "tailwindcss";
 @import "@zero-sketch/common/theme.css";
+@source "../node_modules/@cloudflare/kumo/dist/**/*.{js,jsx,ts,tsx}";
+@import "@cloudflare/kumo/styles/tailwind";
+@import "tailwindcss";
 
 @source "../../../packages/canvas/src";

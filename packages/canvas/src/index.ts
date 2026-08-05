@@ -4,6 +4,7 @@ export type {
   NodeComponentType,
   NodePropsType,
 } from "./components/canvas/types";
+export { sanitizeSvgString } from "./lib/sanitizeSvg";
 export {
   CanvasStoreProvider,
   useCanvasStore,

@@ -20,8 +20,8 @@ import { DropdownRow } from "./DropdownRow";
 import { LibraryInfoDialog } from "./LibraryInfoDialog";
 
 export interface LibraryDropdownProps {
-  onSelectLibrary?: (id: string) => void;
-  onOpenUploadDialog?: () => void;
+  onSelectLibrary: (id: string) => void;
+  onOpenUploadDialog: () => void;
 }
 
 const LibraryDropdownComponent = ({
@@ -67,11 +67,7 @@ const LibraryDropdownComponent = ({
 
   const handleSelectLibrary = (id: string) => {
     setDropdownOpen(false);
-    if (onSelectLibrary) {
-      onSelectLibrary(id);
-    } else {
-      registry.selectLibrary(id);
-    }
+    onSelectLibrary(id);
   };
 
   const handleOpenInfo = (e: React.MouseEvent, lib: LibraryMetadata) => {
@@ -193,18 +189,16 @@ const LibraryDropdownComponent = ({
                     <DropdownMenuLabel className="p-0 text-[10px] uppercase tracking-wide text-secondary">
                       Local
                     </DropdownMenuLabel>
-                    {onOpenUploadDialog && (
-                      <button
-                        type="button"
-                        onClick={() => {
-                          onOpenUploadDialog();
-                        }}
-                        className="p-0.5 rounded text-secondary hover:text-primary hover:bg-dim cursor-pointer transition-colors"
-                      >
-                        <Tooltip text="Upload Local Library" />
-                        <Plus size={13} />
-                      </button>
-                    )}
+                    <button
+                      type="button"
+                      onClick={() => {
+                        onOpenUploadDialog();
+                      }}
+                      className="p-0.5 rounded text-secondary hover:text-primary hover:bg-dim cursor-pointer transition-colors"
+                    >
+                      <Tooltip text="Upload Local Library" />
+                      <Plus size={13} />
+                    </button>
                   </div>
                   <DropdownMenuSeparator />
                   <div className="flex flex-col gap-0.5">

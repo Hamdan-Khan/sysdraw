@@ -52,6 +52,7 @@ export const Toolbar = memo(() => {
       setIsGroupSearchOpen(false);
     } catch (err) {
       console.error("Failed to select library", err);
+      toast.error("Failed to select library.");
     } finally {
       setIsLibLoading(false);
     }
