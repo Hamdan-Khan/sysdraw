@@ -6,9 +6,16 @@ export const Footer = () => {
     <footer className="bg-black py-12 text-white">
       <div className="mx-auto max-w-262.5 px-6 sm:px-10">
         <div className="flex flex-col items-center justify-between gap-6 sm:flex-row">
-          <p className="text-xl font-bold tracking-tight text-white">
-            ZeroSketch
-          </p>
+          <div className="flex items-center gap-2.5 sm:gap-3">
+            <img
+              src="/logo.svg"
+              alt="ZeroSketch Logo"
+              className="size-10 invert"
+            />
+            <p className="text-xl font-bold tracking-tight text-white">
+              ZeroSketch
+            </p>
+          </div>
           <div className="flex items-center gap-6 text-base sm:text-lg font-medium">
             <a
               href={CANVAS_URL}

@@ -20,16 +20,18 @@ export const Philosophy = () => {
           providing ready to use icons that most system design tools ignore.
         </p>
 
-        <a
-          href={LIBRARIES_URL}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="inline-flex items-center gap-3 rounded-xl border-4 border-black bg-white px-6 py-3.5 text-lg font-bold text-black transition-all hover:bg-black hover:text-white md:text-xl group"
-        >
-          <LayoutGrid className="h-6 w-6 group-hover:text-white transition-colors" />
-          <span>Explore Icon Libraries</span>
-          <ArrowUpRight className="h-5 w-5 group-hover:text-white transition-colors" />
-        </a>
+        <div className="flex justify-center sm:justify-start">
+          <a
+            href={LIBRARIES_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="group flex min-h-12 items-center justify-center gap-2.5 rounded-xl border-3 border-black bg-white px-5 py-2.5 text-base font-bold text-black transition-all hover:bg-black hover:text-white focus:outline-none focus:ring-4 focus:ring-black/20 sm:min-h-16 sm:gap-3 sm:border-4 sm:px-7 sm:py-3 sm:text-xl"
+          >
+            <LayoutGrid className="h-5 w-5 transition-colors group-hover:text-white sm:h-6 sm:w-6" />
+            <span>Explore Icon Libraries</span>
+            <ArrowUpRight className="h-4 w-4 transition-colors group-hover:text-white sm:h-5 sm:w-5" />
+          </a>
+        </div>
       </div>
     </section>
   );

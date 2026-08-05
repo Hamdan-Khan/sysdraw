@@ -10,11 +10,11 @@ export const Features = () => {
   ];
 
   const roadmapFeatures = [
-    "Docs",
-    "Collaboration",
+    "Realtime Collaboration",
     "Cloud Sync",
     "AI Assisted Drawings",
     "DSL Parsing (mermaid, etc.)",
+    "Continuous Documentation Sync",
   ];
 
   return (

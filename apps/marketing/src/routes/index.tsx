@@ -6,7 +6,7 @@ import { createFileRoute } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/")({ component: Home });
 
-export function Home() {
+function Home() {
   return (
     <main className="min-h-screen bg-white text-black font-sans">
       <Hero />
