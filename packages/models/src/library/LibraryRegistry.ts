@@ -95,6 +95,9 @@ class LibraryRegistry {
    * Seeds the database with default library if not present.
    */
   private async initIDB() {
+    if (typeof window === "undefined") {
+      return;
+    }
     try {
       this.idb = await openDB<ZeroSketchDB>(
         IDB_DATABASE_NAME,
@@ -242,6 +245,24 @@ class LibraryRegistry {
     ) {
       await this.selectLibrary(defaultLibraryMetadata.id);
     }
+  };
+
+  /**
+   * retrieves a local library manifest by id
+   */
+  public getLibraryManifest = async (
+    id: string,
+  ): Promise<LibraryManifest | null> => {
+    await this.whenReady();
+    if (this.isIDBLoaded) {
+      try {
+        const cached = await this.idb!.get("libraries", id);
+        return cached ?? null;
+      } catch (e) {
+        console.error(`Failed to get library manifest for ${id} from IDB`, e);
+      }
+    }
+    return null;
   };
 
   /**

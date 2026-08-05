@@ -259,6 +259,30 @@ describe("LibraryRegistry Instance", () => {
 
     fetchSpy.mockRestore();
   });
+
+  it("returns default library manifest when getLibraryManifest is called with default library id", async () => {
+    const manifest = await registry.getLibraryManifest(defaultLibrary.id);
+    expect(manifest).toEqual(defaultLibrary);
+  });
+
+  it("retrieves a local library manifest by id from IDB", async () => {
+    const mockLocalLib = {
+      id: "manifest-test-1",
+      name: "Manifest Test",
+      version: "1.0.0",
+      description: "Testing getLibraryManifest",
+      nodes: [{ id: "n1", type: "node" as const, label: "Node 1" }],
+    };
+
+    await registry.addLocalLibrary(mockLocalLib);
+    const manifest = await registry.getLibraryManifest("manifest-test-1");
+    expect(manifest).toEqual(mockLocalLib);
+  });
+
+  it("returns null when getLibraryManifest is called with a non-existent library id", async () => {
+    const manifest = await registry.getLibraryManifest("non-existent-id");
+    expect(manifest).toBeNull();
+  });
 });
 
 describe("LibraryRegistryProvider & Hooks", () => {
