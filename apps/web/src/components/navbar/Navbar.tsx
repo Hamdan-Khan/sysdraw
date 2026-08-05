@@ -3,7 +3,7 @@ import logo from "@/assets/zero-sketch-logo.svg";
 import { GITHUB_LIBRARY_REPO_URL, LANDING_PAGE_URL } from "@/lib/constants";
 import { Badge, Button, LinkButton } from "@cloudflare/kumo";
 import { Link } from "@tanstack/react-router";
-import { ArrowLeft } from "lucide-react";
+import { Frame } from "lucide-react";
 
 export const Navbar = () => {
   return (
@@ -12,11 +12,13 @@ export const Navbar = () => {
         <div className="flex items-center justify-center gap-4">
           <Link to={LANDING_PAGE_URL} className="flex items-center gap-2.5">
             <img src={logo} width={40} alt="Logo" />
-            <span className="font-bold tracking-tight text-base sm:text-lg text-kumo-default">
+            <span className="font-bold tracking-tight sm:text-lg text-kumo-default">
               ZeroSketch
             </span>
           </Link>
-          <Badge variant="beta">Libraries</Badge>
+          <Badge variant="beta" className="size-xs">
+            Libraries
+          </Badge>
         </div>
 
         <div className="flex items-center gap-3">
@@ -28,16 +30,16 @@ export const Navbar = () => {
             className="sm:inline-flex"
             icon={<img src={githubIcon} alt="GitHub" className="size-4" />}
           >
-            GitHub Repo
+            <span className="hidden sm:inline">GitHub Repo</span>
           </LinkButton>
 
           <Link to="/">
             <Button
               variant="secondary"
               size="sm"
-              icon={<ArrowLeft className="size-4" />}
+              icon={<Frame className="size-4" />}
             >
-              Back to Canvas
+              <span className="hidden sm:inline">Open Canvas</span>
             </Button>
           </Link>
         </div>

@@ -49,12 +49,12 @@ export const CommunityLibrariesSection = () => {
         </p>
       </div>
 
-      <div className="flex items-center gap-8">
+      <div className="flex sm:flex-row flex-col gap-4 sm:gap-8">
         <SearchInput
           value={searchQuery}
           onChange={setSearchQuery}
           placeholder="Search libraries..."
-          className="w-60 sm:w-80 flex-1"
+          className="w-full sm:w-80 sm:flex-1"
         />
 
         <TagFilter
