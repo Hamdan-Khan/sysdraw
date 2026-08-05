@@ -1,12 +1,4 @@
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import { cn } from "@/lib/utils";
+import { Button, Dialog } from "@cloudflare/kumo";
 import { AlertTriangle } from "lucide-react";
 import React from "react";
 
@@ -39,44 +31,47 @@ export const ConfirmDialog = ({
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-sm">
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            <Icon
-              className={cn(
-                "size-4",
-                variant === "destructive" ? "text-red-500" : "text-primary",
-              )}
-            />
-            {title}
-          </DialogTitle>
-          <DialogDescription>{description}</DialogDescription>
-        </DialogHeader>
-
-        <DialogFooter className="flex items-center justify-end gap-2 pt-2">
-          <button
-            type="button"
-            onClick={() => onOpenChange(false)}
-            className="flex items-center justify-center h-8 px-3 rounded-md border border-border bg-surface text-secondary text-xs font-medium hover:bg-dim hover:text-primary transition-colors cursor-pointer outline-none"
-          >
-            {cancelText}
-          </button>
-          <button
-            type="button"
-            onClick={handleConfirm}
-            className={cn(
-              "flex items-center gap-1.5 h-8 px-3 rounded-md border text-xs font-medium transition-colors cursor-pointer outline-none shadow-xs",
+    <Dialog.Root
+      role={variant === "destructive" ? "alertdialog" : "dialog"}
+      open={isOpen}
+      onOpenChange={onOpenChange}
+    >
+      <Dialog size="base" className="z-50 p-6">
+        <div className="mb-4 flex items-center gap-3">
+          <Icon
+            className={
               variant === "destructive"
-                ? "border-red-500/30 bg-red-500/10 text-red-500 hover:bg-red-500/20 focus-visible:ring-2 focus-visible:ring-red-500/20"
-                : "border-border bg-surface text-primary hover:bg-dim focus-visible:ring-2 focus-visible:ring-primary/20",
+                ? "size-4.5 text-kumo-danger shrink-0"
+                : "size-4.5 text-kumo-default shrink-0"
+            }
+          />
+          <Dialog.Title className="text-lg font-semibold">{title}</Dialog.Title>
+        </div>
+        <Dialog.Description className="text-sm text-kumo-subtle">
+          {description}
+        </Dialog.Description>
+        <div className="mt-6 flex justify-end gap-2">
+          <Dialog.Close
+            render={(props) => (
+              <Button
+                variant="secondary"
+                size="sm"
+                {...props}
+                onClick={() => onOpenChange(false)}
+              >
+                {cancelText}
+              </Button>
             )}
+          />
+          <Button
+            variant={variant === "destructive" ? "destructive" : "primary"}
+            size="sm"
+            onClick={handleConfirm}
           >
-            <Icon className="size-3.5" />
             {confirmText}
-          </button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+          </Button>
+        </div>
+      </Dialog>
+    </Dialog.Root>
   );
 };

@@ -1,10 +1,3 @@
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import {
@@ -22,8 +15,9 @@ import {
 } from "@/hooks/useCanvasExport";
 import { useCanvasStore } from "@/store/CanvasStoreProvider";
 import { CanvasStoreState } from "@/store/store";
+import { Button, Dialog } from "@cloudflare/kumo";
 import { FILE_EXTENSIONS } from "@zero-sketch/common";
-import { Download, Loader2, Image as LucideImage } from "lucide-react";
+import { Download, Loader2, Image as LucideImage, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useShallow } from "zustand/shallow";
 
@@ -39,9 +33,9 @@ const storeSelector = (s: CanvasStoreState) => ({
 
 export const ExportDialog = ({ open, onOpenChange }: ExportDialogProps) => {
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      {open && <ExportDialogInner onOpenChange={onOpenChange} />}
-    </Dialog>
+    <Dialog.Root open={open} onOpenChange={onOpenChange}>
+      <ExportDialogInner onOpenChange={onOpenChange} />
+    </Dialog.Root>
   );
 };
 
@@ -121,16 +115,33 @@ const ExportDialogInner = ({
   ];
 
   return (
-    <DialogContent className="sm:max-w-sm">
-      <DialogHeader>
-        <DialogTitle>Export Diagram</DialogTitle>
-        <DialogDescription>
-          Export your diagram in your preferred format.
-        </DialogDescription>
-      </DialogHeader>
+    <Dialog size="base" className="z-50 p-6">
+      <div className="mb-4 flex items-start justify-between gap-4">
+        <div>
+          <Dialog.Title className="text-lg font-semibold">
+            Export Diagram
+          </Dialog.Title>
+          <Dialog.Description className="text-sm text-kumo-subtle">
+            Export your diagram in your preferred format.
+          </Dialog.Description>
+        </div>
+        <Dialog.Close
+          aria-label="Close"
+          render={(props) => (
+            <Button
+              {...props}
+              variant="secondary"
+              shape="square"
+              size="sm"
+              icon={<X className="size-4" />}
+              aria-label="Close"
+            />
+          )}
+        />
+      </div>
 
       {/* export preview container */}
-      <div className="relative aspect-video w-full rounded-lg border border-border bg-dim/50 flex flex-col items-center justify-center gap-2 text-secondary overflow-hidden">
+      <div className="relative aspect-video w-full rounded-lg border border-border bg-dim/50 flex flex-col items-center justify-center gap-2 text-secondary overflow-hidden mb-4">
         {isLoadingPreview ? (
           <div className="flex flex-col items-center gap-2">
             <Loader2 className="size-5 text-secondary animate-spin" />
@@ -273,18 +284,19 @@ const ExportDialogInner = ({
                 ))}
               </SelectContent>
             </Select>
-            <button
+            <Button
               type="button"
               disabled={!isFileNameValid}
               onClick={handleExport}
-              className="flex items-center gap-1.5 h-8 px-3 rounded-md border border-border bg-surface text-primary text-xs font-medium hover:bg-dim transition-colors cursor-pointer disabled:opacity-50 disabled:pointer-events-none outline-none focus-visible:ring-2 focus-visible:ring-primary/20 shadow-xs"
+              variant="primary"
+              size="sm"
+              icon={<Download className="size-3.5" />}
             >
-              <Download className="size-3.5" />
               Export
-            </button>
+            </Button>
           </div>
         </div>
       </div>
-    </DialogContent>
+    </Dialog>
   );
 };

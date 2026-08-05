@@ -1,15 +1,8 @@
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { useCanvasExport } from "@/hooks/useCanvasExport";
-import { Download } from "lucide-react";
-import { useState } from "react";
+import { Button, Dialog } from "@cloudflare/kumo";
+import { Download, X } from "lucide-react";
+import React, { useState } from "react";
 
 interface SaveProjectDialogProps {
   isSaveDialogOpen: boolean;
@@ -36,14 +29,35 @@ export const SaveProjectDialog = ({
   };
 
   return (
-    <Dialog open={isSaveDialogOpen} onOpenChange={setIsSaveDialogOpen}>
-      <DialogContent className="sm:max-w-sm">
-        <DialogHeader>
-          <DialogTitle>Save Project</DialogTitle>
-          <DialogDescription>
-            Save your diagram as a .zerosketch project file.
-          </DialogDescription>
-        </DialogHeader>
+    <Dialog.Root open={isSaveDialogOpen} onOpenChange={setIsSaveDialogOpen}>
+      <Dialog size="base" className="z-50 p-6">
+        <div className="mb-4 flex items-start justify-between gap-4">
+          <div>
+            <Dialog.Title className="text-lg font-semibold">
+              Save Project
+            </Dialog.Title>
+            <Dialog.Description className="text-sm text-kumo-subtle">
+              Save your diagram as a{" "}
+              <span className="font-semibold text-kumo-badge-neutral-subtle">
+                .zerosketch
+              </span>{" "}
+              project file.
+            </Dialog.Description>
+          </div>
+          <Dialog.Close
+            aria-label="Close"
+            render={(props) => (
+              <Button
+                {...props}
+                variant="secondary"
+                shape="square"
+                size="sm"
+                icon={<X className="size-4" />}
+                aria-label="Close"
+              />
+            )}
+          />
+        </div>
 
         <form onSubmit={handleSave} className="flex flex-col gap-4 py-2">
           <div className="flex flex-col gap-1.5">
@@ -69,25 +83,32 @@ export const SaveProjectDialog = ({
             </div>
           </div>
 
-          <DialogFooter className="flex items-center justify-end gap-2 pt-2">
-            <button
-              type="button"
-              onClick={() => setIsSaveDialogOpen(false)}
-              className="flex items-center justify-center h-8 px-3 rounded-md border border-border bg-surface text-secondary text-xs font-medium hover:bg-dim hover:text-primary transition-colors cursor-pointer outline-none"
-            >
-              Cancel
-            </button>
-            <button
+          <div className="mt-4 flex justify-end gap-2">
+            <Dialog.Close
+              render={(props) => (
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  {...props}
+                  type="button"
+                  onClick={() => setIsSaveDialogOpen(false)}
+                >
+                  Cancel
+                </Button>
+              )}
+            />
+            <Button
               type="submit"
               disabled={!isFileNameValid}
-              className="flex items-center gap-1.5 h-8 px-3 rounded-md border border-border bg-surface text-primary text-xs font-medium hover:bg-dim transition-colors cursor-pointer disabled:opacity-50 disabled:pointer-events-none outline-none focus-visible:ring-2 focus-visible:ring-primary/20 shadow-xs"
+              variant="primary"
+              size="sm"
+              icon={<Download className="size-3.5" />}
             >
-              <Download className="size-3.5" />
               Save Project
-            </button>
-          </DialogFooter>
+            </Button>
+          </div>
         </form>
-      </DialogContent>
-    </Dialog>
+      </Dialog>
+    </Dialog.Root>
   );
 };
