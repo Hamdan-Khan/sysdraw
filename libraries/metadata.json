@@ -6,7 +6,7 @@
       "name": "ZeroSketch",
       "description": "ZeroSketch's default library, sufficient for simple architecture diagrams.",
       "version": "0.1.0",
-      "icon": "https://dummyimage.com/100x100/54ffcc/005e0e.png&text=Sd",
+      "icon": "https://dummyimage.com/100x100/54ffcc/005e0e.png&text=ZS",
       "tags": ["basic"],
       "path": "data/default_lib.json"
     },
@@ -27,6 +27,15 @@
       "icon": "https://upload.wikimedia.org/wikipedia/commons/5/51/Google_Cloud_logo.svg",
       "tags": ["cloud"],
       "path": "data/gcp_lib.json"
+    },
+    {
+      "id": "kubernetes",
+      "name": "Kubernetes",
+      "description": "Official library of Kubernetes icons",
+      "version": "1.0.0",
+      "icon": "https://upload.wikimedia.org/wikipedia/commons/3/39/Kubernetes_logo_without_workmark.svg",
+      "tags": ["cloud"],
+      "path": "data/kubernetes_lib.json"
     }
   ]
 }
