@@ -1,16 +1,16 @@
-import { GITHUB_LIBRARY_REPO_URL } from "@/lib/constants";
+import githubIcon from "@/assets/github.svg";
+import logo from "@/assets/zero-sketch-logo.svg";
+import { GITHUB_LIBRARY_REPO_URL, LANDING_PAGE_URL } from "@/lib/constants";
 import { Badge, Button, LinkButton } from "@cloudflare/kumo";
 import { Link } from "@tanstack/react-router";
 import { ArrowLeft } from "lucide-react";
-import githubIcon from "../../assets/github.svg";
-import logo from "../../assets/zero-sketch-logo.svg";
 
 export const Navbar = () => {
   return (
     <header className="border-b border-kumo-line bg-kumo-neutral-125">
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-center gap-4">
-          <Link to="/" className="flex items-center gap-2.5">
+          <Link to={LANDING_PAGE_URL} className="flex items-center gap-2.5">
             <img src={logo} width={40} alt="Logo" />
             <span className="font-bold tracking-tight text-base sm:text-lg text-kumo-default">
               ZeroSketch
