@@ -1,4 +1,4 @@
-import { LIBRARY_URL } from "@/lib/constants";
+import { APP_URL, LIBRARY_URL } from "@/lib/constants";
 import { createFileRoute } from "@tanstack/react-router";
 import { Canvas, createCanvasStore } from "@zero-sketch/canvas";
 import { LibraryRegistry } from "@zero-sketch/models";
@@ -15,12 +15,33 @@ export const Route = createFileRoute("/")({
       },
       {
         name: "title",
-        content: "ZeroSketch | A high level system design tool | Free to use",
+        content:
+          "ZeroSketch | A high level system design tool | Open Source & Free to use",
       },
       {
         name: "description",
         content:
-          "ZeroSketch is a free, high level system design diagramming tool that lets you easily create software architecture diagrams.",
+          "Interactive drag & drop system design canvas to sketch software architecture, export diagrams, and manage icon libraries directly in your browser.",
+      },
+      {
+        property: "og:title",
+        content:
+          "ZeroSketch | A high level system design tool | Open Source & Free to use",
+      },
+      {
+        property: "og:description",
+        content:
+          "Interactive drag & drop system design canvas to sketch software architecture, export diagrams, and manage icon libraries directly in your browser.",
+      },
+      {
+        property: "og:url",
+        content: `${APP_URL}/`,
+      },
+    ],
+    links: [
+      {
+        rel: "canonical",
+        href: `${APP_URL}/`,
       },
     ],
   }),
@@ -49,5 +70,10 @@ function HomeComponent() {
     return new LibraryRegistry({ url: LIBRARY_URL });
   }, []);
 
-  return <Canvas libraryRegistry={libraryRegistry} canvasState={canvasState} />;
+  return (
+    <>
+      <h1 className="sr-only">ZeroSketch System Design Canvas</h1>
+      <Canvas libraryRegistry={libraryRegistry} canvasState={canvasState} />
+    </>
+  );
 }

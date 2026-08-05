@@ -8,7 +8,24 @@ import {
 import type { ReactNode } from "react";
 import { Toaster } from "sonner";
 import appCss from "../index.css?url";
+import { APP_URL } from "../lib/constants";
 import { queryClient } from "../lib/queryClient";
+
+const DESCRIPTION =
+  "Interactive drag & drop system design canvas with customizable icon packs, to sketch software architecture, export diagrams, and manage icon libraries directly in your browser.";
+
+const webAppJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "@id": `${APP_URL}/#webapp`,
+  name: "ZeroSketch Canvas",
+  url: APP_URL,
+  applicationCategory: "DesignApplication",
+  operatingSystem: "All",
+  browserRequirements: "Requires JavaScript. Requires HTML5 Canvas.",
+  isAccessibleForFree: true,
+  description: DESCRIPTION,
+};
 
 export const Route = createRootRoute({
   head: () => ({
@@ -30,23 +47,116 @@ export const Route = createRootRoute({
         content: "yes",
       },
       {
+        name: "apple-mobile-web-app-capable",
+        content: "yes",
+      },
+      {
+        name: "apple-mobile-web-app-status-bar-style",
+        content: "default",
+      },
+      {
         name: "apple-mobile-web-app-title",
         content: "ZeroSketch",
+      },
+      {
+        name: "application-name",
+        content: "ZeroSketch Canvas",
+      },
+      {
+        name: "theme-color",
+        content: "#ffffff",
       },
       {
         title: "ZeroSketch | System Design Canvas",
       },
       {
         name: "title",
-        content: "ZeroSketch | A high level system design tool | Free to use",
+        content:
+          "ZeroSketch | A high level system design tool | Open Source & Free to use",
       },
       {
         name: "description",
+        content: DESCRIPTION,
+      },
+      // Open Graph / Web App
+      {
+        property: "og:type",
+        content: "website",
+      },
+      {
+        property: "og:site_name",
+        content: "ZeroSketch Canvas",
+      },
+      {
+        property: "og:locale",
+        content: "en_US",
+      },
+      {
+        property: "og:url",
+        content: APP_URL,
+      },
+      {
+        property: "og:title",
         content:
-          "ZeroSketch is a free, high level system design diagramming tool that lets you easily create software architecture diagrams.",
+          "ZeroSketch | A high level system design tool | Open Source & Free to use",
+      },
+      {
+        property: "og:description",
+        content: DESCRIPTION,
+      },
+      {
+        property: "og:image",
+        content: `${APP_URL}/og-image.png`,
+      },
+      {
+        property: "og:image:width",
+        content: "1200",
+      },
+      {
+        property: "og:image:height",
+        content: "630",
+      },
+      {
+        property: "og:image:alt",
+        content: "ZeroSketch Web Application Canvas Workspace",
+      },
+      // Twitter Card
+      {
+        name: "twitter:card",
+        content: "summary_large_image",
+      },
+      {
+        name: "twitter:site",
+        content: "@zerosketch",
+      },
+      {
+        name: "twitter:title",
+        content:
+          "ZeroSketch | A high level system design tool | Open Source & Free to use",
+      },
+      {
+        name: "twitter:description",
+        content: DESCRIPTION,
+      },
+      {
+        name: "twitter:image",
+        content: `${APP_URL}/og-image.png`,
+      },
+      {
+        name: "twitter:image:alt",
+        content: "ZeroSketch Web Application Canvas Workspace",
       },
     ],
     links: [
+      {
+        rel: "canonical",
+        href: `${APP_URL}/`,
+      },
+      {
+        rel: "icon",
+        type: "image/svg+xml",
+        href: "/logo.svg",
+      },
       {
         rel: "apple-touch-icon",
         sizes: "180x180",
@@ -71,6 +181,12 @@ export const Route = createRootRoute({
       {
         rel: "stylesheet",
         href: appCss,
+      },
+    ],
+    scripts: [
+      {
+        type: "application/ld+json",
+        children: JSON.stringify(webAppJsonLd),
       },
     ],
   }),

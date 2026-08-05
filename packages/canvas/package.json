@@ -24,16 +24,16 @@
     "test:coverage": "vitest run --coverage"
   },
   "peerDependencies": {
-    "react": "^19.2.0",
-    "react-dom": "^19.2.0"
+    "react": "catalog:",
+    "react-dom": "catalog:",
+    "@cloudflare/kumo": "catalog:",
+    "@tanstack/react-virtual": "catalog:"
   },
   "dependencies": {
     "@base-ui/react": "^1.6.0",
     "@fontsource-variable/inter": "^5.3.0",
     "@zero-sketch/common": "workspace:*",
     "@zero-sketch/models": "workspace:*",
-    "@tanstack/react-virtual": "^3.14.9",
-    "@vitest/coverage-v8": "catalog:",
     "@xyflow/react": "^12.11.2",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
@@ -50,7 +50,9 @@
     "zustand": "catalog:"
   },
   "devDependencies": {
+    "@cloudflare/kumo": "catalog:",
     "@tailwindcss/vite": "catalog:",
+    "@tanstack/react-virtual": "catalog:",
     "@testing-library/jest-dom": "catalog:",
     "@testing-library/react": "catalog:",
     "@testing-library/user-event": "^14.6.1",
@@ -58,6 +60,7 @@
     "@types/react": "catalog:",
     "@types/react-dom": "catalog:",
     "@vitejs/plugin-react": "catalog:",
+    "@vitest/coverage-v8": "catalog:",
     "autoprefixer": "catalog:",
     "fake-indexeddb": "catalog:",
     "jsdom": "catalog:",

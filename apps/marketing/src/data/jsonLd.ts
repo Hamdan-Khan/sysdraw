@@ -9,7 +9,7 @@ export const jsonLdSchema = {
       name: "ZeroSketch",
       url: CANVAS_URL,
       description:
-        "ZeroSketch is a free and open-source system design diagramming tool with zero-friction drag & drop canvas, custom icon libraries, and high-level system architecture sketching.",
+        "Free and open-source system design diagramming tool with zero-friction drag & drop canvas, custom icon libraries, and high-level system architecture sketching.",
       applicationCategory: "DesignApplication",
       operatingSystem: "All",
       browserRequirements: "Requires JavaScript. Requires HTML5.",

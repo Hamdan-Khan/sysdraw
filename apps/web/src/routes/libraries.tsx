@@ -1,8 +1,8 @@
 import { Navbar } from "@/components/navbar/Navbar";
-import { GITHUB_LIBRARY_REPO_URL, LIBRARY_URL } from "@/lib/constants";
+import { APP_URL, GITHUB_LIBRARY_REPO_URL, LIBRARY_URL } from "@/lib/constants";
 import { Link } from "@cloudflare/kumo";
-import { LibraryRegistry, LibraryRegistryProvider } from "@zero-sketch/models";
 import { createFileRoute } from "@tanstack/react-router";
+import { LibraryRegistry, LibraryRegistryProvider } from "@zero-sketch/models";
 import { useMemo } from "react";
 import { CommunityLibrariesSection } from "../components/libraries/CommunityLibrariesSection";
 import { LocalLibrariesSection } from "../components/libraries/LocalLibrariesSection";
@@ -12,12 +12,44 @@ export const Route = createFileRoute("/libraries")({
   head: () => ({
     meta: [
       {
-        title: "Libraries | ZeroSketch",
+        title: "Libraries | ZeroSketch Canvas",
+      },
+      {
+        name: "title",
+        content: "Libraries | ZeroSketch Canvas",
       },
       {
         name: "description",
         content:
-          "Browse official icon libraries, contribute official icon sets, or build local SVG custom libraries for ZeroSketch.",
+          "Browse official cloud architecture icon sets, contribute official icon libraries, or build custom offline SVG packs in your browser.",
+      },
+      {
+        property: "og:title",
+        content: "Icon Libraries | ZeroSketch Canvas",
+      },
+      {
+        property: "og:description",
+        content:
+          "Browse official cloud architecture icon sets, contribute official icon libraries, or build custom offline SVG packs in your browser.",
+      },
+      {
+        property: "og:url",
+        content: `${APP_URL}/libraries`,
+      },
+      {
+        name: "twitter:title",
+        content: "Icon Libraries | ZeroSketch Canvas",
+      },
+      {
+        name: "twitter:description",
+        content:
+          "Browse official cloud architecture icon sets, contribute official icon libraries, or build custom offline SVG packs in your browser.",
+      },
+    ],
+    links: [
+      {
+        rel: "canonical",
+        href: `${APP_URL}/libraries`,
       },
     ],
   }),
