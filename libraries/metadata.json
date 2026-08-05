@@ -13,11 +13,20 @@
     {
       "id": "aws",
       "name": "AWS",
-      "description": "Official library of AWS icons",
+      "description": "Official library of Amazon Web Services (AWS) icons",
       "version": "1.0.0",
       "icon": "https://upload.wikimedia.org/wikipedia/commons/f/f1/Aws_logo.svg",
-      "tags": ["aws", "cloud"],
+      "tags": ["cloud"],
       "path": "data/aws_lib.json"
+    },
+    {
+      "id": "gcp",
+      "name": "GCP",
+      "description": "Official library of Google Cloud Platform (GCP) icons",
+      "version": "1.0.0",
+      "icon": "https://upload.wikimedia.org/wikipedia/commons/5/51/Google_Cloud_logo.svg",
+      "tags": ["cloud"],
+      "path": "data/gcp_lib.json"
     }
   ]
 }
