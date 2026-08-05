@@ -1,4 +1,5 @@
 import { HeadContent, Scripts, createRootRoute } from "@tanstack/react-router";
+import { jsonLdSchema } from "../data/jsonLd";
 import appCss from "../styles.css?url";
 
 export const Route = createRootRoute({
@@ -21,7 +22,7 @@ export const Route = createRootRoute({
       {
         name: "description",
         content:
-          "ZeroSketch is a free and open-source system design diagramming tool with zero-friction drag & drop, custom icon libraries, and high-level system architecture sketching.",
+          "ZeroSketch is a free and open-source system design diagramming tool with zero-friction drag & drop canvas, custom icon libraries, and high-level system architecture sketching.",
       },
       {
         name: "referrer",
@@ -53,6 +54,12 @@ export const Route = createRootRoute({
       {
         rel: "stylesheet",
         href: appCss,
+      },
+    ],
+    scripts: [
+      {
+        type: "application/ld+json",
+        children: JSON.stringify(jsonLdSchema),
       },
     ],
   }),
