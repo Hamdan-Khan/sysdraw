@@ -240,9 +240,3 @@ input[type="number"] {
     );
   mask-composite: intersect;
 }
-
-/* kumo dialog overlay z-index fix */
-div[role="presentation"].fixed.inset-0.bg-kumo-recessed {
-  z-index: 50;
-}
-

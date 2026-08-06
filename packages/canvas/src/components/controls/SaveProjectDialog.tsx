@@ -1,6 +1,5 @@
-import { Input } from "@/components/ui/input";
 import { useCanvasExport } from "@/hooks/useCanvasExport";
-import { Button, Dialog } from "@cloudflare/kumo";
+import { Button, Dialog, Input, Label } from "@cloudflare/kumo";
 import { Download, X } from "lucide-react";
 import React, { useState } from "react";
 
@@ -30,7 +29,7 @@ export const SaveProjectDialog = ({
 
   return (
     <Dialog.Root open={isSaveDialogOpen} onOpenChange={setIsSaveDialogOpen}>
-      <Dialog size="base" className="z-50 p-6">
+      <Dialog size="base" className="p-6">
         <div className="mb-4 flex items-start justify-between gap-4">
           <div>
             <Dialog.Title className="text-lg font-semibold">
@@ -61,12 +60,9 @@ export const SaveProjectDialog = ({
 
         <form onSubmit={handleSave} className="flex flex-col gap-4 py-2">
           <div className="flex flex-col gap-1.5">
-            <label
-              htmlFor="save-file-name"
-              className="text-xs font-bold text-primary"
-            >
+            <Label htmlFor="save-file-name" className="text-sm ml-1">
               File Name
-            </label>
+            </Label>
             <div className="flex items-center gap-2">
               <Input
                 id="save-file-name"
@@ -76,8 +72,9 @@ export const SaveProjectDialog = ({
                 placeholder="diagram"
                 autoFocus
                 required
+                className="w-full"
               />
-              <span className="text-xs text-secondary shrink-0">
+              <span className="text-xs text-kumo-subtle shrink-0 font-mono">
                 .zerosketch
               </span>
             </div>

@@ -36,7 +36,7 @@ export const ConfirmDialog = ({
       open={isOpen}
       onOpenChange={onOpenChange}
     >
-      <Dialog size="base" className="z-50 p-6">
+      <Dialog size="base" className="p-6">
         <div className="mb-4 flex items-center gap-3">
           <Icon
             className={

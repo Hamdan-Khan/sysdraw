@@ -77,7 +77,7 @@ const CanvasElement = () => {
 
   return (
     <div
-      className="w-screen h-screen bg-bg relative"
+      className="w-screen h-screen bg-bg relative isolate"
       style={{ width: "100%", height: "100%" }}
     >
       <DndWrapper
@@ -134,6 +134,7 @@ const Canvas = ({ canvasState, libraryRegistry }: CanvasProps) => {
     <CanvasStoreProvider store={canvasState}>
       <LibraryRegistryProvider registry={libraryRegistry}>
         <ReactFlowProvider>
+          {/* todo: add it at web level */}
           <Toaster />
           <CanvasElement />
         </ReactFlowProvider>

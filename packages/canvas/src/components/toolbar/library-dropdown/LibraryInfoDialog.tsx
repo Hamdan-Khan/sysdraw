@@ -18,7 +18,7 @@ export const LibraryInfoDialog = ({
 
   return (
     <Dialog.Root open={open} onOpenChange={onOpenChange}>
-      <Dialog size="base" className="z-50 p-6">
+      <Dialog size="base" className="p-6">
         <div className="mb-4 flex items-start justify-between gap-4">
           <div className="flex items-start gap-3 min-w-0">
             {lib.icon && !imgError ? (

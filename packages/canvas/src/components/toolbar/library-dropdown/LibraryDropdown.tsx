@@ -134,7 +134,15 @@ const LibraryDropdownComponent = ({
             className="group w-full flex items-center justify-between gap-2 px-3 py-2 text-xs font-medium rounded border transition-colors cursor-pointer bg-bg border-border text-primary hover:bg-surface/50 data-popup-open:bg-dim data-popup-open:border-primary data-open:bg-dim data-open:border-primary outline-none"
           >
             <div className="flex items-center gap-2 min-w-0">
-              <Image size={16} className="text-secondary shrink-0" />
+              {selectedLib?.icon ? (
+                <img
+                  src={selectedLib.icon}
+                  alt={selectedLib.name}
+                  className="size-4 shrink-0"
+                />
+              ) : (
+                <Image size={16} className="text-secondary shrink-0" />
+              )}
               <span className="truncate">
                 {selectedLib?.name || "Select library"}
               </span>

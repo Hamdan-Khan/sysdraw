@@ -1,3 +1,4 @@
+import { InputGroup } from "@cloudflare/kumo";
 import { Search, X } from "lucide-react";
 
 interface SearchInputProps {
@@ -11,36 +12,42 @@ export const SearchInput = ({
   searchValue,
   setSearchValue,
   onSearchOpenChange,
-  placeholder,
+  placeholder = "Search...",
 }: SearchInputProps) => {
   return (
-    <div className="relative flex items-center animate-in fade-in-0 duration-150">
-      <Search className="absolute left-1.5 size-3 text-secondary/60 pointer-events-none" />
-      <input
-        autoFocus
-        type="text"
-        placeholder={placeholder || "Search..."}
-        value={searchValue}
-        onChange={(e) => setSearchValue(e.target.value)}
-        onKeyDown={(e) => {
-          if (e.key === "Escape") {
-            setSearchValue("");
-            onSearchOpenChange(false);
-          }
-        }}
-        className="w-24 pl-5 pr-4 py-0.5 text-[11px] bg-bg border border-border rounded text-text placeholder:text-secondary/50 focus:outline-none focus:border-primary/60 transition-colors"
-      />
-      <button
-        type="button"
-        onClick={() => {
-          setSearchValue("");
-          onSearchOpenChange(false);
-        }}
-        className="absolute right-1 text-secondary/60 hover:text-text cursor-pointer p-0.5"
-        aria-label="Close search"
-      >
-        <X className="size-3" strokeWidth={2.5} />
-      </button>
+    <div className="animate-in fade-in-0 duration-150">
+      <InputGroup size="sm" className="w-28">
+        <InputGroup.Addon align="start" className="px-1.5">
+          <Search className="size-3 text-kumo-subtle pointer-events-none" />
+        </InputGroup.Addon>
+        <InputGroup.Input
+          autoFocus
+          type="text"
+          placeholder={placeholder}
+          value={searchValue}
+          onChange={(e) => setSearchValue(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === "Escape") {
+              setSearchValue("");
+              onSearchOpenChange(false);
+            }
+          }}
+          className="text-[11px] py-0.5 px-1"
+        />
+        <InputGroup.Addon align="end" className="px-1">
+          <button
+            type="button"
+            onClick={() => {
+              setSearchValue("");
+              onSearchOpenChange(false);
+            }}
+            className="text-kumo-subtle hover:text-kumo-default cursor-pointer p-0.5 rounded transition-colors"
+            aria-label="Close search"
+          >
+            <X className="size-3" strokeWidth={2.5} />
+          </button>
+        </InputGroup.Addon>
+      </InputGroup>
     </div>
   );
 };

@@ -1,12 +1,3 @@
-import { Input } from "@/components/ui/input";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import {
   type ExportBackground,
   type ExportFormat,
@@ -15,7 +6,7 @@ import {
 } from "@/hooks/useCanvasExport";
 import { useCanvasStore } from "@/store/CanvasStoreProvider";
 import { CanvasStoreState } from "@/store/store";
-import { Button, Dialog } from "@cloudflare/kumo";
+import { Button, Dialog, Input, Label, Radio, Select } from "@cloudflare/kumo";
 import { FILE_EXTENSIONS } from "@zero-sketch/common";
 import { Download, Loader2, Image as LucideImage, X } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -115,7 +106,7 @@ const ExportDialogInner = ({
   ];
 
   return (
-    <Dialog size="base" className="z-50 p-6">
+    <Dialog size="base" className="p-6">
       <div className="mb-4 flex items-start justify-between gap-4">
         <div>
           <Dialog.Title className="text-lg font-semibold">
@@ -166,88 +157,81 @@ const ExportDialogInner = ({
         )}
       </div>
 
-      <div className="flex flex-col gap-3">
+      <div className="flex flex-col gap-4">
         {/* file name */}
-        <Input
-          id="export-file-name"
-          type="text"
-          value={fileName}
-          onChange={(e) => setFileName(e.target.value)}
-          placeholder="diagram"
-          required
-        />
+        <div className="flex items-center justify-between gap-3">
+          <Label htmlFor="export-file-name" className="text-sm font-bold">
+            File Name
+          </Label>
+          <Input
+            id="export-file-name"
+            type="text"
+            size="sm"
+            value={fileName}
+            onChange={(e) => setFileName(e.target.value)}
+            placeholder="diagram"
+            required
+          />
+        </div>
 
         {/* background */}
         <div className="flex items-center justify-between gap-3">
-          <span className="text-xs font-bold text-primary shrink-0">
-            Background
-          </span>
-          <RadioGroup
+          <Label className="text-sm font-bold">Background</Label>
+          <Radio.Group
             value={exportOptions.background}
             onValueChange={(v) =>
               setExportOptions({ background: v as ExportBackground })
             }
-            className="flex flex-row gap-1 w-auto"
+            orientation="horizontal"
+            className="[&_span]:text-xs"
           >
             {backgrounds.map(({ value, label }) => (
-              <label
-                key={value}
-                className="flex items-center gap-1.5 cursor-pointer px-2.5 py-1 rounded-md border border-border text-xs font-medium text-secondary hover:bg-dim hover:text-primary transition-colors has-data-checked:border-primary/60 has-data-checked:bg-primary/8 has-data-checked:text-primary"
-              >
-                <RadioGroupItem value={value} className="sr-only" />
-                {label}
-              </label>
+              <Radio.Item key={value} value={value} label={label} />
             ))}
-          </RadioGroup>
+          </Radio.Group>
         </div>
 
         {/* grid */}
         <div className="flex items-center justify-between gap-3">
-          <span className="text-xs font-bold text-primary shrink-0">Grid</span>
-          <RadioGroup
+          <Label className="text-sm font-bold">Grid</Label>
+          <Radio.Group
             value={String(exportOptions.showGrid)}
             onValueChange={(v) => setExportOptions({ showGrid: v === "true" })}
-            className="flex flex-row gap-1 w-auto"
+            orientation="horizontal"
+            className="[&_span]:text-xs"
           >
             {gridOptions.map(({ value, label }) => (
-              <label
-                key={value}
-                className="flex items-center gap-1.5 cursor-pointer px-2.5 py-1 rounded-md border border-border text-xs font-medium text-secondary hover:bg-dim hover:text-primary transition-colors has-data-checked:border-primary/60 has-data-checked:bg-primary/8 has-data-checked:text-primary"
-              >
-                <RadioGroupItem value={value} className="sr-only" />
-                {label}
-              </label>
+              <Radio.Item key={value} value={value} label={label} />
             ))}
-          </RadioGroup>
+          </Radio.Group>
         </div>
 
         {/* scale */}
         <div className="flex items-center justify-between gap-3">
-          <span className="text-xs font-bold text-primary shrink-0">Scale</span>
-          <RadioGroup
+          <Label className="text-sm font-bold">Scale</Label>
+          <Radio.Group
             value={String(exportOptions.scale)}
             onValueChange={(v) =>
               setExportOptions({ scale: Number(v) as ExportScale })
             }
-            className="flex flex-row gap-1 w-auto"
+            orientation="horizontal"
+            className="[&_span]:text-xs"
           >
             {scales.map(({ value, label }) => (
-              <label
-                key={value}
-                className="flex items-center gap-1.5 cursor-pointer px-2.5 py-1 rounded-md border border-border text-xs font-medium text-secondary hover:bg-dim hover:text-primary transition-colors has-data-checked:border-primary/60 has-data-checked:bg-primary/8 has-data-checked:text-primary"
-              >
-                <RadioGroupItem value={String(value)} className="sr-only" />
-                {label}
-              </label>
+              <Radio.Item
+                key={String(value)}
+                value={String(value)}
+                label={label}
+              />
             ))}
-          </RadioGroup>
+          </Radio.Group>
         </div>
 
         {/* padding */}
         <div className="flex items-center justify-between gap-3">
-          <span className="text-xs font-bold text-primary shrink-0">
+          <Label htmlFor="export-padding" className="text-sm font-bold">
             Padding
-          </span>
+          </Label>
           <div className="flex items-center gap-1.5">
             <Input
               id="export-padding"
@@ -256,11 +240,12 @@ const ExportDialogInner = ({
               max={200}
               step={4}
               value={exportOptions.padding}
+              size="sm"
               onChange={(e) => {
                 const val = Math.max(0, Number(e.target.value));
                 setExportOptions({ padding: val });
               }}
-              className="h-8 w-20 text-xs text-right [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+              className="text-xs text-right [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
             />
             <span className="text-xs text-secondary">px</span>
           </div>
@@ -268,25 +253,23 @@ const ExportDialogInner = ({
 
         {/* export action */}
         <div className="flex items-center justify-between gap-3 pt-1">
-          <span className="text-xs font-bold text-primary shrink-0">
-            Export as
-          </span>
+          <Label className="text-sm font-bold">Export as</Label>
           <div className="flex items-center gap-2">
-            <Select value={format} onValueChange={(v) => setFormat(v)}>
-              <SelectTrigger className="h-8 text-xs">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {formats.map((f) => (
-                  <SelectItem key={f.value} value={f.value}>
-                    {f.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
+            <Select
+              value={format}
+              onValueChange={(v) => setFormat(v as ExportFormat)}
+              renderValue={(v) => formats.find((f) => f.value === v)?.label}
+              size="sm"
+            >
+              {formats.map((f) => (
+                <Select.Option key={f.value} value={f.value}>
+                  {f.label}
+                </Select.Option>
+              ))}
             </Select>
             <Button
               type="button"
-              disabled={!isFileNameValid}
+              disabled={!isFileNameValid || isLoadingPreview}
               onClick={handleExport}
               variant="primary"
               size="sm"

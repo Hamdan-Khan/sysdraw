@@ -148,7 +148,7 @@ export const Toolbar = memo(() => {
       <div
         data-no-context-menu
         className={cn(
-          "absolute left-4 top-1/2 -translate-y-1/2 z-20 bg-surface border border-border rounded-lg py-2 flex flex-col gap-3 shadow-md min-w-35 transition-all duration-300 ease-in-out",
+          "absolute left-4 top-1/2 -translate-y-1/2 z-2 bg-surface border border-border rounded-lg py-2 flex flex-col gap-3 shadow-md min-w-35 transition-all duration-300 ease-in-out",
           isOpen
             ? "translate-x-0 opacity-100 pointer-events-auto"
             : "-translate-x-[calc(100%+2rem)] opacity-0 pointer-events-none",
@@ -156,7 +156,7 @@ export const Toolbar = memo(() => {
       >
         {/* libraries label & close button */}
         <div className="flex items-center justify-between px-4">
-          <h5 className="text-xs text-secondary font-bold uppercase">
+          <h5 className="text-sm text-kumo-subtle font-bold uppercase">
             Libraries
           </h5>
           <div className="flex items-center gap-1">
@@ -191,7 +191,7 @@ export const Toolbar = memo(() => {
         <div className="relative flex flex-col gap-3">
           <div className="flex flex-col gap-2 px-4">
             <div className="flex items-center justify-between gap-2 min-h-6">
-              <h5 className="text-xs text-secondary font-bold uppercase">
+              <h5 className="text-sm text-kumo-subtle font-bold uppercase">
                 Nodes
               </h5>
               {isNodeSearchOpen ? (
@@ -279,7 +279,7 @@ export const Toolbar = memo(() => {
 
           <div className="flex flex-col gap-2 px-4 mb-2">
             <div className="flex items-center justify-between gap-2 min-h-6">
-              <h5 className="text-xs text-secondary font-bold uppercase">
+              <h5 className="text-sm text-kumo-subtle font-bold uppercase">
                 Groups
               </h5>
               {isGroupSearchOpen ? (

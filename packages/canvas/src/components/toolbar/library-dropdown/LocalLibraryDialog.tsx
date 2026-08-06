@@ -123,7 +123,7 @@ export const LocalLibraryDialog = ({
   return (
     <>
       <Dialog.Root open={open && !conflictLib} onOpenChange={handleClose}>
-        <Dialog size="base" className="z-50 p-6">
+        <Dialog size="base" className="p-6">
           <div className="mb-3 flex items-start justify-between gap-4">
             <Dialog.Title className="text-lg font-semibold">
               Add a Custom Library
@@ -211,7 +211,7 @@ export const LocalLibraryDialog = ({
         open={!!conflictLib}
         onOpenChange={(o) => !o && handleReset()}
       >
-        <Dialog size="base" className="z-50 p-6">
+        <Dialog size="base" className="p-6">
           <div className="mb-4 flex items-center gap-3">
             <AlertTriangle className="size-5 text-kumo-danger" />
             <Dialog.Title className="text-xl font-semibold">
