@@ -24,6 +24,7 @@ export const SearchInput = ({
           autoFocus
           type="text"
           placeholder={placeholder}
+          aria-label={placeholder}
           value={searchValue}
           onChange={(e) => setSearchValue(e.target.value)}
           onKeyDown={(e) => {

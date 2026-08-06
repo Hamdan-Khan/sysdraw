@@ -66,6 +66,7 @@ export const SaveProjectDialog = ({
             <div className="flex items-center gap-2">
               <Input
                 id="save-file-name"
+                aria-label="File Name"
                 type="text"
                 value={fileName}
                 onChange={(e) => setFileName(e.target.value)}

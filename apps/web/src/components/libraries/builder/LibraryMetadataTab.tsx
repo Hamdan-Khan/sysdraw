@@ -41,6 +41,7 @@ export const LibraryMetadataTab = ({
             value={form.name}
             onChange={(e) => setForm({ ...form, name: e.target.value })}
             placeholder="e.g. Microservices & Message Queues"
+            aria-label="Library Name"
           />
         </InputGroup>
       </div>
@@ -68,6 +69,7 @@ export const LibraryMetadataTab = ({
               value={form.version}
               onChange={(e) => setForm({ ...form, version: e.target.value })}
               placeholder="1.0.0"
+              aria-label="Version"
             />
           </InputGroup>
         </div>

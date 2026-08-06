@@ -165,6 +165,7 @@ const ExportDialogInner = ({
           </Label>
           <Input
             id="export-file-name"
+            aria-label="File Name"
             type="text"
             size="sm"
             value={fileName}
@@ -235,6 +236,7 @@ const ExportDialogInner = ({
           <div className="flex items-center gap-1.5">
             <Input
               id="export-padding"
+              aria-label="Padding"
               type="number"
               min={0}
               max={200}

@@ -130,6 +130,7 @@ export const LibraryIconsTab = ({
                           onChange={(e) =>
                             onUpdateNode(node.id, "label", e.target.value)
                           }
+                          aria-label="Label"
                         />
                       </InputGroup>
                     </div>
