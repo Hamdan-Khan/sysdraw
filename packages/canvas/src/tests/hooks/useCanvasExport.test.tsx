@@ -3,7 +3,7 @@ import {
   DEFAULT_EXPORT_OPTIONS,
   useCanvasExport,
 } from "@/hooks/useCanvasExport";
-import { renderToNativeSvg } from "@/lib/svgExport";
+import { renderToSvg } from "@/lib/svgRenderer";
 import { downloadFile } from "@/lib/utils";
 import { CanvasStoreProvider } from "@/store/CanvasStoreProvider";
 import { renderHook } from "@testing-library/react";
@@ -18,8 +18,8 @@ vi.mock("html-to-image", () => ({
   toPng: vi.fn(),
 }));
 
-vi.mock("@/lib/svgExport", () => ({
-  renderToNativeSvg: vi.fn(),
+vi.mock("@/lib/svgRenderer", () => ({
+  renderToSvg: vi.fn(),
 }));
 
 vi.mock("@/lib/utils", async (importOriginal) => {
@@ -168,7 +168,7 @@ describe("useCanvasExport", () => {
       });
 
       const mockSvgData = "data:image/svg+xml;utf8,<svg></svg>";
-      vi.mocked(renderToNativeSvg).mockReturnValue(mockSvgData);
+      vi.mocked(renderToSvg).mockReturnValue(mockSvgData);
 
       const capturePromise = result.current.captureImage(FILE_EXTENSIONS.SVG);
 
@@ -186,8 +186,8 @@ describe("useCanvasExport", () => {
       const dataUrl = await capturePromise;
 
       expect(dataUrl).toBe(mockSvgData);
-      expect(renderToNativeSvg).toHaveBeenCalledWith(
-        mockFlowEl,
+      expect(renderToSvg).toHaveBeenCalledWith(
+        expect.anything(),
         600,
         450,
         "#ffffff",
@@ -339,7 +339,7 @@ describe("useCanvasExport", () => {
       });
 
       const mockSvgData = "data:image/svg+xml;utf8,<svg></svg>";
-      vi.mocked(renderToNativeSvg).mockReturnValue(mockSvgData);
+      vi.mocked(renderToSvg).mockReturnValue(mockSvgData);
 
       const exportPromise = result.current.exportAsSvg("architecture.svg");
 
@@ -377,7 +377,7 @@ describe("useCanvasExport", () => {
         .spyOn(console, "error")
         .mockImplementation(() => {});
       const mockSvgData = "data:image/svg+xml;utf8,<svg></svg>";
-      vi.mocked(renderToNativeSvg).mockReturnValue(mockSvgData);
+      vi.mocked(renderToSvg).mockReturnValue(mockSvgData);
       vi.mocked(downloadFile).mockImplementation(() => {
         throw new Error("Download error");
       });

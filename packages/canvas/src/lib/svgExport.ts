@@ -8,7 +8,7 @@ import {
   NODE_ICON_CLASS_ID,
   NODE_WRAPPER_CLASS_ID,
 } from "@zero-sketch/common";
-import { CANVAS_GRID_BG_COLOR } from "../components/canvas/CanvasGrid";
+import { CANVAS_MAJOR_GRID_COLOR } from "../components/canvas/CanvasGrid";
 import { EXPORT_CANVAS_GRID_ID } from "../components/export/ExportRenderer";
 
 function escapeXml(unsafe: string): string {
@@ -277,7 +277,7 @@ function renderBackgroundGrid(flowEl: HTMLElement): string {
       return;
     }
     const clone = bgSvg.cloneNode(true) as HTMLElement;
-    bakeComputedStyles(bgSvg, clone, { patternColor: CANVAS_GRID_BG_COLOR });
+    bakeComputedStyles(bgSvg, clone, { patternColor: CANVAS_MAJOR_GRID_COLOR });
     gridSvg += `<!-- Background Grid -->\n<g class="bg-grid-layer">\n${clone.innerHTML}\n</g>\n`;
   });
 

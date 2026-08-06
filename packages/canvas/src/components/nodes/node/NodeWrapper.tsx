@@ -15,8 +15,13 @@ export interface NodeWrapperProps {
   title?: string;
 }
 
-const DEFAULT_NODE_SIZE = 40;
-const LABEL_EXTRA_HEIGHT = 20;
+export const DEFAULT_NODE_SIZE = 40;
+export const LABEL_EXTRA_HEIGHT = 20;
+export const NODE_PADDING = 4;
+export const NODE_TITLE_FONT_FAMILY = "Inter, system-ui, sans-serif";
+export const NODE_TITLE_FONT_SIZE = 12;
+export const NODE_TITLE_FONT_WEIGHT = "500";
+export const NODE_TITLE_COLOR = "#0f172a";
 
 export const NodeWrapper = ({
   children,
@@ -142,10 +147,11 @@ export const NodeWrapper = ({
       handles={handles}
       selected={selected}
       onAddLabel={startEditing}
-      className={`flex flex-col items-center justify-center gap-1 relative w-full h-full p-1 ${NODE_CLASS_ID}`}
+      className={`flex flex-col items-center justify-center gap-1 relative w-full h-full ${NODE_CLASS_ID}`}
       style={{
         width: nodeWidth,
         height: nodeHeight,
+        padding: NODE_PADDING,
       }}
       minWidth={40}
       minHeight={hasLabel ? 60 : 40}
