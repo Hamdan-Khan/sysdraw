@@ -141,7 +141,7 @@ export const LibraryIconsTab = ({
                         size="sm"
                         value={node.type}
                         onValueChange={(val) =>
-                          onUpdateNode(node.id, "type", val)
+                          onUpdateNode(node.id, "type", val as string)
                         }
                         className="w-full"
                       >

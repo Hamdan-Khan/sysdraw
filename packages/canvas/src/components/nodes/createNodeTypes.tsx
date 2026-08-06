@@ -11,7 +11,7 @@ import { GenericGroup } from "./group/GenericGroup";
 import { GroupWrapper } from "./group/GroupWrapper";
 import { NodeWrapper } from "./node/NodeWrapper";
 
-type CanvasNodeData = {
+export type CanvasNodeData = {
   label?: string;
   title?: string;
   color?: string;

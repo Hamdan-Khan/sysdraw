@@ -2,7 +2,7 @@ import {
   ExportReadyPayload,
   ExportRenderer,
 } from "@/components/export/ExportRenderer";
-import { renderToNativeSvg } from "@/lib/svgExport";
+import { renderToSvg } from "@/lib/svgRenderer";
 import { downloadFile } from "@/lib/utils";
 import {
   CanvasStoreContext,
@@ -117,7 +117,7 @@ export const useCanvasExport = () => {
             },
           });
         } else if (format === FILE_EXTENSIONS.SVG) {
-          dataUrl = renderToNativeSvg(flowEl, width, height, bgColor);
+          dataUrl = renderToSvg(storeApi.getState(), width, height, bgColor);
         }
       } catch (error) {
         console.error(error);
