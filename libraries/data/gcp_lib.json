@@ -1,7 +1,12 @@
 {
   "id": "gcp",
   "name": "GCP",
+  "description": "Official library of Google Cloud Platform (GCP) icons",
   "version": "1.0.0",
+  "icon": "https://upload.wikimedia.org/wikipedia/commons/5/51/Google_Cloud_logo.svg",
+  "tags": [
+    "cloud"
+  ],
   "nodes": [
     {
       "id": "gcp-ai-hypercomputer",

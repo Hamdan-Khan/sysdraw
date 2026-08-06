@@ -1,7 +1,12 @@
 {
   "id": "aws",
   "name": "AWS",
+  "description": "Official library of Amazon Web Services (AWS) icons",
   "version": "1.0.0",
+  "icon": "https://upload.wikimedia.org/wikipedia/commons/f/f1/Aws_logo.svg",
+  "tags": [
+    "cloud"
+  ],
   "nodes": [
     {
       "id": "arch_aws-clean-rooms",

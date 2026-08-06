@@ -1,7 +1,12 @@
 {
   "id": "kubernetes",
   "name": "Kubernetes",
+  "description": "Official library of Kubernetes icons",
   "version": "1.0.0",
+  "icon": "https://upload.wikimedia.org/wikipedia/commons/3/39/Kubernetes_logo_without_workmark.svg",
+  "tags": [
+    "cloud"
+  ],
   "nodes": [
     {
       "id": "k8s-api-server",

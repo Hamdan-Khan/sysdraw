@@ -1,7 +1,12 @@
 {
   "id": "default",
   "name": "ZeroSketch",
+  "description": "ZeroSketch's default library, sufficient for simple architecture diagrams.",
   "version": "0.1.0",
+  "icon": "https://dummyimage.com/100x100/54ffcc/005e0e.png&text=ZS",
+  "tags": [
+    "basic"
+  ],
   "nodes": [
     {
       "id": "database",
