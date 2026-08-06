@@ -84,10 +84,6 @@ export const Route = createRootRoute({
         content: "summary_large_image",
       },
       {
-        name: "twitter:site",
-        content: "@zerosketch",
-      },
-      {
         name: "twitter:title",
         content:
           "ZeroSketch | System Design for Everyone | Open Source & Free to use",
