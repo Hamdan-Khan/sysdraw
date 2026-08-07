@@ -6,7 +6,7 @@ import {
   type HandleProps,
 } from "@xyflow/react";
 import { HANDLE_DOT_CLASS_ID } from "@zero-sketch/common";
-import { memo, useState } from "react";
+import { memo } from "react";
 
 const ARROW_ROTATION: Record<Position, number> = {
   [Position.Top]: -90,
@@ -26,10 +26,13 @@ const DOT_POSITION: Record<Position, { top: string; left: string }> = {
   [Position.Left]: { top: "50%", left: "30%" },
 };
 
+export interface CustomHandleProps extends HandleProps {
+  isHovered: boolean;
+}
+
 export const CustomHandle = memo(
-  ({ position = Position.Top, ...props }: HandleProps) => {
+  ({ position, isHovered, ...props }: CustomHandleProps) => {
     const { zoom } = useViewport();
-    const [isHovered, setIsHovered] = useState(false);
     const connections = useNodeConnections({
       handleType: props.type,
       handleId: props.id!,
@@ -38,13 +41,7 @@ export const CustomHandle = memo(
     const { top, left } = DOT_POSITION[position];
 
     return (
-      <Handle
-        position={position}
-        {...props}
-        className="custom-handle"
-        onMouseEnter={() => setIsHovered(true)}
-        onMouseLeave={() => setIsHovered(false)}
-      >
+      <Handle position={position} {...props} className="custom-handle">
         {isConnected && (
           // dot to denote a connected edge
           <svg

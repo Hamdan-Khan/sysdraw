@@ -9,6 +9,7 @@ import {
   useViewport,
 } from "@xyflow/react";
 import type { NodeHandleConfig } from "@zero-sketch/models";
+import { useState } from "react";
 
 export interface CommonNodeWrapperProps {
   children: React.ReactNode;
@@ -42,9 +43,15 @@ export const CommonNodeWrapper = ({
   const nodeId = useNodeId();
   const isNodeLocked = useCanvasStore((s) => s.isNodeLocked(nodeId));
   const { zoom } = useViewport();
+  const [isHovered, setIsHovered] = useState(false);
 
   return (
-    <div className={className} style={style}>
+    <div
+      className={className}
+      style={style}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
       <NodeResizer
         minWidth={minWidth}
         minHeight={minHeight}
@@ -62,6 +69,7 @@ export const CommonNodeWrapper = ({
             id={handle.id}
             type={handle.type}
             position={handle.position || Position.Top}
+            isHovered={isHovered}
           />
         );
       })}

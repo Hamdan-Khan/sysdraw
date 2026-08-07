@@ -21,14 +21,20 @@ export type CanvasNodeData = {
 };
 
 export const defaultHandles: NodeHandleConfig[] = [
-  { id: "top", type: "target", position: Position.Top },
-  { id: "bottom", type: "source", position: Position.Bottom },
+  { id: "top-target", type: "target", position: Position.Top },
+  { id: "top-source", type: "source", position: Position.Top },
+  { id: "bottom-target", type: "target", position: Position.Bottom },
+  { id: "bottom-source", type: "source", position: Position.Bottom },
+  { id: "left-target", type: "target", position: Position.Left },
+  { id: "left-source", type: "source", position: Position.Left },
+  { id: "right-target", type: "target", position: Position.Right },
+  { id: "right-source", type: "source", position: Position.Right },
 ];
 
 // oxlint-disable-next-line react/only-export-components
 const NodeComponent = (props: NodePropsType<CanvasNodeData>) => {
   if (props.data?.kind === "group") {
-    const handles = props.data?.handles || [];
+    const handles = props.data?.handles || defaultHandles;
     return (
       <GroupWrapper
         selected={props.selected}
