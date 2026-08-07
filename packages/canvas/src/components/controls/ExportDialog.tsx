@@ -25,7 +25,7 @@ const storeSelector = (s: CanvasStoreState) => ({
 export const ExportDialog = ({ open, onOpenChange }: ExportDialogProps) => {
   return (
     <Dialog.Root open={open} onOpenChange={onOpenChange}>
-      <ExportDialogInner onOpenChange={onOpenChange} />
+      {open && <ExportDialogInner onOpenChange={onOpenChange} />}
     </Dialog.Root>
   );
 };
