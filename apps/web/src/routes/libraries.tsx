@@ -4,6 +4,7 @@ import { Link } from "@cloudflare/kumo";
 import { createFileRoute } from "@tanstack/react-router";
 import { LibraryRegistry, LibraryRegistryProvider } from "@zero-sketch/models";
 import { useMemo } from "react";
+import { Toaster } from "sonner";
 import { CommunityLibrariesSection } from "../components/libraries/CommunityLibrariesSection";
 import { LocalLibrariesSection } from "../components/libraries/LocalLibrariesSection";
 
@@ -89,6 +90,7 @@ function LibrariesPageComponent() {
           <LocalLibrariesSection />
         </main>
       </div>
+      <Toaster richColors position="top-right" />
     </LibraryRegistryProvider>
   );
 }

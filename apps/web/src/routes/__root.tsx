@@ -6,7 +6,6 @@ import {
   Scripts,
 } from "@tanstack/react-router";
 import type { ReactNode } from "react";
-import { Toaster } from "sonner";
 import appCss from "../index.css?url";
 import { APP_URL } from "../lib/constants";
 import { queryClient } from "../lib/queryClient";
@@ -227,7 +226,6 @@ function RootDocument({ children }: Readonly<{ children: ReactNode }>) {
           <h1 className="sr-only">ZeroSketch</h1>
         </header>
         {children}
-        <Toaster richColors position="top-right" />
         <Scripts />
       </body>
     </html>
