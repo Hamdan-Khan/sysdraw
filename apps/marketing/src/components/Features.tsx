@@ -1,4 +1,5 @@
 import { Check, Timer } from "lucide-react";
+import { WaitlistForm } from "./WaitlistForm";
 
 export const Features = () => {
   const availableFeatures = [
@@ -73,6 +74,8 @@ export const Features = () => {
             </ul>
           </div>
         </div>
+
+        <WaitlistForm />
       </div>
     </section>
   );

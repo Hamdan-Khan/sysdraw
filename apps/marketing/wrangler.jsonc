@@ -10,4 +10,11 @@
       "invocation_logs": true,
     },
   },
+  // waitlist kv
+  "kv_namespaces": [
+    {
+      "binding": "KV",
+      "id": "648b1dca262e448cb8e2e32db19a19a2",
+    },
+  ],
 }
