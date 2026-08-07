@@ -55,13 +55,14 @@ export const createNodeData = (
         kind,
         label: nodeDef.label,
         description: nodeDef.description,
-        icon: nodeDef.icon,
+        icon: nodeDef?.icon,
         handles: defaultHandles,
       }
     : {
         kind,
         label: nodeDef.label,
         description: nodeDef.description,
+        icon: nodeDef?.icon,
       };
 };
 

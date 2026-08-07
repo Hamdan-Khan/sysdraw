@@ -11,7 +11,7 @@ import { GenericGroup } from "./group/GenericGroup";
 import { GroupWrapper } from "./group/GroupWrapper";
 import { NodeWrapper } from "./node/NodeWrapper";
 
-type CanvasNodeData = {
+export type CanvasNodeData = {
   label?: string;
   title?: string;
   color?: string;
@@ -36,12 +36,7 @@ const NodeComponent = (props: NodePropsType<CanvasNodeData>) => {
         width={props.width}
         height={props.height}
       >
-        <GenericGroup
-          data={{
-            label: props.data?.label || "Group",
-            color: props.data?.color,
-          }}
-        />
+        <GenericGroup data={props.data} />
       </GroupWrapper>
     );
   }
