@@ -3,7 +3,7 @@ import {
   DEFAULT_EXPORT_OPTIONS,
   useCanvasExport,
 } from "@/hooks/useCanvasExport";
-import { renderToSvg } from "@/lib/svgRenderer";
+import { renderToSvg } from "@/lib/svg/svgRenderer";
 import { downloadFile } from "@/lib/utils";
 import { CanvasStoreProvider } from "@/store/CanvasStoreProvider";
 import { renderHook } from "@testing-library/react";
@@ -18,7 +18,7 @@ vi.mock("html-to-image", () => ({
   toPng: vi.fn(),
 }));
 
-vi.mock("@/lib/svgRenderer", () => ({
+vi.mock("@/lib/svg/svgRenderer", () => ({
   renderToSvg: vi.fn(),
 }));
 

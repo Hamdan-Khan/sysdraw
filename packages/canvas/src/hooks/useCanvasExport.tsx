@@ -2,7 +2,7 @@ import {
   ExportReadyPayload,
   ExportRenderer,
 } from "@/components/export/ExportRenderer";
-import { renderToSvg } from "@/lib/svgRenderer";
+import { renderToSvg } from "@/lib/svg/svgRenderer";
 import { downloadFile } from "@/lib/utils";
 import {
   CanvasStoreContext,
