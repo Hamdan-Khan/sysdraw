@@ -5,3 +5,6 @@ export const LANDING_PAGE_URL =
   import.meta.env.VITE_LANDING_URL ?? "https://zerosketch.dev";
 export const APP_URL =
   import.meta.env.VITE_SITE_URL ?? "https://app.zerosketch.dev";
+
+export const LOCALSTORAGE_MOBILE_BANNER_KEY =
+  "zerosketch-mobile-banner-dismissed";

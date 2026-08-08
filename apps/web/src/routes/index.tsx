@@ -1,8 +1,14 @@
-import { APP_URL, LIBRARY_URL } from "@/lib/constants";
+import {
+  APP_URL,
+  LIBRARY_URL,
+  LOCALSTORAGE_MOBILE_BANNER_KEY,
+} from "@/lib/constants";
+import { isMobileDevice } from "@/lib/utils";
+import { Button } from "@cloudflare/kumo";
 import { createFileRoute } from "@tanstack/react-router";
 import { Canvas, createCanvasStore } from "@zero-sketch/canvas";
 import { LibraryRegistry } from "@zero-sketch/models";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { Classic } from "../components/loading-ui/classic";
 
 export const Route = createFileRoute("/")({
@@ -61,6 +67,41 @@ function LoadingScreen() {
   );
 }
 
+function MobileBanner() {
+  const isMobile = useMemo(() => isMobileDevice(), []);
+  const [bannerDismissed, setBannerDismissed] = useState(() => {
+    if (typeof window === "undefined") return false;
+    return localStorage.getItem(LOCALSTORAGE_MOBILE_BANNER_KEY) === "true";
+  });
+
+  const handleDismissBanner = () => {
+    setBannerDismissed(true);
+    try {
+      localStorage.setItem(LOCALSTORAGE_MOBILE_BANNER_KEY, "true");
+    } catch {
+      // ignore
+    }
+  };
+  if (isMobile && !bannerDismissed) {
+    return (
+      <div className="fixed inset-0 z-50 flex flex-col items-center justify-center gap-4 bg-surface p-6 text-center select-none">
+        <img src="logo.svg" alt="" width={100} />
+        <h2 className="text-2xl font-semibold text-kumo-default tracking-tighter">
+          ZeroSketch is recommended to be used on desktop devices.
+        </h2>
+        <Button
+          variant="primary"
+          size="base"
+          onClick={handleDismissBanner}
+          className="mb-24"
+        >
+          Continue anyway
+        </Button>
+      </div>
+    );
+  }
+}
+
 function HomeComponent() {
   const canvasState = useMemo(
     () => createCanvasStore({ nodes: [], edges: [] }),
@@ -73,6 +114,7 @@ function HomeComponent() {
   return (
     <>
       <h1 className="sr-only">ZeroSketch System Design Canvas</h1>
+      <MobileBanner />
       <Canvas libraryRegistry={libraryRegistry} canvasState={canvasState} />
     </>
   );
